@@ -1,12 +1,12 @@
 $().config({
-  client_id: "2698716-91b0b74c-0286-486a-bf04-add4a41ad5fb",
+  client_id: "2347322-cac652da-dcdc-455a-a0de-e32bac08ea06",
   info: {
     title: "Proving",
   },
   client: {
     servers: [
       {
-        url: "https://proving.aliconnect.nl/api"
+        url: "https://proving-nl.aliconnect.nl/api"
       }
     ]
   },

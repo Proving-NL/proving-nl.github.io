@@ -1,13 +1,5 @@
 info:
   title: Proving
-  description: .
-  termsOfService: http://hoogewerf.aliconnect.nl/docs/
-  contact:
-    email: max.van.kampen@alicon.nl
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
 components:
   schemas:
     Schema:
@@ -37,7 +29,6 @@ components:
           schema: Webpage
     Folder:
       color: yellow
-      security: *basic_security
       header:
       - [Title]
       - [Description]
@@ -63,7 +54,6 @@ components:
           schema: Webpage
     Contact:
       color: green
-      security: *basic_security
       header:
       - [GivenName,FirstName,MiddleName,Surname]
       - [Department]
@@ -233,7 +223,6 @@ components:
           type: text
           class: groups
     Company:
-      security: *basic_security
       properties:
         Keyname:
           label: Organisatie
@@ -551,16 +540,6 @@ components:
         Children:
           type: array
     Website:
-      security: *basic_security
-      btns:
-      - edit
-      childClasses:
-      - 1092
-      dashboard:
-        Relaties:
-          Projecten: []
-          Subsystemen: []
-        Subsystemen: []
       properties:
         state:
           label: Website
@@ -612,15 +591,6 @@ components:
         Children:
           type: array
     Webpage:
-      security: *basic_security
-      btns: [slide,msg,fav,send,edit,del,printmenu]
-      childSchema:
-      - Webpage
-      header:
-      - [Title]
-      - [Description]
-      - [BodyHTML]
-      treeTitleAttributeName: Title
       properties:
         State:
           label: State
@@ -1410,7 +1380,6 @@ components:
         cspnummer:
           title: CSP nummer
     Message:
-      security: *basic_security
       treeTitleAttributeName: Title
       header:
       - [Title]

@@ -1,5 +1,5 @@
 # PROVING
-client_id: CAC652DA-DCDC-455A-A0DE-E32BAC08EA06
+client_id: 2347322-cac652da-dcdc-455a-a0de-e32bac08ea06
 info:
   title: Proving
   version: 1.0.0
@@ -17,17 +17,18 @@ client:
     - url: https://proving.aliconnect.nl/api
     # authorizationUrl: https://login.aliconnect.nl/api/oauth2
     # tokenUrl: https://login.aliconnect.nl/api/oauth2/token
-ref:
-  wiki: https://airo.aliconnect.nl/wiki
-  home: https://proving.aliconnect.nl
+# ref:
+#   wiki: https://airo.aliconnect.nl/wiki
+#   home: https://proving.aliconnect.nl
 css:
-  basebg: rgb(8,121,191)
+  # basebg: rgb(8,121,191)
+  basebg: red
   basefg: white
-  .row.top.bar: background-color:rgb(8,121,191);color:white;
-  .bannerimage: width:400px; right:0;
-  .aimbanner: height:300px;background:url(https://aliconnect.nl/shared/1/267/2753267/4951C48FCA0D489A82C6840EAAF4A3C4/top-bg.jpg) center;
-  .aimbanner>.inner>.logo: top:10px;
-  .row.footer: background-color:rgba(8,121,191,0.1);
+  # .row.top.bar: background-color:rgb(8,121,191);color:white;
+  # .bannerimage: width:400px; right:0;
+  # .aimbanner: height:300px;background:url(https://aliconnect.nl/shared/1/267/2753267/4951C48FCA0D489A82C6840EAAF4A3C4/top-bg.jpg) center;
+  # .aimbanner>.inner>.logo: top:10px;
+  # .row.footer: background-color:rgba(8,121,191,0.1);
 menu:
   Website:
     className: shop

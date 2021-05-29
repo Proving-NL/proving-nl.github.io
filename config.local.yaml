@@ -17,9 +17,9 @@ client:
     - url: https://proving.aliconnect.nl/api
     # authorizationUrl: https://login.aliconnect.nl/api/oauth2
     # tokenUrl: https://login.aliconnect.nl/api/oauth2/token
-ref:
-  wiki: https://airo.aliconnect.nl/wiki
-  home: https://proving.aliconnect.nl
+# ref:
+#   wiki: https://airo.aliconnect.nl/wiki
+#   home: https://proving.aliconnect.nl
 css:
   basebg: rgb(8,121,191)
   basefg: white

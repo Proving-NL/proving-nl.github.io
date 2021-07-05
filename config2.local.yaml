@@ -20,8 +20,6 @@ client:
 # ref:
 #   wiki: https://airo.aliconnect.nl/wiki
 #   home: https://proving.aliconnect.nl
-ref:
-  home: //proving.aliconnect.nl/wiki/Home.md
 css:
   basebg: rgb(8,121,191)
   basefg: white

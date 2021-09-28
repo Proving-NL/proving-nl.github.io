@@ -1,0 +1,6 @@
+html {
+  --basefg: white;
+  --basebg: #1B60DB;
+  --link: var(--basebg);
+  --header-color: var(--basebg);
+}

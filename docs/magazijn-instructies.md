@@ -8,6 +8,11 @@ Instructie voor het apkken van materialen
 
 # Voorraad tellen
 
+![Instructie](img/instructie-voor-chrome.png)
+
+
+
+
 1. Doe iets
 1. Doe iets
 1. Doe iets

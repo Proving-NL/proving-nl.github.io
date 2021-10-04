@@ -1,0 +1,27 @@
+import:
+  xlsx:
+    EMM Onderdelen:
+      - tab: Onderdelen
+        colRow: 11
+        cols:
+          - name: supplier
+            value: emm
+          - title: Artikelnr.
+            name: orderCode
+          # - title: Omschrijving
+          #   name: productTitle
+          - title: Verkoopprijs
+            name: catalogPrice
+  xls:
+    EMM Prijslijst NL:
+      - tab: EMM BASIS:
+        colRow: 16
+        cols:
+          - name: supplier
+            value: emm
+          - title: Art. nummer
+            name: orderCode
+          - title: NL
+            name: catalogPrice
+          - title: NL
+            name: purchaseDiscount

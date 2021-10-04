@@ -1,10 +1,6 @@
-Instructie voor het apkken van materialen
-
 **Inhoud**
 
-- [Voorraad tellen](#voorraad-tellen)
-- [Order pakken](#order-pakken)
-
+<!-- docIndex --><!-- /docIndex -->
 
 # Voorraad tellen
 

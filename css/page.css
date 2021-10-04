@@ -1,0 +1,156 @@
+#nav-top {
+  display: flex;
+  flex-direction: row;
+}
+
+#nav-top ul {
+  list-style: none;
+  padding:0;
+  margin:0;
+  /* cursor: pointer; */
+}
+
+#nav-top > ul {
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  line-height: 48px;
+}
+
+#nav-top > ul > li {
+  padding: 0 10px;
+  color:white;
+}
+#nav-top a {
+  color:inherit;
+  display:block;
+}
+#nav-top > ul > li:hover::before {
+  display: inline-block;
+  content:'';
+  background-color: rgba(255,255,255,0.1);
+  position:absolute;
+  margin: auto;
+  top:0;bottom:0;left:0;right:0;
+}
+
+#nav-top > ul > li:not(:hover) > ul {
+  display: none;
+}
+#nav-top > ul > li > ul {
+  position:absolute;
+  right:0;
+  background:white;
+  min-width: 200px;
+  box-shadow: 0 0 3px #ccc;
+  color:black;
+  padding:0 10px;
+}
+body>nav{
+  background-color: #0078be;
+  z-index: 2;
+}
+body>header{
+  height:200px;
+  margin-top:48px;
+  background: url(/docs/img/top-bg.jpg);
+  z-index:1;
+}
+body>header>div{
+  display: inline-inline-block;
+  background: url(/docs/img/logo-proving.png) no-repeat;
+  height:100px;
+  margin-top:10px;
+}
+body>header>div::after{
+  content:'';
+  display: inline-block;
+  position:absolute;
+  right:0;
+  height:200px;
+  width:300px;
+  background: url(/docs/img/maxmeyer2.png) no-repeat;
+  background-size: contain;
+}
+body>main, body>nav>div, footer>div, header>div {
+  max-width: 1200px;
+  margin:auto;
+
+}
+aside:empty {
+  display: none;
+}
+footer{
+  background:#333;
+  color:#999;
+}
+footer>div>ul{
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  padding:0;
+  margin:0;
+}
+footer>div>ul>li{
+  flex-basis: auto;
+  flex-grow: 1;
+  padding: 20px 0;
+}
+.doc-content h1{
+  top: 48px;
+}
+
+div.products {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+div.products>div {
+  flex: 250px 1 0;
+  /* max-width: 250px; */
+  padding:10px;
+  border:solid 1px #ccc;
+  margin:3px;
+}
+div.price{
+  display: flex;
+  flex-direction: row;
+}
+span[catalogprice]{
+  margin-left: auto;
+}
+span[catalogprice]::after{
+  content: attr(catalogprice);
+  font-weight: bold;
+  color:green;
+  margin-right: 10px;
+}
+span[discount]::after{
+  content: attr(discount);
+  font-weight: bold;
+  color:orange;
+  margin-right: 10px;
+}
+span[salesprice]::after{
+  content: attr(salesprice);
+  font-weight: bold;
+  color:green;
+}
+span[discount='0'], span[discount='0']+span, span[discount='-0'], span[discount='-0']+span{
+  display:none;
+}
+body>nav>div>p{
+  margin:0;
+}
+body>nav>div>p>input{
+  outline:none;
+  border:none;
+  line-height: inherit;
+  height:100%;
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+  padding: 0 10px;
+}
+body>nav>div>p>input::placeholder {
+  color: inherit;
+}

@@ -8,7 +8,7 @@ Instructie voor het apkken van materialen
 
 # Voorraad tellen
 
-![Instructie](img/instructie-voor-chrome.png)
+![Instructie](img/instructie-voor-chrome.PNG)
 
 
 

@@ -643,3 +643,50 @@ KEMTEX PRIJSLIJST.xlsx:
      name: packageQuantity
      - title: TARIEF 2021
      name: catalogPrice
+
+3M AAD Prijslijst.xlsx:
+  name: AAD Prijslijst
+   colRow: 1
+   cols:
+     name: host
+     value: Metalak
+     - title: Partnr.
+     name: orderCode
+     - title: Productomschrijving
+     name: description
+     - title: prijs per 1 sept 2021
+     name: catalogPrice
+     - title: Verkoop-eenheid (VE)
+     name: packageQuantity
+
+PPG alle producten Prijslijst.xlsx:
+  name: Sheet1
+   colRow: 4
+  cols:
+    name: host
+    Value: PPG
+    - title: PPG Item CODE
+    name: orderCode
+    - title: PPG Item Description
+    name: description
+    - title: Bruto prijs per 1 okt
+    name: catalogPrice
+    - title: Adjustment Value (1)
+    name: Discount
+
+Motip-Baten prijslijst.xlsx:
+  name: BNL 6
+   colRow: 11
+   cols:
+     name: host
+     Value: Baten Trading Company
+     - title: Artikel
+     name: orderCode
+     - title: EAN code
+     name: eanCode
+     - title: Omschrijving NL
+     name: Description
+     -title: Advies-Prijs excl.
+     name: catalogPrice
+     -title: VERPAKKING
+     name: packageQuantity

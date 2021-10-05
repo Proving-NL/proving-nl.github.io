@@ -1,0 +1,429 @@
+components:
+  schemas:
+    client:
+      order: companyName
+      properties:
+        id:
+          chapter: Identificatie
+          title: AID
+          readOnly: true
+        itemId:
+          title: ID
+          readOnly: true
+        clientUid:
+          title: UID
+          readOnly: true
+        keyName:
+          title: Zoeknaam
+        stateId:
+          title: Status
+        loc:
+          title: Locatie
+        geoLocatie:
+          title: GEO Locatie
+        files:
+          title: Bijlagen
+        categorie:
+          title: Catagorien
+        archiefDt:
+          title: Archief datum
+        modifiedBy:
+          title: Aangepast door
+
+        companyName:
+          chapter: Organisatie gegevens
+          title: Firma
+        description:
+          title: Omschrijving
+        opmerking:
+          title: Opmerking
+        extra1:
+          title: Extra 1
+        extra2:
+          title: Extra 2
+        extra3:
+          title: Extra 3
+
+        mailAddress:
+          chapter: Contactgegevens
+          title: Mail adres
+        businessPhone:
+          title: Telefoon
+        contactMobile:
+          title: Mobiel
+        businessFax:
+          title: Fax
+        contactPersoon:
+          title: Contact persoon
+        contactEmail:
+          title: Contact mail adres
+
+        businessAddressStreet:
+          chapter: Vestigingsgegevens
+          title: Straat
+        businessAddressPostalCode:
+          title: Postcode
+        businessAddressCity:
+          title: Plaats
+        businessAddressContact:
+          title: Aanhef
+
+        otherAddressStreet:
+          chapter: Facturering gegevens
+          title: Straat
+        otherAddressCity:
+          title: Postcode en plaats
+        otherAddressContact:
+          title: Aanhef
+        klantFactuurGegevens:
+          title: Factuur gegegevens
+        invoiceAddress1:
+          title: Factuur aanhef
+          readOnly: true
+        invoiceAddress2:
+          title: Factuur straat
+          readOnly: true
+        invoiceAddress3:
+          title: Factuur postcode en plaats
+          readOnly: true
+        uwRef:
+          title: Factuur referentie
+        btwNummer:
+          title: BTW nummer
+        btw:
+          title: BTW tarief
+        kortingContant:
+          title: Korting contant
+        vrachtKost:
+          title: Vrachtkosten
+        faktuurEmail:
+          title: Factuur mail adres
+        iban:
+          title: IBAN
+        faktuurNr:
+          title: Laatste factuur nummer
+          readOnly: true
+
+        accountName:
+          chapter: Verkoop
+          title: Account bedrijf
+        accountManager:
+          title: Account manager
+        mailgroepen:
+          title: Mail groepen
+        laatsteOrderDt:
+          title: Laatste order
+          format: datetime
+          readOnly: true
+        prio:
+          title: Prio
+        status:
+          title: Status
+        omzet:
+          title: Totaal omzet
+          readOnly: true
+        totNetto:
+          title: Totaal netto
+          readOnly: true
+        orderCnt:
+          title: Aantal orders
+          readOnly: true
+        gemomzetperOrder:
+          title: Gemiddelde omzet / order
+          readOnly: true
+
+        regio:
+          chapter: Planning
+          title: Regio
+        routeNr:
+          title: Route nummer
+        volgNr:
+          title: Volg nummer
+        bestelDag:
+          title: Besteldag
+        leverDag:
+          title: Leverdag
+        tekenBon:
+          title: Tekenbon
+        leverDatum:
+          title: Leverdatum
+          readOnly: true
+        pakbonId:
+          title: Pakbon Id
+          readOnly: true
+        # vocVan:
+        # vocTot:
+        # totVos:
+
+        debNr:
+          chapter: Administratie
+          title: Debiteur nummer
+        debName:
+          title: Debiteur naam
+        openstaand:
+          title: Openstaand
+
+    product:
+      order: supplier,productTitle
+      properties:
+        bedrijf:
+        supplier:
+        manufacturer:
+        brand:
+          cell(): row => link(row.brand || '', listRef('product', `&filter=brand eq '${row.brand}'`)) },
+        productTitle:
+          title: productTitle
+        description:
+        productGroup:
+        tagName:
+        orderCode:
+        packageUnit:
+        packageQuantity:
+        barcode:
+        packageWeight:
+        catalogPrice:
+        purchaseDiscount:
+        purchasePrice:
+        salesMargin:
+        salesPrice:
+        startOfStock:
+        stock:
+        stockLocation:
+    aimproduct:
+      order: supplier,productTitle
+      properties:
+        description:
+        orderCode:
+        group:
+        packageQuantity:
+        packingUnit:
+        catalogPrice:
+        purchaseDiscount:
+        scaleDiscountStart:
+        scaleDiscount:
+    salesorder:
+      order: orderNr
+      select: clientKeyName,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank
+      properties:
+        clientKeyName:
+          title: Klant
+          cell: return listLink(row.clientKeyName, 'salesorder', `clientKeyName EQ '${row.clientKeyName}'`)
+          cell: return pageLink(row.clientKeyName, 'client', row.clientId)
+        orderNr:
+          title: Order
+          cell(): row => link(row.orderNr || '', apiUrl+listPath + `?request_type=order&order_uid=${row.orderUid}&access_token=${access_token}`, 'page') },
+        status:
+          title: Status
+        orderDate:
+          title: Besteld
+        orderPrintDate:
+          title: Geprint
+          cell: return orderChangeCell(col,row)
+        orderPickDate:
+          title: Gepakt
+          cell: return orderChangeCell(col,row)
+        orderSendDate:
+          title: Verzonden
+          cell: return orderChangeCell(col,row)
+        orderDeliverDate:
+          title: Geleverd
+          cell: return orderChangeCell(col,row)
+        payPin:
+          title: Pin
+          cell: return orderChangeCell(col,row,true)
+        payCash:
+          title: Contant
+          cell: return orderChangeCell(col,row,true)
+        orderDoneDate:
+          title: Klaar
+          cell: return orderChangeCell(col,row)
+        invoiceNr:
+          title: Factuur
+          cell(): row => link(row.invoiceNr || '', apiUrl+listPath + `?request_type=invoice&invoice_uid=${row.invoiceUid}&access_token=${access_token}`, 'page') },
+        invoiceDate:
+          title: Gefactureerd
+          cell: return orderChangeCell(col,row)
+        invoiceSendDate:
+          title: Verzonden
+          cell: return orderChangeCell(col,row)
+        invoiceBookDate:
+          title: Geboekt
+          cell: return orderChangeCell(col,row)
+        invoicePayDate:
+          title: Betaald
+          cell: return orderChangeCell(col,row)
+        payBank:
+          title: Bank
+          cell: return orderChangeCell(col,row,true)
+navleft:
+  Orders:
+    Aangemaakt:
+      metaData:
+        l: &linkData
+          url: https://aliconnect.nl/abis/data
+          request_type: salesorder
+          $select: clientKeyName,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
+          $order: clientKeyName
+          $filter: orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1
+    Printen:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: orderPrintDate EQ NULL AND active NE 0 AND isOffer NE 1
+    Pakken:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: orderPickDate EQ NULL AND orderPrintDate NE NULL
+    Verzenden:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: orderSendDate EQ NULL AND orderPickDate NE NULL
+    Geleverd:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: orderDeliverDate EQ NULL AND orderSendDate NE NULL
+    Factureren:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: invoiceDate EQ NULL AND orderDeliverDate NE NULL
+    Boeken:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: invoiceBookDate EQ NULL AND invoiceNr GT 0
+    TeBetalen:
+      metaData:
+        l:
+          <<: *linkData
+          $filter: invoicePayDate EQ NULL AND invoiceBookDate NE NULL
+  Producten:
+    Proving:
+      metaData:
+        l:
+          url: https://aliconnect.nl/abis/data
+          request_type: product
+          $select: bedrijf,manufacturer,brand,productTitle,description,productGroup,supplier
+          $filter: bedrijf EQ 'proving'
+          $search:
+    Airo:
+      metaData:
+        l:
+          url: https://aliconnect.nl/abis/data
+          request_type: product
+          $select: supplier
+          $filter: bedrijf EQ 'airo'
+          $search:
+    Alles:
+      metaData:
+        l:
+          url: https://aliconnect.nl/abis/data
+          request_type: aimproduct
+          $select: orderCode,description,group,packageQuantity,packingUnit,catalogPrice,purchaseDiscount,scaleDiscountStart,scaleDiscount
+          $search:
+  Relaties:
+    metaData:
+      l: &linkClientData
+        url: https://aliconnect.nl/abis/data
+        request_type: client
+        $select: accountName,accountManager,keyName,companyName,debNr,invoiceAddress1,businessAddressStreet,businessAddressPostalCode,businessAddressCity,businessAddressContact,otherAddressStreet,otherAddressCity,otherAddressContact,id
+        $filter: archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+        $search:
+    Klanten:
+      metaData:
+        l: &linkClientData
+          url: https://aliconnect.nl/abis/data
+          $filter: accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      Airo:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountName EQ 'airo' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+        DG:
+          metaData:
+            l:
+              <<: *linkClientData
+              $filter: accountManager EQ 'EA' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      Proving:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountName EQ 'proving' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+        EA:
+          metaData:
+            l:
+              <<: *linkClientData
+              $filter: accountManager EQ 'EA' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+        AK:
+          metaData:
+            l:
+              <<: *linkClientData
+              $filter: accountManager EQ 'AK' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      FVI:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountManager EQ 'FVI' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+    Overig:
+      metaData:
+        l:
+          <<: *linkClientData
+          $filter: accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+    Archief:
+      metaData:
+        l:
+          <<: *linkClientData
+          $filter: archiefDT NE NULL OR companyName LIKE '%vervallen%'
+import:
+  xls:
+    EMM Onderdelen.xlsx:
+      - name: Onderdelen
+        colRow: 11
+        cols:
+          - name: host
+            value: emm
+          - name: schema
+            value: product
+          - title: Artikelnr.
+            name: keyname
+          - title: Artikelnr.
+            name: orderCode
+          # - title: Omschrijving
+          #   name: productTitle
+          - title: Verkoopprijs
+            name: catalogPrice
+    EMM Prijslijst NL.xls:
+      - name: EMM BASIS
+        colRow: 16
+        cols:
+          - name: host
+            value: emm
+          - name: schema
+            value: product
+          - title: Art. nummer
+            name: keyname
+          - title: Art. nummer
+            name: orderCode
+          - title: Groep
+            name: group
+          - title: Catalogus pag.
+            name: catalogPage
+          - title: NL Product Omschrijving
+            name: description
+          - title: NL Verpakking/Bestelhoeveelheid
+            name: packageQuantity
+          - title: NL
+            name: catalogPrice
+          - title: Korting
+            name: purchaseDiscount
+          - title: Vanaf
+            name: scaleDiscountStart
+          - title: Staffelkorting
+            name: scaleDiscount
+          - title: NL prijs per
+            name: packingUnit
+          - title: EAN-code
+            name: eanCode

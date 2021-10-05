@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html class="app" dark="1">
+<head>
+  <title>Import</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://aliconnect.nl/aliconnect/aliconnect.sdk/dist/js/jszip.js"></script>
+  <script src="https://aliconnect.nl/aliconnect/aliconnect.sdk/dist/js/xlsx.js"></script>
+  <!-- <link href="https://aliconnect.nl/aliconnect-sdk/src/public/css/elem.css" rel="stylesheet" /> -->
+  <script src="https://aliconnect.nl/aliconnect/aliconnect.sdk/src/js/aim.js"></script>
+  <script src="https://aliconnect.nl/aliconnect/aliconnect.sdk/src/js/web.js" libraries="import"></script>
+  <style>
+  * {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: relative;
+    z-index: 0;
+  }
+  body{font-family: sans-serif;padding:0;margin:0;}
+  table{border-collapse: collapse;}
+  th{text-align: left;}
+  th,td{white-space: nowrap;border:solid 1px #ccc;padding:0;}
+  /* tr.SrcID{background-color:#fef;} */
+  tr>td.readOnly{background-color:#fafafa;}
+  tr.Prefix>td:nth-child(-n+6){background-color:#f0f0ff;}
+  tr.SrcID>td:nth-child(-n+7){background-color:#f0fff0;}
+  tr.SrcID.Prefix>td:nth-child(-n+7){background-color:#fafffa;}
+  tr.InheritedID>td:nth-child(-n+9){background-color:#fff0f0;}
+  input{font: inherit;border: none;padding: 0;margin: 0;width: 100%;outline: none;}
+  #button_bar{position:sticky;left:0;top:0;z-index:1;line-height: 30px;background:blue;margin:0;padding:0;}
+  /* #response_text{overflow:auto;padding:0;margin:0;flex-grow: 0;} */
+  #response_text {padding:0;margin:0;}
+  thead{position: sticky;top:30px;background:#ccc;z-index: 1;}
+  th{border: none;padding:1px;}
+  tbody{height:400px;overflow-y: scroll;}
+  </style>
+</head>
+<body>
+  <div id="button_bar"></div>
+  <pre id="response_text"></pre>
+  <progress class="import"></progress><span class="info"></span>
+</body>
+</html>

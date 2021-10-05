@@ -1,27 +1,50 @@
 import:
-  xlsx:
-    EMM Onderdelen:
-      - tab: Onderdelen
+  xls:
+    EMM Onderdelen.xlsx:
+      - name: Onderdelen
         colRow: 11
         cols:
-          - name: supplier
+          - name: host
             value: emm
+          - name: schema
+            value: product
+          - title: Artikelnr.
+            name: keyname
           - title: Artikelnr.
             name: orderCode
           # - title: Omschrijving
           #   name: productTitle
           - title: Verkoopprijs
             name: catalogPrice
-  xls:
-    EMM Prijslijst NL:
-      - tab: EMM BASIS:
+    EMM Prijslijst NL.xls:
+      - name: EMM BASIS
         colRow: 16
         cols:
-          - name: supplier
+          - name: host
             value: emm
+          - name: schema
+            value: product
+          - title: Art. nummer
+            name: keyname
           - title: Art. nummer
             name: orderCode
+          - title: Groep
+            name: group
+          - title: Catalogus pag.
+            name: catalogPage
+          - title: NL Product Omschrijving
+            name: description
+          - title: NL Verpakking/Bestelhoeveelheid
+            name: packageQuantity
           - title: NL
             name: catalogPrice
-          - title: NL
+          - title: Korting
             name: purchaseDiscount
+          - title: Vanaf
+            name: scaleDiscountStart
+          - title: Staffelkorting
+            name: scaleDiscount
+          - title: NL prijs per
+            name: packingUnit
+          - title: EAN-code
+            name: eanCode

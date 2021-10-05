@@ -549,3 +549,97 @@ Prijslijst Chemicar.xlsx:
      name:
      - title: Customer Name
      name:
+
+Dynabrade EURO Price List.xlsx:
+  name: Feuil1
+    colRow: 8
+    cols:
+      -name: host
+      value: Metaaltechniek
+      - title: ITEM
+      name: orderCode
+      - title: SO DESC1
+      name: description
+      - title: EAN CODE
+      name: eanCode
+      - title: EURO 2021
+      name: catalogPrice
+
+Prijslijst Endstra.xlsx:
+  name: Brutoprijs 2021
+    colRow: 1
+    cols:
+      name: host
+      value: Endstra
+      - title: Artikelnummer
+      name: orderCode
+      - title: Omschrijving
+      name: description
+      - title: Bruto prijs huidig
+      name: catalogPrice
+      -title: Eenheid
+      name: packingUnit
+      - title: V.E.
+      name: packageQuantity
+      - title: EAN code
+      name: eanCode
+
+gerko airo nederland april.xlsx:
+  name: Blad1
+    colRow: 2
+    cols:
+      name: host
+      value: Endstra
+      - title: code
+      name: orderCode
+      - title: omschrijving
+      name: description
+      - title: prijs
+      name:
+
+INP SMART - NL.inkoop.xlsx:
+  name: Blad1
+   colRow: 1
+   cols:
+     name: host
+     value: INP
+     - title: Art.nr.
+     name: orderCode
+     - title: Omschrijving
+     name: description
+     - title: Verpakking
+     name: packingUnit
+     - title: EURO
+     name:
+
+Iwata AI_Fahrzeuglackierung_Preisliste.xlsx:
+  name: Fahrzeuglackierung
+   colRow: 1
+   cols:
+     name: host
+     value: Iwata
+     - title: Art.-Nr.
+     name: orderCode
+     - title: Bezeichnung
+     name: description
+     - title: Stück je VE
+     name: packageQuantity
+     - title: Catalogusprijs
+       name: catalogPrice
+
+KEMTEX PRIJSLIJST.xlsx:
+  name: PRIJSLIJST 2021
+   colRow: 1
+   cols:
+     name: host
+     value: Kemtex
+     - title: Artikel
+     name: orderCode
+     - title: Code EAN
+     name: eanCode
+     - title: Omschrijving
+     name: description
+     - title: VERPAKKING
+     name: packageQuantity
+     - title: TARIEF 2021
+     name: catalogPrice

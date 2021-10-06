@@ -643,6 +643,9 @@ KEMTEX PRIJSLIJST.xlsx:
      name: packageQuantity
      - title: TARIEF 2021
      name: catalogPrice
+     -title: Korting
+     -name: Discount
+
 
 3M AAD Prijslijst.xlsx:
   name: AAD Prijslijst
@@ -679,7 +682,7 @@ Motip-Baten prijslijst.xlsx:
    colRow: 11
    cols:
      name: host
-     Value: Baten Trading Company
+     value: Baten Trading Company
      - title: Artikel
      name: orderCode
      - title: EAN code
@@ -690,3 +693,37 @@ Motip-Baten prijslijst.xlsx:
      name: catalogPrice
      -title: VERPAKKING
      name: packageQuantity
+
+SHI Bruto prijslijst non paint.xlsx:
+  name: Compleet
+  colRow: 6
+  cols:
+    name: host
+    value: SHI
+    - title: Bestel nummer
+    name: orderCode
+    - title: Omschrijving
+    name: description
+    - title: EAN
+    name: eanCode
+    -title: BE
+    name: packageQuantity
+    -title: Bruto prijs vanaf                 01-03-'21
+    name: catalogPrice
+
+Majestic.xlsx:
+  name: per maat
+  colRow: 1
+  cols:
+    name: host
+    value: Majestic
+    -title: Artikel
+    name: orderCode
+    -title: Omschrijving
+    name: description
+    -title: maat
+    name: description
+    -title: Verpakt Per
+    name: packageQuantity
+    -title: Prijs
+    name: catalogPrice

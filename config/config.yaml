@@ -15,6 +15,7 @@ components:
           readOnly: true
         keyName:
           title: Zoeknaam
+          header: 1
         stateId:
           title: Status
         loc:
@@ -33,6 +34,7 @@ components:
         companyName:
           chapter: Organisatie gegevens
           title: Firma
+          header: 1
         description:
           title: Omschrijving
         opmerking:
@@ -61,12 +63,17 @@ components:
         businessAddressStreet:
           chapter: Vestigingsgegevens
           title: Straat
+          header: 2
         businessAddressPostalCode:
           title: Postcode
+          header: 2
         businessAddressCity:
           title: Plaats
+          header: 2
+          filter: true
         businessAddressContact:
           title: Aanhef
+          header: 2
 
         otherAddressStreet:
           chapter: Facturering gegevens
@@ -107,8 +114,10 @@ components:
         accountName:
           chapter: Verkoop
           title: Account bedrijf
+          filter: true
         accountManager:
           title: Account manager
+          filter: true
         mailgroepen:
           title: Mail groepen
         laatsteOrderDt:
@@ -162,7 +171,6 @@ components:
           title: Debiteur naam
         openstaand:
           title: Openstaand
-
     product:
       order: supplier,productTitle
       properties:
@@ -205,13 +213,17 @@ components:
       order: orderNr
       select: clientKeyName,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank
       properties:
+        id:
+          title: Order ID
+        orderNr:
+          title: Order NR
         clientKeyName:
           title: Klant
+          schema: client
           cell: return listLink(row.clientKeyName, 'salesorder', `clientKeyName EQ '${row.clientKeyName}'`)
           cell: return pageLink(row.clientKeyName, 'client', row.clientId)
-        orderNr:
-          title: Order
-          cell(): row => link(row.orderNr || '', apiUrl+listPath + `?request_type=order&order_uid=${row.orderUid}&access_token=${access_token}`, 'page') },
+        clientId:
+          title: Klant ID
         status:
           title: Status
         orderDate:
@@ -262,28 +274,35 @@ navleft:
         l: &linkData
           url: https://aliconnect.nl/abis/data
           request_type: salesorder
-          $select: clientKeyName,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
+          $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
+          $select: clientKeyName,clientId,orderNr,status,orderDate
+          $select: id,orderNr,clientKeyName,clientId,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,invoiceDate,invoiceNr,invoicePrintDate,invoiceSendDate,payCash,payPin
           $order: clientKeyName
           $filter: orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1
     Printen:
       metaData:
         l:
           <<: *linkData
+          $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate
           $filter: orderPrintDate EQ NULL AND active NE 0 AND isOffer NE 1
     Pakken:
       metaData:
         l:
           <<: *linkData
+          $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate
           $filter: orderPickDate EQ NULL AND orderPrintDate NE NULL
     Verzenden:
       metaData:
         l:
           <<: *linkData
+          $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate
           $filter: orderSendDate EQ NULL AND orderPickDate NE NULL
     Geleverd:
       metaData:
         l:
           <<: *linkData
+          $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
+          $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
           $filter: orderDeliverDate EQ NULL AND orderSendDate NE NULL
     Factureren:
       metaData:
@@ -324,59 +343,61 @@ navleft:
           request_type: aimproduct
           $select: orderCode,description,group,packageQuantity,packingUnit,catalogPrice,purchaseDiscount,scaleDiscountStart,scaleDiscount
           $search:
-  Relaties:
-    metaData:
-      l: &linkClientData
-        url: https://aliconnect.nl/abis/data
-        request_type: client
-        $select: accountName,accountManager,keyName,companyName,debNr,invoiceAddress1,businessAddressStreet,businessAddressPostalCode,businessAddressCity,businessAddressContact,otherAddressStreet,otherAddressCity,otherAddressContact,id
-        $filter: archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
-        $search:
-    Klanten:
-      metaData:
-        l: &linkClientData
-          url: https://aliconnect.nl/abis/data
-          $filter: accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+  CRM:
+    Relaties:
+      Alles:
+        metaData:
+          l: &linkClientData
+            url: https://aliconnect.nl/abis/data
+            request_type: client
+            $select: accountName,accountManager,keyName,companyName,debNr,invoiceAddress1,businessAddressStreet,businessAddressPostalCode,businessAddressCity,businessAddressContact,otherAddressStreet,otherAddressCity,otherAddressContact,id
+            $filter: archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+            $search:
+      Klanten:
+        metaData:
+          l: &linkClientData
+            url: https://aliconnect.nl/abis/data
+            $filter: accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
       Airo:
         metaData:
           l:
             <<: *linkClientData
             $filter: accountName EQ 'airo' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
-        DG:
-          metaData:
-            l:
-              <<: *linkClientData
-              $filter: accountManager EQ 'EA' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
       Proving:
         metaData:
           l:
             <<: *linkClientData
             $filter: accountName EQ 'proving' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
-        EA:
-          metaData:
-            l:
-              <<: *linkClientData
-              $filter: accountManager EQ 'EA' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
-        AK:
-          metaData:
-            l:
-              <<: *linkClientData
-              $filter: accountManager EQ 'AK' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      EA:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountManager EQ 'EA' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      AK:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountManager EQ 'AK' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      DG:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountManager EQ 'EA' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
       FVI:
         metaData:
           l:
             <<: *linkClientData
             $filter: accountManager EQ 'FVI' AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
-    Overig:
-      metaData:
-        l:
-          <<: *linkClientData
-          $filter: accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
-    Archief:
-      metaData:
-        l:
-          <<: *linkClientData
-          $filter: archiefDT NE NULL OR companyName LIKE '%vervallen%'
+      Overig:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'
+      Archief:
+        metaData:
+          l:
+            <<: *linkClientData
+            $filter: archiefDT NE NULL OR companyName LIKE '%vervallen%'
 import:
   xls:
     EMM Onderdelen.xlsx:

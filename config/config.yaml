@@ -398,6 +398,19 @@ navleft:
           l:
             <<: *linkClientData
             $filter: archiefDT NE NULL OR companyName LIKE '%vervallen%'
+    Analyse:
+      Klant:
+        metaData:
+          l:
+            url: https://proving.aliconnect.nl/report/client
+      Voorraad:
+        metaData:
+          l:
+            url: https://proving.aliconnect.nl/report/voorraad
+      Verloop:
+        metaData:
+          l:
+            url: https://proving.aliconnect.nl/report/verkoop_verloop
 import:
   xls:
     EMM Onderdelen.xlsx:

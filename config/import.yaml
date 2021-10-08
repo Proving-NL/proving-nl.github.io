@@ -1,729 +1,835 @@
 import:
-  xls:
-    EMM Onderdelen.xlsx:
-      - name: Onderdelen
-        colRow: 11
-        cols:
-          - name: host
-            value: emm
-          - name: schema
-            value: product
-          - title: Artikelnr.
-            name: keyname
-          - title: Artikelnr.
-            name: orderCode
-          # - title: Omschrijving
-          #   name: productTitle
-          - title: Verkoopprijs
-            name: catalogPrice
-    EMM Prijslijst NL.xls:
-      - name: EMM BASIS
-        colRow: 16
-        cols:
-          - name: host
-            value: emm
-          - name: schema
-            value: product
-          - title: Art. nummer
-            name: keyname
-          - title: Art. nummer
-            name: orderCode
-          - title: Groep
-            name: group
-          - title: Catalogus pag.
-            name: catalogPage
-          - title: NL Product Omschrijving
-            name: description
-          - title: NL Verpakking/Bestelhoeveelheid
-            name: packageQuantity
-          - title: NL
-            name: catalogPrice
-          - title: Korting
-            name: purchaseDiscount
-          - title: Vanaf
-            name: scaleDiscountStart
-          - title: Staffelkorting
-            name: scaleDiscount
-          - title: NL prijs per
-            name: packingUnit
-          - title: EAN-code
-            name: eanCode
-
- Rhiwa Prijslijst.xlsx:
-       - name: Mirka schuurmaterialen
-         colRow: 1
-         cols:
-          -name: host
-            value: Rhiwa
-          - title: Art. Nr
-            name: orderCode
-          - title: Omschrijving
-            name: description
-          - title: Korrel
-            name:
-          - title: VE_stuks
-            name: packageQuantity
-          - title: Mirka_nr
-            name: keyname
-          - title: Catalogusprijs
-            name: catalogPrice
-          - title: EAN
-            name: eanCode
-          - title: CBS/Intrastat
-            name:
-
-          - name: machines en gereedschappen
-          colRow: 1
-          cols:
-          - name: host
-            value: Rhiwa
-          - title: Art. Nr
-            name: orderCode
-          - title: Omschrijving
-            name: description
-          - title: Mirka nr.
-            name: keyname
-          - title: Eenheid
-            name: packageQuantity
-          - title: Catalogusprijs
-            name: catalogPrice
-          - title: Art_groep
-            name:
-          - title: EAN
-            name: eanCode
-          - title: CBS
-            name:
-
-          - name: Mirka rollen & banden
-          colRow: 1
-          cols:
-          - name: host
-           value: Rhiwa
-          - title: Art. Nr
-            name: orderCode
-          - title: Omschrijving
-            name: description
-          - title: Korrel
-            name:
-          - title: VE_stuks
-            name: packageQuantity
-          - title: Mirka_nr
-            name: keyname
-          - title: Catalogusprijs
-            name: catalogPrice
-          - title: Art_groep
-            name:
-          - title: EAN
-            name: eanCode
-
-          - name: Sundstrom adembescherming
-          colRow: 1
-          cols:
-            - name: host
-             value: Rhiwa
-            - title: Art. Nr
-              name: orderCode
-            - title: Omschrijving
-              name: description
-            - title: Bruto €
-              name: catalogPrice
-            - title: Eenheid
-              name: packageQuantity
-            - title: Art_groep
-              name: keyname
-            - title: EAN
-              name: eanCode
-
-          - name: poets en reinigingsmaterialen
-          colRow: 1
-          cols:
-            - name: host
-             value: Rhiwa
-             - title: Artikelnr
-             name: orderCode
-             - title: Omschrijving
-             name: description
-             - title: Inhoud
-             name: packageQuantity
-             - title: Catalogusprijs
-             name: catalogPrice
-
-          - name: Perslucht
-          colRow: 1
-          cols:
-            - name: host
-            value: Rhiwa
-            - title: Artikelnr
-            name: orderCode
-            - title: Omschrijving
-            name: description
-            - title: VE_Stuks
-            name: packageQuantity
-            - title: Korrel
-            name:
-            - title: Origineel nr.
-            name:
-            - title: Catalogusprijs
-            name: catalogPrice
-            - title: Art_groep
-            name: keyname
-            - title: EAN
-            name: eanCode
-
-        -   name: Div non Paint
-          colRow: 1
-          cols:
-            - name: host
-            value: Rhiwa
-            - title: Artikelnr
-            name: orderCode
-            - title: Omschrijving
-            name: description
-            - title: VE_Stuks
-            name: packageQuantity
-            - title: Catalogusprijs
-            name: catalogPrice
-            - title: Art_groep
-            name: keyname
-            - title: EAN
-            name: eanCode
-
-WSB - SATA Advies Verkoopprijslijst.xlsx:
-        - name: SATA BJ 2021
-         colRow: 4
-         cols:
-           -name: host
-           value: WSB
-           - title: WSB Artikel nummer
-           name: orderCode
-           - title: Omschrijving Engels
-           name: description
-           - title: Omschrijving Nederlands:
-             name: description
-           - title: EAN code
-             name: eanCode
-           - title: Land van Herkomst
-            name:
-            - title: Statistiek nummers
-            name:
-            - title: Net. Gewicht in KG
-             name:
-            - title: Bruto gewicht in KG
-             name:
-            - title: Lengte in MM
-             name:
-            - title: Breedte in MM
-             name:
-            - title: Hoogte in MM
-             name:
-            - title: Bruto Advies Verkoopprijs 2021
-             name: catalogPrice
-
-WSB - RUPES Bruto Advies Verkoopprijslijst.xlsx:
-        - name: WSB - RUPES Prijslijst 2021
-          colRow: 4
-          cols:
-            -name: host
-            value: WSB
-            - title: Art. nr. WSB
-            name: orderCode
-            - title: Artikelomschrijving Engels:
-              name: description
-            - title: Artikelomschrijving Nederlands
-            name: description
-            - title: Artikelomschrijving Frans
-            name: description
-            - title: PG
-            name:
-            - title: PG omschrijving
-            name:
-            - title: EAN Codes
-            name: eanCode
-            - title: Statistiek Codes
-            name:
-            - title: Land van herkomst
-            name:
-            - title: Gewicht
-            name:
-            - title: Breedte
-            name:
-            - title: Lengte
-            name:
-            - title: Hoogte
-            name:
-            - title: Adviesprijs 2021
-            name: catalogPrice
-
-Ani Prijzen netto.xlsx:
-          - name: Cliente 40572 PROVING   - P2
-            colRow: 2
-            cols:
-              -name: host
-              value: Ani
-              - title: Code
-              name: orderCode
-              - title: Article
-              name: description
-              -title: NET PRICE
-              name:
-
-Proving PRIJSLIJST CAP Automotive.xlsx:
-          - name: Prijslijst
-            colRow: 49
-            cols:
-              - name: host
-              value: CAP
-              - title: ARTIKELNUMMER
-             name: orderCode
-             - title: Verpakkingeenheid
-             name: packageQuantity
-             -title: OMSCHRIJVING
-             name: description
-             - title: Catalogusprijs
-             name: catalogPrice
-             - title: Korting
-             name: purchaseDiscount
-             - title: Proving Prijsafspraak 2021
-             name:
-
-AiroNL_Netto.xls:
-  name: Seite 1
-  colRow: 1
-  cols:
-    -name: host
-    value: Airo
-    - title: Art.-Nr.
-    name: orderCode
-    - title: Omschrijving
-    name: description
-    - title: omschrijving 2
-    name: description
-    - title: Omschrijving 3
-    name: description
-    - title: Omschrijving 4
-    name: description
-    - title: Inhoud
-    name:
-    - title: Gewicht
-    name:
-    - title: Verpakkingseenheid
-    name: packingUnit
-    - title: verzendeenheid
-    name:
-    - title: stuks op pallet
-    name:
-    - title: Netto Prijs
-    name:
-
-  name: Seite 2
-    colRow: 1
-    cols:
-      -name: host
-      value: Airo
-      - title: Art.-Nr.
-      name: orderCode
-      - title: Omschrijving
-      name: description
-      - title: omschrijving 2
-      name: description
-      - title: Omschrijving 3
-      name: description
-      - title: Omschrijving 4
-      name: description
-      - title: Inhoud
-      name:
-      - title: Gewicht
-      name:
-      - title: Verpakkingseenheid
-      name: packingUnit
-      - title: verzendeenheid
-      name:
-      - title: stuks op pallet
-      name:
-      - title: Netto Prijs
-      name:
-
-    name: Seite 3
-      colRow: 1
-      cols:
-        -name: host
-        value: Airo
-        - title: Art.-Nr.
-        name: orderCode
-        - title: Omschrijving
-        name: description
-        - title: omschrijving 2
-        name: description
-        - title: Omschrijving 3
-        name: description
-        - title: Omschrijving 4
-        name: description
-        - title: Inhoud
-        name:
-        - title: Gewicht
-        name:
-        - title: Verpakkingseenheid
-        name: packingUnit
-        - title: verzendeenheid
-        name:
-        - title: stuks op pallet
-        name:
-        - title: Netto Prijs
-        name:
-
-      name: Seite 4
-       colRow: 1
-       cols:
-         -name: host
-         value: Airo
-         - title: Art.-Nr.
-         name: orderCode
-         - title: Omschrijving
-         name: description
-         - title: omschrijving 2
-         name: description
-         - title: Omschrijving 3
-         name: description
-         - title: Omschrijving 4
-         name: description
-         - title: Inhoud
-         name:
-         - title: Gewicht
-         name:
-         - title: Verpakkingseenheid
-         name: packingUnit
-         - title: verzendeenheid
-         name:
-         - title: stuks op pallet
-         name:
-         - title: Netto Prijs
-         name:
-
-      name: Seite 5
+  - filename: metalak-3m.xlsx
+    template: 3M AAD Prijslijst
+    tabs:
+      - tabname: AAD Prijslijst
         colRow: 1
         cols:
-          -name: host
-          value: Airo
-          - title: Art.-Nr.
-          name: orderCode
-          - title: Omschrijving
-          name: description
-          - title: omschrijving 2
-          name: description
-          - title: Omschrijving 3
-          name: description
-          - title: Omschrijving 4
-          name: description
-          - title: Inhoud
-          name:
-          - title: Gewicht
-          name:
-          - title: Verpakkingseenheid
-          name: packingUnit
-          - title: verzendeenheid
-          name:
-          - title: stuks op pallet
-          name:
-          - title: Netto Prijs
-          name:
+          - name: host
+            value: metalak
+          - name: sap
+            title: SAP NR
+          - name: partNr
+            title: Partnr.
+          - name: commodityClass
+            title: Commodity Class
+          - name: commodityCode
+            title: Commodity Code
+          - name: description
+            title: Productomschrijving
+          - name: catalogPrice
+            title: prijs per 1 sept 2021
+          - name: packageQuantity
+            title: Verkoop-eenheid (VE)
+          - name: packageQuantity
+            title: Stuks per verkoop-eenheid
+          - name: ean
+            title: EAN Code Kleinverpakking
+          - name: eanPackage
+            title: EAN Code Overdoos
+          - name: palletQuantity
+            title: Stuks per pallet
+          - name: pictireLowResUrl
+            title: Main Picture URL to Low Respicture
+          - name: pictureHighResUrl
+            title: Main Picture URL to Hi Res picture
 
-      name: Seite 6
-        colRow: 1
-        cols:
-          -name: host
-          value: Airo
-          - title: Art.-Nr.
-          name: orderCode
-          - title: Omschrijving
-          name: description
-          - title: omschrijving 2
-          name: description
-          - title: Omschrijving 3
-          name: description
-          - title: Omschrijving 4
-          name: description
-          - title: Inhoud
-          name:
-          - title: Gewicht
-          name:
-          - title: Verpakkingseenheid
-          name: packingUnit
-          - title: verzendeenheid
-          name:
-          - title: stuks op pallet
-          name:
-          - title: Netto Prijs
-          name:
-
-      name: Seite 7
-        colRow: 1
-        cols:
-          -name: host
-          value: Airo
-          - title: Art.-Nr.
-          name: orderCode
-          - title: Omschrijving
-          name: description
-          - title: omschrijving 2
-          name: description
-          - title: Omschrijving 3
-          name: description
-          - title: Omschrijving 4
-          name: description
-          - title: Inhoud
-          name:
-          - title: Gewicht
-          name:
-          - title: Verpakkingseenheid
-          name: packingUnit
-          - title: verzendeenheid
-          name:
-          - title: stuks op pallet
-          name:
-          - title: Netto Prijs
-          name:
-
-      name: Seite 8
-       colRow: 1
-       cols:
-         -name: host
-         value: Airo
-         - title: Art.-Nr.
-         name: orderCode
-         - title: Omschrijving
-         name: description
-         - title: omschrijving 2
-         name: description
-         - title: Omschrijving 3
-         name: description
-         - title: Omschrijving 4
-         name: description
-         - title: Inhoud
-         name:
-         - title: Gewicht
-         name:
-         - title: Verpakkingseenheid
-         name: packingUnit
-         - title: verzendeenheid
-         name:
-         - title: Netto Prijs
-         name:
-
-Prijslijst Chemicar.xlsx:
-  name: BPM_PRL_Export
-   colRow: 1
-   cols:
-     -name: host
-     value: Chemicar
-     -title: Item Code
-     name: orderCode
-     -title: Price
-     name: catalogPrice
-     - title: Qty
-     name: packageQuantity
-     - title: Discount Perc
-     name: purchaseDiscount
-     title: New Price
-     name:
-     - title: Item Desc
-     name: description
-     - title: Catalogue Page Nr
-     name: catalogPage
-     - title: Sales Unit
-     name: packingUnit
-     - title: Outer Box Units
-     name: packageQuantity
-     - title: Pallet Unit
-     name:
-     - title: Barcode
-     name:
-     - title: HSCode
-     name:
-     - title: Net Weight
-     name:
-     - title: Module Description
-     name:
-     - title: ABCD
-     name:
-     - title: Customer Code
-     name:
-     - title: Customer Name
-     name:
-
-Dynabrade EURO Price List.xlsx:
-  name: Feuil1
-    colRow: 8
-    cols:
-      -name: host
-      value: Metaaltechniek
-      - title: ITEM
-      name: orderCode
-      - title: SO DESC1
-      name: description
-      - title: EAN CODE
-      name: eanCode
-      - title: EURO 2021
-      name: catalogPrice
-
-Prijslijst Endstra.xlsx:
-  name: Brutoprijs 2021
-    colRow: 1
-    cols:
-      name: host
-      value: Endstra
-      - title: Artikelnummer
-      name: orderCode
-      - title: Omschrijving
-      name: description
-      - title: Bruto prijs huidig
-      name: catalogPrice
-      -title: Eenheid
-      name: packingUnit
-      - title: V.E.
-      name: packageQuantity
-      - title: EAN code
-      name: eanCode
-
-gerko airo nederland april.xlsx:
-  name: Blad1
-    colRow: 2
-    cols:
-      name: host
-      value: Endstra
-      - title: code
-      name: orderCode
-      - title: omschrijving
-      name: description
-      - title: prijs
-      name:
-
-INP SMART - NL.inkoop.xlsx:
-  name: Blad1
-   colRow: 1
-   cols:
-     name: host
-     value: INP
-     - title: Art.nr.
-     name: orderCode
-     - title: Omschrijving
-     name: description
-     - title: Verpakking
-     name: packingUnit
-     - title: EURO
-     name:
-
-Iwata AI_Fahrzeuglackierung_Preisliste.xlsx:
-  name: Fahrzeuglackierung
-   colRow: 1
-   cols:
-     name: host
-     value: Iwata
-     - title: Art.-Nr.
-     name: orderCode
-     - title: Bezeichnung
-     name: description
-     - title: Stück je VE
-     name: packageQuantity
-     - title: Catalogusprijs
-       name: catalogPrice
-
-KEMTEX PRIJSLIJST.xlsx:
-  name: PRIJSLIJST 2021
-   colRow: 1
-   cols:
-     name: host
-     value: Kemtex
-     - title: Artikel
-     name: orderCode
-     - title: Code EAN
-     name: eanCode
-     - title: Omschrijving
-     name: description
-     - title: VERPAKKING
-     name: packageQuantity
-     - title: TARIEF 2021
-     name: catalogPrice
-     -title: Korting
-     -name: Discount
-
-
-3M AAD Prijslijst.xlsx:
-  name: AAD Prijslijst
-   colRow: 1
-   cols:
-     name: host
-     value: Metalak
-     - title: Partnr.
-     name: orderCode
-     - title: Productomschrijving
-     name: description
-     - title: prijs per 1 sept 2021
-     name: catalogPrice
-     - title: Verkoop-eenheid (VE)
-     name: packageQuantity
-
-PPG alle producten Prijslijst.xlsx:
-  name: Sheet1
-   colRow: 4
-  cols:
-    name: host
-    Value: PPG
-    - title: PPG Item CODE
-    name: orderCode
-    - title: PPG Item Description
-    name: description
-    - title: Bruto prijs per 1 okt
-    name: catalogPrice
-    - title: Adjustment Value (1)
-    name: Discount
-
-Motip-Baten prijslijst.xlsx:
-  name: BNL 6
-   colRow: 11
-   cols:
-     name: host
-     value: Baten Trading Company
-     - title: Artikel
-     name: orderCode
-     - title: EAN code
-     name: eanCode
-     - title: Omschrijving NL
-     name: Description
-     -title: Advies-Prijs excl.
-     name: catalogPrice
-     -title: VERPAKKING
-     name: packageQuantity
-
-SHI Bruto prijslijst non paint.xlsx:
-  name: Compleet
-  colRow: 6
-  cols:
-    name: host
-    value: SHI
-    - title: Bestel nummer
-    name: orderCode
-    - title: Omschrijving
-    name: description
-    - title: EAN
-    name: eanCode
-    -title: BE
-    name: packageQuantity
-    -title: Bruto prijs vanaf                 01-03-'21
-    name: catalogPrice
-
-Majestic.xlsx:
-  name: per maat
-  colRow: 1
-  cols:
-    name: host
-    value: Majestic
-    -title: Artikel
-    name: orderCode
-    -title: Omschrijving
-    name: description
-    -title: maat
-    name: description
-    -title: Verpakt Per
-    name: packageQuantity
-    -title: Prijs
-    name: catalogPrice
+# supplier:
+  # airo:
+  #   import:
+  #     - filename: airo-netto.xls:
+  #       template: AiroNL_Netto
+  #       tabs:
+  #         - tabname: Seite 1
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: stuks op pallet
+  #             - name:
+  #               title: Netto Prijs
+  #         - tabname: Seite 2
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: stuks op pallet
+  #             - name:
+  #               title: Netto Prijs
+  #         - tabname: Seite 3
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: stuks op pallet
+  #             - name:
+  #               title: Netto Prijs
+  #         - tabname: Seite 4
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: stuks op pallet
+  #             - name:
+  #               title: Netto Prijs
+  #         - tabname: Seite 5
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: stuks op pallet
+  #             - name:
+  #               title: Netto Prijs
+  #         - tabname: Seite 6
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: stuks op pallet
+  #             - name:
+  #               title: Netto Prijs
+  #         - tabname: Seite 7
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #             title: Inhoud
+  #             - name:
+  #             title: Gewicht
+  #             - name: packingUnit
+  #             title: Verpakkingseenheid
+  #             - name:
+  #             title: verzendeenheid
+  #             - name:
+  #             title: stuks op pallet
+  #             - name:
+  #             title: Netto Prijs
+  #         - tabname: Seite 8
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Airo
+  #             - name: orderCode
+  #               title: Art.-Nr.
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: omschrijving 2
+  #             - name: description
+  #               title: Omschrijving 3
+  #             - name: description
+  #               title: Omschrijving 4
+  #             - name:
+  #               title: Inhoud
+  #             - name:
+  #               title: Gewicht
+  #             - name: packingUnit
+  #               title: Verpakkingseenheid
+  #             - name:
+  #               title: verzendeenheid
+  #             - name:
+  #               title: Netto Prijs
+  # ani:
+  #   import:
+  #     - filename: ani.xlsx
+  #       template: Ani Prijzen netto
+  #       tabs:
+  #         - tabname: Cliente 40572 PROVING   - P2
+  #           colRow: 2
+  #           cols:
+  #             - name: host
+  #               value: Ani
+  #             - name: orderCode
+  #               title: Code
+  #             - name: description
+  #               title: Article
+  #             - name:
+  #               title: NET PRICE
+  # capautomotive:
+  #   import:
+  #     - filename: cap-automotive.xlsx
+  #       template: Proving PRIJSLIJST CAP Automotive
+  #       tabs:
+  #         - tabname: Prijslijst
+  #           colRow: 49
+  #           cols:
+  #             - name: host
+  #               value: CAP
+  #             - name: orderCode
+  #               title: ARTIKELNUMMER
+  #             - name: packageQuantity
+  #               title: Verpakkingeenheid
+  #             - name: description
+  #               title: OMSCHRIJVING
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #             - name: purchaseDiscount
+  #               title: Korting
+  #             - name:
+  #               title: Proving Prijsafspraak 2021
+  # chemicar:
+  #   import:
+  #     - filename: chemicar.xlsx
+  #       template: Prijslijst Chemicar
+  #       tabs:
+  #         - tabname: BPM_PRL_Export
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Chemicar
+  #             - name: orderCode
+  #               title: Item Code
+  #             - name: catalogPrice
+  #               title: Price
+  #             - name: packageQuantity
+  #               title: Qty
+  #             - name: purchaseDiscount
+  #               title: Discount Perc
+  #             - name:
+  #               title: New Price
+  #             - name: description
+  #               title: Item Desc
+  #             - name: catalogPage
+  #               title: Catalogue Page Nr
+  #             - name: packingUnit
+  #               title: Sales Unit
+  #             - name: packageQuantity
+  #               title: Outer Box Units
+  #             - name:
+  #               title: Pallet Unit
+  #             - name:
+  #               title: Barcode
+  #             - name:
+  #               title: HSCode
+  #             - name:
+  #               title: Net Weight
+  #             - name:
+  #               title: Module Description
+  #             - name:
+  #               title: ABCD
+  #             - name:
+  #               title: Customer Code
+  #             - name:
+  #               title: Customer Name
+  # dynabride:
+  #   import:
+  #     - filename: dynabride.xlsx
+  #       template: Dynabrade EURO Price List
+  #       tabs:
+  #         - tabname: Feuil1
+  #           colRow: 8
+  #           cols:
+  #             - name: host
+  #               value: Metaaltechniek
+  #             - name: orderCode
+  #               title: ITEM
+  #             - name: description
+  #               title: SO DESC1
+  #             - name: eanCode
+  #               title: EAN CODE
+  #             - name: catalogPrice
+  #               title: EURO 2021
+  # emm:
+  #   import:
+  #     - filename: emm-onderdelen.xlsx
+  #       template: EMM Onderdelen
+  #       tabs:
+  #         - tabname: Onderdelen
+  #           colRow: 11
+  #           cols:
+  #             - name: host
+  #               value: emm
+  #             - name: schema
+  #               value: product
+  #             - name: keyname
+  #               title: Artikelnr.
+  #             - name: orderCode
+  #               title: Artikelnr.
+  #             # - title: Omschrijving
+  #             #   name: productTitle
+  #             - name: catalogPrice
+  #               title: Verkoopprijs
+  #     - filename: emm-met-balken.xls
+  #       template: EMM Prijslijst NL 2021 27-09-2021 met gele balken
+  #       tabs:
+  #         - tabname: EMM BASIS
+  #           colRow: 16
+  #           cols:
+  #             - name: host
+  #               value: emm
+  #             - name: schema
+  #               value: product
+  #             - name: keyname
+  #               title: Art. nummer
+  #             - name: orderCode
+  #               title: Art. nummer
+  #             - name: group
+  #               title: Groep
+  #             - name: catalogPage
+  #               title: Catalogus pag.
+  #             - name: description
+  #               title: NL Product Omschrijving
+  #             - name: packageQuantity
+  #               title: NL Verpakking/Bestelhoeveelheid
+  #             - name: catalogPrice
+  #               title: NL
+  #             - name: purchaseDiscount
+  #               title: Korting
+  #             - name: scaleDiscountStart
+  #               title: Vanaf
+  #             - name: scaleDiscount
+  #               title: Staffelkorting
+  #             - name: packingUnit
+  #               title: NL prijs per
+  #             - name: eanCode
+  #               title: EAN-code
+  #     - filename: emm
+  #     - filename: emm-proving
+  #       template: Proving EMM Prijslijst NL 2021 14-06-2021
+  # endstra:
+  #   import:
+  #     - filename: endstra.xlsx
+  #       template: Prijslijst Endstra
+  #       tabs:
+  #         - tabname: Brutoprijs 2021
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Endstra
+  #             - name: orderCode
+  #               title: Artikelnummer
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: catalogPrice
+  #               title: Bruto prijs huidig
+  #             - name: packingUnit
+  #               title: Eenheid
+  #             - name: packageQuantity
+  #               title: V.E.
+  #             - name: eanCode
+  #               title: EAN code
+  #     - filename: endstra-aanvulling
+  #       template: Prijslijst Endstra 2021 aanvulling september
+  # gerko:
+  #   import:
+  #     - filename: gerko.xlsx
+  #       template: gerko airo nederland april
+  #       tabs:
+  #         - tabname: Blad1
+  #           colRow: 2
+  #           cols:
+  #             name: host
+  #             value: Endstra
+  #             - name: orderCode
+  #             title: code
+  #             - name: description
+  #             title: omschrijving
+  #             - name:
+  #             title: prijs
+  # gregory:
+  # inp:
+  #   import:
+  #     - filename: inp.xlsx
+  #       template: INP SMART - NL.inkoop
+  #       tabs:
+  #         - tabname: Blad1
+  #          colRow: 1
+  #          cols:
+  #            name: host
+  #            value: INP
+  #            - name: orderCode
+  #            title: Art.nr.
+  #            - name: description
+  #            title: Omschrijving
+  #            - name: packingUnit
+  #            title: Verpakking
+  #            - name:
+  #            title: EURO
+  # iwata:
+  #   import:
+  #     - filename: iwata.xlsx
+  #       template: Iwata AI_Fahrzeuglackierung_Preisliste
+  #       tabs:
+  #         - tabname: Fahrzeuglackierung
+  #          colRow: 1
+  #          cols:
+  #            name: host
+  #            value: Iwata
+  #            - name: orderCode
+  #            title: Art.-Nr.
+  #            - name: description
+  #            title: Bezeichnung
+  #            - name: packageQuantity
+  #            title: Stück je VE
+  #            - name: catalogPrice
+  #              title: Catalogusprijs
+  # jbc:
+  #   import:
+  #     - filename: jbc-thinner
+  #       template: Prijzen juli JBC thinner e.d.
+  # kemtex:
+  #   import:
+  #     - filename: kemtex.xlsx
+  #       template: KEMTEX PRIJSLIJST
+  #       tabs:
+  #         - tabname: PRIJSLIJST 2021
+  #          colRow: 1
+  #          cols:
+  #            name: host
+  #            value: Kemtex
+  #            - name: orderCode
+  #            title: Artikel
+  #            - name: eanCode
+  #            title: Code EAN
+  #            - name: description
+  #            title: Omschrijving
+  #            - name: packageQuantity
+  #            title: VERPAKKING
+  #            - name: catalogPrice
+  #            title: TARIEF 2021
+  #            - title: Korting
+  #            - name: Discount
+  # majestic:
+  #   import:
+  #     - filename: majestic.xlsx
+  #       template: Majestic
+  #       tabs:
+  #         - tabname: per maat
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Majestic
+  #             - name: orderCode
+  #               title: Artikel
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: description
+  #               title: maat
+  #             - name: packageQuantity
+  #               title: Verpakt Per
+  #             - name: catalogPrice
+  #               title: Prijs
+  #     - filename: majestic-1.xlsx
+  #       template: Majestic Prijslijst Q4 2021
+  # metalak:
+  #     - filename: metalak-kovax.xlsx
+  #       template: Kovax Europe_Prijslijst 2021
+  #       tabs:
+  #     - filename: metalak-teroson.xlsx
+  #       template: TEROSON PRIJSLIJST DISTRIBUTEURS 2021_BNL
+  # motip:
+  #   import:
+  #     - filename: motip.xlsx
+  #       template: Motip-Baten prijslijst
+  #       tabs:
+  #         - tabname: BNL 6
+  #          colRow: 11
+  #          cols:
+  #            name: host
+  #            value: Baten Trading Company
+  #            - name: orderCode
+  #            title: Artikel
+  #            - name: eanCode
+  #            title: EAN code
+  #            - name: Description
+  #            title: Omschrijving NL
+  #            - name: catalogPrice
+  #            title: Advies-Prijs excl.
+  #            - name: packageQuantity
+  #            title: VERPAKKING
+  # ppg:
+  #   import:
+  #     - filename: ppg.xlsx
+  #       template: PPG alle producten Prijslijst
+  #       tabs:
+  #         - tabname: Sheet1
+  #          colRow: 4
+  #           cols:
+  #             name: host
+  #             Value: PPG
+  #             - name: orderCode
+  #             title: PPG Item CODE
+  #             - name: description
+  #             title: PPG Item Description
+  #             - name: catalogPrice
+  #             title: Bruto prijs per 1 okt
+  #             - name: Discount
+  #             title: Adjustment Value (1)
+  #     - filename: ppg-car
+  #       template: PPG Car Prijs en bestellijst 2021-06
+  #     - filename: ppg-delfleet
+  #       template: PPG Delfleet Prijslijst 2021-06
+  #     - filename: ppg-delfleet-one
+  #       template: PPG Delfleet One Prijslijst 2021-06
+  #     - filename: ppg-korting
+  #       template: Lijst met alle PPG merken en producten ingaande juli 2021 prijs korting netto prijs
+  #     - filename: ppg-maxmeyer.xlsx
+  #       template: MaxMeyer Prijs en bestellijstlijst 2021
+  #       tabs:
+  #     - filename: ppg-nexa-autocolor
+  #       template: Nexa Autocolor 2021-06 non compliant
+  #     - filename: ppg-nexa-autocolor-car
+  #       template: Nexa Autocolor Car Prijs en bestellijst 2021-06
+  #     - filename: ppg-nexa-autocolor-ct
+  #       template: NEXA AUTOCOLOR CT Prijslijst 2021-06
+  #     - filename: ppg-nexa-turbo-vision
+  #       template: NEXA TURBO VISION Prijslijst 2021-06
+  #     - filename: ppg-non-compliant
+  #       template: PPG Prijs en bestellijst 2021-06 non compliant
+  #     - filename: ppg-producten
+  #       template: PPG alle producten aanpassing 1 oktober prijslijst
+  #     - filename: ppg-selemix
+  #       template: Selemix Prijs- en Bestellijst 2021-06
+  #     - filename: ppg-selemix-aqua
+  #       template: Selemix Aqua Prijs- en Bestellijst 2021-06
+  # rhiwa:
+  #   import:
+  #     - filename: rhiwa.xlsx
+  #       template: Rhiwa Prijslijst
+  #       tabs:
+  #         - tabname: Mirka schuurmaterialen
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Art. Nr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name:
+  #               title: Korrel
+  #             - name: packageQuantity
+  #               title: VE_stuks
+  #             - name: keyname
+  #               title: Mirka_nr
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #             - name: eanCode
+  #               title: EAN
+  #             - name:
+  #               title: CBS/Intrastat
+  #         - tabname: machines en gereedschappen
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Art. Nr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: keyname
+  #               title: Mirka nr.
+  #             - name: packageQuantity
+  #               title: Eenheid
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #             - name:
+  #               title: Art_groep
+  #             - name: eanCode
+  #               title: EAN
+  #             - name:
+  #               title: CBS
+  #         - tabname: Mirka rollen & banden
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Art. Nr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name:
+  #               title: Korrel
+  #             - name: packageQuantity
+  #               title: VE_stuks
+  #             - name: keyname
+  #               title: Mirka_nr
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #             - name:
+  #               title: Art_groep
+  #             - name: eanCode
+  #               title: EAN
+  #         - tabname: Sundstrom adembescherming
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Art. Nr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: catalogPrice
+  #               title: Bruto €
+  #             - name: packageQuantity
+  #               title: Eenheid
+  #             - name: keyname
+  #               title: Art_groep
+  #             - name: eanCode
+  #               title: EAN
+  #         - tabname: poets en reinigingsmaterialen
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Artikelnr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: packageQuantity
+  #               title: Inhoud
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #         - tabname: Perslucht
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Artikelnr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: packageQuantity
+  #               title: VE_Stuks
+  #             - name:
+  #               title: Korrel
+  #             - name:
+  #               title: Origineel nr.
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #             - name: keyname
+  #               title: Art_groep
+  #             - name: eanCode
+  #               title: EAN
+  #         - tabname: Div non Paint
+  #           colRow: 1
+  #           cols:
+  #             - name: host
+  #               value: Rhiwa
+  #             - name: orderCode
+  #               title: Artikelnr
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: packageQuantity
+  #               title: VE_Stuks
+  #             - name: catalogPrice
+  #               title: Catalogusprijs
+  #             - name: keyname
+  #               title: Art_groep
+  #             - name: eanCode
+  #               title: EAN
+  # shi:
+  #   import:
+  #     - filename: shi.xlsx
+  #       template: SHI Bruto prijslijst non paint
+  #       tabs:
+  #         - tabname: Compleet
+  #           colRow: 6
+  #           cols:
+  #             - name: host
+  #               value: SHI
+  #             - name: orderCode
+  #               title: Bestel nummer
+  #             - name: description
+  #               title: Omschrijving
+  #             - name: eanCode
+  #               title: EAN
+  #             - name: packageQuantity
+  #               title: BE
+  #             - name: catalogPrice
+  #               title: Bruto prijs vanaf                 01-03-'21
+  # wsb:
+  #   import:
+  #     - filename: wsb-rupes.xlsx
+  #       template: WSB - RUPES Bruto Advies Verkoopprijslijst
+  #       tabs:
+  #         - tabname: WSB - RUPES Prijslijst 2021
+  #           colRow: 4
+  #           cols:
+  #             - name: host
+  #               value: WSB
+  #             - name: orderCode
+  #               title: Art. nr. WSB
+  #             - name: description
+  #               title: Artikelomschrijving Engels:
+  #             - name: description
+  #               title: Artikelomschrijving Nederlands
+  #             - name: description
+  #               title: Artikelomschrijving Frans
+  #             - name:
+  #               title: PG
+  #             - name:
+  #               title: PG omschrijving
+  #             - name: eanCode
+  #               title: EAN Codes
+  #             - name:
+  #               title: Statistiek Codes
+  #             - name:
+  #               title: Land van herkomst
+  #             - name:
+  #               title: Gewicht
+  #             - name:
+  #               title: Breedte
+  #             - name:
+  #               title: Lengte
+  #             - name:
+  #               title: Hoogte
+  #             - name: catalogPrice
+  #               title: Adviesprijs 2021
+  #     - filename: wsb-sata.xlsx
+  #       template: WSB - SATA Advies Verkoopprijslijst
+  #       tabs:
+  #         - tabname: SATA BJ 2021
+  #           colRow: 4
+  #           cols:
+  #             - name: host
+  #               value: WSB
+  #             - name: orderCode
+  #               title: WSB Artikel nummer
+  #             - name: description
+  #               title: Omschrijving Engels
+  #             - name: description
+  #               title: Omschrijving Nederlands:
+  #             - name: eanCode
+  #               title: EAN code
+  #             - name:
+  #               title: Land van Herkomst
+  #             - name:
+  #               title: Statistiek nummers
+  #             - name:
+  #               title: Net. Gewicht in KG
+  #             - name:
+  #               title: Bruto gewicht in KG
+  #             - name:
+  #               title: Lengte in MM
+  #             - name:
+  #               title: Breedte in MM
+  #             - name:
+  #               title: Hoogte in MM
+  #             - name: catalogPrice
+  #               title: Bruto Advies Verkoopprijs 2021

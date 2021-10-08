@@ -1,4 +1,4 @@
-<input onchange="search(this)" placeholder="Zoeken">
+<input onchange="aim.search(this)" placeholder="Zoeken">
 - Producten
     - [Paint](/docs/Paint)
     - [Non paint](/docs/Non-paint)

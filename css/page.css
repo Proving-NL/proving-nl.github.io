@@ -58,7 +58,7 @@ body>header{
 }
 body>header>div{
   display: inline-inline-block;
-  background: url(/docs/img/logo-proving.png) no-repeat;
+  background: url(/img/logo-proving.png) no-repeat;
   height:100px;
   margin-top:10px;
 }
@@ -69,7 +69,7 @@ body>header>div::after{
   right:0;
   height:200px;
   width:300px;
-  background: url(/docs/img/maxmeyer2.png) no-repeat;
+  background: url(/img/maxmeyer2.png) no-repeat;
   background-size: contain;
 }
 body>main, body>nav>div, footer>div, header>div {

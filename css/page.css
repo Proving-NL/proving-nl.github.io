@@ -81,8 +81,8 @@ aside:empty {
   display: none;
 }
 footer{
-  background:.333;
-  color:.999;
+  background:#333;
+  color:#999;
 }
 footer>div>ul{
   display: flex;

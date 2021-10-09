@@ -52,7 +52,7 @@ body>nav{
 }
 body>header{
   height:200px;
-  margin-top:48px;
+  /* margin-top:48px; */
   background: url(/img/top-bg.jpg);
   z-index:1;
 }
@@ -60,11 +60,12 @@ body>header>div{
   /* display: inlineblock; */
   background: url(/img/logo-proving.png) no-repeat 0 20px;
   height:100px;
-  margin-top:10px;
+  /* margin-top:10px; */
 }
 body>header>div>h1 {
   color: white;
-  padding-top:120px;
+  margin: 0;
+  padding-top: 120px;
 }
 body>header>div::before{
   content:'';
@@ -143,19 +144,4 @@ span[salesprice]::after{
 }
 span[discount='0'], span[discount='0']+span, span[discount='-0'], span[discount='-0']+span{
   display:none;
-}
-body>nav>div>p{
-  margin:0;
-}
-body>nav input{
-  outline:none;
-  border:none;
-  line-height: inherit;
-  height:100%;
-  background-color: rgba(255,255,255,0.1);
-  color: white;
-  padding: 0 10px;
-}
-body>nav input::placeholder {
-  color: inherit;
 }

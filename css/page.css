@@ -102,9 +102,6 @@ footer>div>ul>li{
   flex-grow: 1;
   padding: 20px 0;
 }
-.doc-content h1{
-  top: 48px;
-}
 
 div.products {
   display: flex;

@@ -4,6 +4,7 @@ components:
       order: companyName
       properties:
         id:
+          legend: ID
           chapter: Identificatie
           title: AID
           readOnly: true
@@ -32,6 +33,7 @@ components:
           title: Aangepast door
 
         companyName:
+          legend: Organisatie gegevens
           chapter: Organisatie gegevens
           title: Firma
           header: 1
@@ -230,43 +232,43 @@ components:
           title: Besteld
         orderPrintDate:
           title: Geprint
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         orderPickDate:
           title: Gepakt
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         orderSendDate:
           title: Verzonden
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         orderDeliverDate:
           title: Geleverd
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         payPin:
           title: Pin
-          cell: return orderChangeCell(col,row,true)
+          # cell: return aim.orderChangeCell(col,row,true)
         payCash:
           title: Contant
-          cell: return orderChangeCell(col,row,true)
+          # cell: return aim.orderChangeCell(col,row,true)
         orderDoneDate:
           title: Klaar
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         invoiceNr:
           title: Factuur
           cell(): row => link(row.invoiceNr || '', apiUrl+listPath + `?request_type=invoice&invoice_uid=${row.invoiceUid}&access_token=${access_token}`, 'page') },
         invoiceDate:
           title: Gefactureerd
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         invoiceSendDate:
           title: Verzonden
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         invoiceBookDate:
           title: Geboekt
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         invoicePayDate:
           title: Betaald
-          cell: return orderChangeCell(col,row)
+          # cell: return aim.orderChangeCell(col,row)
         payBank:
           title: Bank
-          cell: return orderChangeCell(col,row,true)
+          # cell: return aim.orderChangeCell(col,row,true)
 navleft:
   Orders:
     Aangemaakt:

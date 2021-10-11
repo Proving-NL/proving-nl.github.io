@@ -1,4 +1,3 @@
-<form><input name="search" placeholder="Zoeken"></form>
 - Producten
     - [Paint](/Paint)
     - [Non paint](/Non-paint)

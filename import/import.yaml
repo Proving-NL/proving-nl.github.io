@@ -1,0 +1,62 @@
+import:
+  - filename: metalak-3m.xlsx
+    template: 3M AAD Prijslijst
+    tabs:
+      - tabname: AAD Prijslijst
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: 3M
+          - name: artNr
+            title: Partnr.
+          - name: supplier
+            value: Metalak
+          - name: catalogPrice
+            title: Prijs per 1 sept 2021
+          - name: purchaseDiscount
+            value: 40
+          - name: description
+            title: Productomschrijving
+
+          - name: sap
+            title: SAP NR
+          - name: commodityClass
+            title: Commodity Class
+          - name: commodityCode
+            title: Commodity Code
+          - name: packageQuantity
+            title: Verkoop-eenheid (VE)
+          - name: packageQuantity
+            title: Stuks per verkoop-eenheid
+          - name: ean
+            title: EAN Code Kleinverpakking
+          - name: eanPackage
+            title: EAN Code Overdoos
+          - name: palletQuantity
+            title: Stuks per pallet
+          - name: pictireLowResUrl
+            title: Main Picture URL to Low Respicture
+          - name: pictureHighResUrl
+            title: Main Picture URL to Hi Res picture
+  - filename: metalak-kovax.xlsx
+    template: Kovax Europe_Prijslijst 2021
+    todo: aanpassen kolom B naar Productomschrijving, prijs spatie weghalen
+    tabs:
+      - tabname: Prijslijst 2021
+        colRow: 8
+        cols:
+          - name: manufacturer
+            value: Kovax
+          - name: artNr
+            title: Artikel nr.
+          - name: supplier
+            value: Metalak
+          - name: catalogPrice
+            title: prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Productomschrijving
+
+          - name: PackageQuantity
+            title: Inhoud verp.

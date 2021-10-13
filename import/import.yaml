@@ -530,7 +530,7 @@ import:
         cols:
   - filename: kemtex.xlsx
     template: KEMTEX PRIJSLIJST
-    todo:
+    todo: kortingscodes overzetten in percentages
     tabs:
       - tabname: PRIJSLIJST 2021
         colRow: 1
@@ -571,6 +571,7 @@ import:
             title: Omschrijving
   - filename: metalak-teroson.xlsx
     template: TEROSON PRIJSLIJST DISTRIBUTEURS 2021_BNL
+    todo:  Kortingscodes uitzoeken
     tabs:
       - tabname: PRIJSLIJST DISTRIBUTEURS 2021
         colRow: 4
@@ -594,6 +595,7 @@ import:
             title:  MOQ SURCHARGE*
   - filename: motip.xlsx
     template: Motip-Baten prijslijst
+    todo: percentages uitrekenen. bruto en netto is bekend
     tabs:
       - tabname: BNL 6
         colRow: 11
@@ -914,6 +916,7 @@ import:
             title: Omschrijving
   - filename: rhiwa.xlsx
     template: Rhiwa Prijslijst
+    todo: kortingen opvragen
     tabs:
       - tabname: Mirka schuurmaterialen
         colRow: 1
@@ -1055,6 +1058,7 @@ import:
             title: EAN
   - filename: shi.xlsx
     template: SHI Bruto prijslijst non paint
+    todo: Korting opvragen
     tabs:
       - tabname: Compleet
         colRow: 6
@@ -1078,6 +1082,7 @@ import:
             title: EAN Code Kleinverpakking
   - filename: wsb-rupes.xlsx
     template: WSB - RUPES Bruto Advies Verkoopprijslijst
+    todo: kortingen opvragen
     tabs:
       - tabname: WSB - RUPES Prijslijst 2021
         colRow: 4
@@ -1117,6 +1122,7 @@ import:
             title: Main Picture URL to Hi Res picture
   - filename: wsb-sata.xlsx
     template: WSB - SATA Advies Verkoopprijslijst
+    todo: Kortingspercentage opvragen
     tabs:
       - tabname: SATA BJ 2021
         colRow: 4

@@ -42,5 +42,5 @@ import:
           purchaseDiscount: Korting
           scaleDiscountStart: Vanaf
           scaleDiscount: Staffelkorting
-          packingUnit: NL prijs per
+          packageUnit: NL prijs per
           partEan: EAN-code

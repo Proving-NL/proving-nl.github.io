@@ -501,9 +501,6 @@ supplier:
       - filename: majestic-1.xlsx
         template: Majestic Prijslijst Q4 2021
   metalak:
-      - filename: metalak-kovax.xlsx
-        template: Kovax Europe_Prijslijst 2021
-        tabs:
       - filename: metalak-teroson.xlsx
         template: TEROSON PRIJSLIJST DISTRIBUTEURS 2021_BNL
   motip:

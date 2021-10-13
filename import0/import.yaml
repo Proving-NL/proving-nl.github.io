@@ -1,0 +1,46 @@
+import:
+  - filename: metalak-3m.xlsx
+    template: 3M AAD Prijslijst
+    tabs:
+      - tabname: AAD Prijslijst
+        colRow: 1
+        data:
+          supplier: Metalak
+          purchaseDiscount: 40
+          brand: 3M
+        cols:
+          orderCode: SAP NR
+          partNr: Partnr.
+
+          partEan: EAN Code Kleinverpakking
+          description: Productomschrijving
+          catalogPrice: Prijs per 1 sept 2021
+          commodityClass: Commodity Class
+          commodityCode: Commodity Code
+          packageUnit: Verkoop-eenheid (VE)
+          packageQuantity: Stuks per verkoop-eenheid
+          packageEan: EAN Code Overdoos
+          packageMbe: MBE in aantal VE's
+          palletQuantity: Stuks per pallet
+          pictureLowResUrl: Main Picture URL to Low Respicture
+          pictureHighResUrl: Main Picture URL to Hi Res picture
+  - filename: emm-met-balken.xls
+    template:
+    tabs:
+      - tabname: EMM BASIS
+        colRow: 16
+        data:
+          supplier: EMM
+        cols:
+          orderCode: Art. nummer
+          brand: Groep
+
+          catalogPage: Catalogus pag.
+          description: NL Product Omschrijving
+          packageQuantity: NL Verpakking/Bestelhoeveelheid
+          catalogPrice: NL
+          purchaseDiscount: Korting
+          scaleDiscountStart: Vanaf
+          scaleDiscount: Staffelkorting
+          packingUnit: NL prijs per
+          partEan: EAN-code

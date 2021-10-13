@@ -14,7 +14,7 @@ import:
           - name: catalogPrice
             title: Prijs per 1 sept 2021
           - name: purchaseDiscount
-            value: 40
+            value: 40.6
           - name: description
             title: Productomschrijving
 
@@ -60,3 +60,1079 @@ import:
 
           - name: PackageQuantity
             title: Inhoud verp.
+  - filename: airo-netto.xls
+    template: AiroNL_Netto
+    todo: Prijzen in xlsx bestand zijn netto prijzen. aanpassen naar bruto
+      - tabname: Seite 1
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 2
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 3
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 4
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 5
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 6
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 7
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+      - tabname: Seite 8
+
+
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Airo
+          - name: artNr
+            title: Art.-Nr.
+          - name: supplier
+            value: Airo
+          - name: catalogPrice
+            title: Netto Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: description
+            title: omschrijving 2
+          - name: description
+            title: Omschrijving 3
+          - name: description
+            title: Omschrijving 4
+          - name: packageQuantity
+          - title: Verzendeenheid
+  - filename: ani.xlsx
+    template: Ani Prijzen netto
+    todo: Prijzen zijn Netto. Aanpassen naar Brutoprijs
+    tabs:
+      - tabname: Cliente 40572 PROVING   - P2
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: Ani
+          - name: orderCode
+            title: Code
+          - name: supplier
+            value: Ani
+          - name: catalogPrice
+            title: NET PRICE
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Article
+  - filename: capautomotive.xlsx
+    template: Proving PRIJSLIJST CAP Automotive
+    todo: Extra Kolom met speciale Prijsafspraak. Aanpassen.
+    tabs:
+      - tabname: Prijslijst
+        colRow: 49
+        cols:
+          - name: manufacturer
+            value: DeVilbiss
+          - name: orderCode
+            title: ARTIKELNUMMER
+          - name: supplier
+            value: CAP Automotive
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            title: Korting
+          - name: description
+            title: OMSCHRIJVING
+
+          - name: packageQuantity
+            title: Verpakkingeenheid
+          - name:
+            title: Proving Prijsafspraak 2021
+  - filename: chemicar.xlsx
+    template: Prijslijst Chemicar
+    todo: Geen bijzonderheden gevonden.
+    tabs:
+      - tabname: BPM_PRL_Export
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Chemicar
+          - name: orderCode
+            title: Item Code
+          - name: supplier
+            value: Chemicar
+          - name: catalogPrice
+            title: Price
+          - name: purchaseDiscount
+            title: Discount Perc
+          - name: description
+            title: Item Desc
+
+          - name: catalogPage
+            title: Catalogue Page Nr
+          - name: packingUnit
+            title: Sales Unit
+          - name: packageQuantity
+            title: Outer Box Units
+  - filename: dynabride.xlsx
+    template: Dynabrade EURO Price List
+    todo: Geen bijzonderheden gevonden.
+    tabs:
+      - tabname: Feuil1
+        colRow: 8
+        cols:
+          - name: manufacturer
+            value: Dynabride
+          - name: orderCode
+            title: ITEM
+          - name: supplier
+            value: Metaaltechniek
+          - name: catalogPrice
+            title: EURO 2021
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: SO DESC1
+
+          - name: eanCode
+            title: EAN CODE
+  - filename: emm-onderdelen.xlsx
+    template: EMM Onderdelen
+    todo: Korting onbekend. uitzoeken
+    tabs:
+      - tabname: Onderdelen
+        colRow: 11
+        cols:
+          - name: manufacturer
+            value: EMM
+          - name: orderCode
+            title: Artikelnr.
+          - name: supplier
+            value: EMM
+          - name: catalogPrice
+            title: Verkoopprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: emm-met-balken.xls
+    template: EMM Prijslijst NL 2021 27-09-2021 met gele balken
+    todo: Meerdere Fabrikanten,leverancier is EMM. Sommige producten hebben Staffelkorting
+    tabs:
+      - tabname: EMM BASIS
+        colRow: 16
+        cols:
+          - name: manufacturer
+            value: Colad
+          - name: manufacturer
+            value: Hamach
+          - name: manufacturer
+            value: Ronin
+          - name: orderCode
+            title: Art. nummer.
+          - name: supplier
+            value: EMM
+          - name: catalogPrice
+            title: NL
+          - name: purchaseDiscount
+            title: Korting
+          - name: description
+            title: NL Product Omschrijving
+
+          - name: manufacturer
+            value: Groep
+          - name: catalogPage
+            value: Catalogus pag.
+          - name: packageQuantity
+            title: NL Verpakking/Bestelhoeveelheid
+          - name: eanCode
+            value: EAN-code
+  - filename: endstra.xls
+    template: Prijslijst Endstra
+    todo: bruto prijs huidis aantal keer leeg. Vervallen? korting niet bekend
+    tabs:
+      - tabname: Brutoprijs 2021
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Endstra
+          - name: orderCode
+            title: Artikelnummer
+          - name: supplier
+            value: Endstra
+          - name: catalogPrice
+            title: Bruto prijs 1/9/21
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packingUnit
+            value: Eenheid
+          - name: packageQuantity
+            title: V.E.
+          - name: eanCode
+            value: EAN code
+  - filename: endstra-aanvulling.xlsx
+    template: Prijslijst Endstra 2021 aanvulling september
+    todo: bruto prijs huidis aantal keer leeg. Vervallen? korting niet bekend
+    tabs:
+      - tabname: Brutoprijs 2021
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Endstra
+          - name: orderCode
+            title: Artikelnummer
+          - name: supplier
+            value: Endstra
+          - name: catalogPrice
+            title: Bruto prijs 1/9/21
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packingUnit
+            value: Eenheid
+          - name: packageQuantity
+            title: V.E.
+          - name: eanCode
+            value: EAN code
+  - filename: gerko.xlsx
+    template: gerko airo nederland april
+    todo: Prijzen onbekend Bruto of netto. Uitzoeken plus korting uitzoeken
+    tabs:
+      - tabname: Blad1
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: Gerko
+          - name: orderCode
+            title: code
+          - name: supplier
+            value: Gerko
+          - name: catalogPrice
+            title: prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: omschrijving
+
+          - name: packingUnit
+            value: Eenheid
+          - name: packageQuantity
+            title: V.E.
+          - name: eanCode
+            value: EAN code
+  - filename: inp.xlsx
+    template: INP SMART - NL.inkoop
+    todo: Prijzen Netto. Bruto prijzen+kortingen uitzoeken
+    tabs:
+      - tabname: Blad1
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: INP
+          - name: orderCode
+            title: Art.nr.
+          - name: supplier
+            value: INP
+          - name: catalogPrice
+            title: EURO
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packingUnit
+            value: Verpakking
+  - filename: iwata.xlsx
+    template: Iwata AI_Fahrzeuglackierung_Preisliste
+    todo: Prijzen Netto? Bruto prijzen+kortingen uitzoeken
+    tabs:
+      - tabname: Fahrzeuglackierung
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Iwata
+          - name: orderCode
+            title: Art.-Nr.
+          - name: supplier
+            value: Iwata
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Bezeichnung
+
+          - name: packageQuantity
+            value: Stück je VE
+  - filename: jbc-thinner.xlsx
+    template: Prijzen juli JBC thinner e.d.
+    todo: Excel sheet aanpassen. niet in te lezen. Uitzoeken Bruto prijzen+ kortingen
+    tabs:
+      - tabname: Fahrzeuglackierung
+        colRow: 1
+        cols:
+  - filename: kemtex.xlsx
+    template: KEMTEX PRIJSLIJST
+    todo:
+    tabs:
+      - tabname: PRIJSLIJST 2021
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Kemtex
+          - name: orderCode
+            title: Artikel
+          - name: supplier
+            value: Kemtex
+          - name: catalogPrice
+            title: TARIEF 2021
+          - name: purchaseDiscount
+            title: Korting
+          - name: description
+            title: Omschrijving
+
+          - name: eanCode
+            value: Code EAN
+  - filename: majestic.xlsx
+    template: Majestic
+    todo: prijzen uitzoeken Bruto/Netto
+    tabs:
+      - tabname: per maat
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Majestic
+          - name: orderCode
+            title: Artikel
+          - name: supplier
+            value: Kemtex
+          - name: catalogPrice
+            title: Prijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: metalak-teroson.xlsx
+    template: TEROSON PRIJSLIJST DISTRIBUTEURS 2021_BNL
+    tabs:
+      - tabname: PRIJSLIJST DISTRIBUTEURS 2021
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: Teroson
+          - name: artNr
+            title: IDH
+          - name: supplier
+            value: Metalak
+          - name: catalogPrice
+            title: "PRIX UNITAIRE BRUT € HT* BRUTOPRIJS EENHEID € HT*"
+          - name: purchaseDiscount
+            value: 42,5
+          - name: description
+            title: "CONNU SOUS LE NOM DE GEKEND ONDER DE NAAM"
+
+          - name: packageQuantity
+            title: " NB UNC/CARTON EENHDEN/KARTON "
+          - name: packageQuantity
+            title:  MOQ SURCHARGE*
+  - filename: motip.xlsx
+    template: Motip-Baten prijslijst
+    tabs:
+      - tabname: BNL 6
+        colRow: 11
+        cols:
+          - name: manufacturer
+            value: Motip
+          - name: orderCode
+            title: Artikel
+          - name: supplier
+            value: Baten Trading Company
+          - name: catalogPrice
+            title: Advies-Prijs excl.
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving NL
+
+          - name: packageQuantity
+            title: VERPAKKING
+  - filename: ppg.xlsx
+    template: PPG alle producten Prijslijst
+    tabs:
+      - tabname: Sheet1
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: Max Meyer
+          - name: manufacturer
+            value: Selemix
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: PPG Item CODE
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Bruto prijs per 1 okt
+          - name: purchaseDiscount
+            title: Adjustment Value (1)
+          - name: description
+            title: PPG Item Description
+  - filename: ppg-car.xlsx
+    template: PPG Car Prijs en bestellijst 2021-06
+    todo: Prijzen uitzoeken. Bruto/Netto/Kortingspercentage
+    tabs:
+      - tabname: PPG CAR
+        colRow: 3
+        cols:
+          - name: manufacturer
+            value: PPG
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: ppg-delfleet.xlsx
+    template: PPG Delfleet Prijslijst 2021-06
+    todo: Bruto Prijzen. Korting nog uitzoeken
+    tabs:
+      - tabname: PPG CT
+        colRow: 3
+        cols:
+          - name: manufacturer
+            value: PPG
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title:  Omschrijving
+
+          - name: PackageQuantity
+            title: Verpakt per
+  - filename: ppg-delfleet-one.xlsx
+    template: PPG Delfleet One Prijslijst 2021-06
+    todo: Bruto Prijzen. Korting nog uitzoeken
+    tabs:
+      - tabname: PPG Delfleet One
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: PPG
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: ppg-korting.xlsx
+    template: Lijst met alle PPG merken en producten ingaande juli 2021 prijs korting netto prijs
+    todo: Lijst met alle PPG producten die wij bestellen. Bruto+Korting aanwezig!
+    tabs:
+      - tabname: Blad1
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: PPG
+          - name: manufacturer
+            value: MaxMeyer
+          - name: manufacturer
+            value: Selemix
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: PPG Item Code
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: List Price
+          - name: purchaseDiscount
+            title: Adjustment Value % korting
+          - name: description
+            title: PPG Item Description
+  - filename: ppg-maxmeyer.xlsx
+    template: MaxMeyer Prijs en bestellijstlijst 2021
+    todo:
+    tabs:
+      - tabname: MM CAR
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: MaxMeyer
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Verpakt per
+  - filename: ppg-nexa-autocolor.xlsx
+    template: Nexa Autocolor 2021-06 non compliant
+    todo:
+    tabs:
+      - tabname: NEXA NC
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Verpakt per
+  - filename: ppg-nexa-autocolor-car.xlsx
+    template: Nexa Autocolor Car Prijs en bestellijst 2021-06
+    todo: Geen korting aanwezig
+    tabs:
+      - tabname: NEXA CAR
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Verpakt
+  - filename: ppg-nexa-autocolor-ct.xlsx
+    template: NEXA AUTOCOLOR CT Prijslijst 2021-06
+    todo: Geen korting aanwezig
+    tabs:
+      - tabname: NEXA CT
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Verpakt per
+  - filename: ppg-nexa-turbo-vision.xlsx
+    template: NEXA TURBO VISION Prijslijst 2021-06
+    todo: Geen korting aanwezig
+    tabs:
+      - tabname: NEXA CT
+        colRow: 2
+        cols:
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: ppg-non-compliant.xlsx
+    template: PPG Prijs en bestellijst 2021-06 non compliant
+    todo: Geen korting aanwezig
+    tabs:
+      - tabname: PPG NC
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: PPG
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Verpakt per
+  - filename: ppg-producten.xlsx
+    template: PPG alle producten aanpassing 1 oktober prijslijst
+    todo: Complete lijst. onderaan lijst taan producten met Netto Prijs? Uitzoeken
+    tabs:
+      - tabname: Sheet1
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: PPG
+          - name: manufacturer
+            value: MaxMeyer
+          - name: manufacturer
+            value: Selemix
+          - name: manufacturer
+            value: Nexa
+          - name: artNr
+            title: PPG Item Code
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Bruto prijs per 1 okt
+          - name: purchaseDiscount
+            title: Adjustment Value (1)
+          - name: description
+            title: PPG Item Description
+  - filename: ppg-selemix.xlsx
+    template: Selemix Prijs- en Bestellijst 2021-06
+    todo:
+    tabs:
+      - tabname:  SELEMIX
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Selemix
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: ppg-selemix-aqua.xlsx
+    template: Selemix Aqua Prijs- en Bestellijst 2021-06
+    todo: geen kortingen
+    tabs:
+      - tabname:  SELEMIX AQUA
+        colRow: 5
+        cols:
+          - name: manufacturer
+            value: Selemix
+          - name: artNr
+            title: Bestelcode
+          - name: supplier
+            value: PPG
+          - name: catalogPrice
+            title: Prijs per stuk (ltr/kg)
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+  - filename: rhiwa.xlsx
+    template: Rhiwa Prijslijst
+    tabs:
+      - tabname: Mirka schuurmaterialen
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Mirka
+          - name: artNr
+            title: Art. Nr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: VE_stuks
+          - name: ean
+            title: EAN
+      - tabname: machines en gereedschappen
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Mirka
+          - name: artNr
+            title: Art. Nr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Eenheid
+          - name: ean
+            title: EAN
+      - tabname: Mirka rollen & banden
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Mirka
+          - name: artNr
+            title: Art. Nr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: VE_stuks
+          - name: ean
+            title: EAN
+      - tabname: Sundstrom adembescherming
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Mirka
+          - name: artNr
+            title: Art. Nr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Bruto €
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Eenheid
+          - name: ean
+            title: EAN
+      - tabname: poets en reinigingsmaterialen
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Sundstrom
+          - name: artNr
+            title: Artikelnr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: Inhoud
+      - tabname: Perslucht
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Mirka
+          - name: artNr
+            title: Artikelnr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: VE_Stuks
+          - name: ean
+            title: EAN
+      - tabname: Div non Paint
+        colRow: 1
+        cols:
+          - name: manufacturer
+            value: Mirka
+          - name: artNr
+            title: Artikelnr
+          - name: supplier
+            value: Rhiwa
+          - name: catalogPrice
+            title: Catalogusprijs
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: VE_Stuks
+          - name: ean
+            title: EAN
+  - filename: shi.xlsx
+    template: SHI Bruto prijslijst non paint
+    tabs:
+      - tabname: Compleet
+        colRow: 6
+        cols:
+          - name: manufacturer
+            value: SHI
+          - name: artNr
+            title: Bestel nummer
+          - name: supplier
+            value: SHI
+          - name: catalogPrice
+            title: Bruto prijs vanaf                 01-03-'21
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving
+
+          - name: packageQuantity
+            title: BE
+          - name: ean
+            title: EAN Code Kleinverpakking
+  - filename: wsb-rupes.xlsx
+    template: WSB - RUPES Bruto Advies Verkoopprijslijst
+    tabs:
+      - tabname: WSB - RUPES Prijslijst 2021
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: Rupes
+          - name: artNr
+            title: Art. nr. WSB
+          - name: supplier
+            value: WSB
+          - name: catalogPrice
+            title: Adviesprijs 2021
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Artikelomschrijving Nederlands
+
+          - name: sap
+            title: SAP NR
+          - name: commodityClass
+            title: Commodity Class
+          - name: commodityCode
+            title: Commodity Code
+          - name: packageQuantity
+            title: Verkoop-eenheid (VE)
+          - name: packageQuantity
+            title: Stuks per verkoop-eenheid
+          - name: ean
+            title: EAN Codes
+          - name: eanPackage
+            title: EAN Code Overdoos
+          - name: palletQuantity
+            title: Stuks per pallet
+          - name: pictireLowResUrl
+            title: Main Picture URL to Low Respicture
+          - name: pictureHighResUrl
+            title: Main Picture URL to Hi Res picture
+  - filename: wsb-sata.xlsx
+    template: WSB - SATA Advies Verkoopprijslijst
+    tabs:
+      - tabname: SATA BJ 2021
+        colRow: 4
+        cols:
+          - name: manufacturer
+            value: SATA
+          - name: artNr
+            title: WSB Artikel nummer
+          - name: supplier
+            value: WSB
+          - name: catalogPrice
+            title: Bruto Advies Verkoopprijs 2021
+          - name: purchaseDiscount
+            value: 0
+          - name: description
+            title: Omschrijving Nederlands
+
+          - name: ean
+            title: EAN code

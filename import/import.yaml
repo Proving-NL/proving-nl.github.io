@@ -73,9 +73,9 @@ import:
           - name: supplier
             value: Airo
           - name: catalogPrice
-            title: Netto Prijs
+            title: Bruto Prijs
           - name: purchaseDiscount
-            value: 0
+            value: 60
           - name: description
             title: Omschrijving
 
@@ -515,7 +515,7 @@ import:
           - name: catalogPrice
             title: Catalogusprijs
           - name: purchaseDiscount
-            value: 0
+            title: Korting
           - name: description
             title: Bezeichnung
 
@@ -530,7 +530,7 @@ import:
         cols:
   - filename: kemtex.xlsx
     template: KEMTEX PRIJSLIJST
-    todo: kortingscodes overzetten in percentages
+    todo:
     tabs:
       - tabname: PRIJSLIJST 2021
         colRow: 1

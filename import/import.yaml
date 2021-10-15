@@ -1096,7 +1096,7 @@ import:
           - name: catalogPrice
             title: Adviesprijs 2021
           - name: purchaseDiscount
-            value: 0
+            title: Korting
           - name: description
             title: Artikelomschrijving Nederlands
 
@@ -1136,7 +1136,7 @@ import:
           - name: catalogPrice
             title: Bruto Advies Verkoopprijs 2021
           - name: purchaseDiscount
-            value: 0
+            value: 35
           - name: description
             title: Omschrijving Nederlands
 

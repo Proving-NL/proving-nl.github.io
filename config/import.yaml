@@ -311,3 +311,14 @@ import:
           catalogPrice: Catalogusprijs
           artGroep: Art_groep
           ean: EAN
+  - filename: ani.xlsx
+    template: Ani Prijzen netto
+    todo: Prijzen zijn Netto. Aanpassen naar Brutoprijs
+    tabs:
+      - tabname: Cliente 40572 PROVING   - P2
+        colRow: 2
+        keyname: ANI
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partPrice: [C]

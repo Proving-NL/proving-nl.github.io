@@ -1,5 +1,5 @@
 $().on('load', async e => {
-  supplierproduct = await fetch('/product.json').then( response => response.json() );
+  supplierproduct = await fetch('product.json').then( response => response.json() );
   // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
   supplierproduct.forEach(row => {
     row.description = row.description || row.title;
@@ -66,7 +66,7 @@ $(window).on('drop', async e => {
   if (data.types.includes('Files')) {
     const config = await fetch('https://aliconnect.nl/yaml.php', {
       method: 'POST',
-      body: await fetch('/config/import.yaml').then(res => res.text()),
+      body: await fetch('config/import.yaml').then(res => res.text()),
     }).then(res => res.json());
     Array.from(files).forEach(file => {
       config.import.filter(fileConfig => fileConfig.filename === file.name).forEach(fileConfig => {
@@ -141,7 +141,7 @@ $(window).on('drop', async e => {
             };
             console.log(data);
             // return;
-            const res = await fetch("/import.php?data=purchaseproduct", {
+            const res = await fetch("https://proving.aliconnect.nl/import.php?data=purchaseproduct", {
               method: 'POST', // *GET, POST, PUT, DELETE, etc.
               mode: 'cors', // no-cors, *cors, same-origin
               cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

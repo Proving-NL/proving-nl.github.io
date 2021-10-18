@@ -7,13 +7,14 @@ import:
         data:
           supplier: Metalak
           purchaseDiscount: 40
+          brand: 3M
         cols:
           orderCode: SAP NR
+          partNr: Partnr.
+
+          partEan: EAN Code Kleinverpakking
           description: Productomschrijving
           catalogPrice: Prijs per 1 sept 2021
-
-          partNr: Partnr.
-          partEan: EAN Code Kleinverpakking
           commodityClass: Commodity Class
           commodityCode: Commodity Code
           packageUnit: Verkoop-eenheid (VE)
@@ -23,20 +24,6 @@ import:
           palletQuantity: Stuks per pallet
           pictureLowResUrl: Main Picture URL to Low Respicture
           pictureHighResUrl: Main Picture URL to Hi Res picture
-  - filename: metalak-kovax.xlsx
-    tabs:
-      - tabname: Prijslijst 2021
-        colRow: 8
-        orderCode: KOV
-        data:
-          supplier: Metalak
-          purchaseDiscount: 40
-        cols:
-          orderCode: Artikel nr.
-          description: Productomschrijving
-          packageQuantity: Inhoud verp.
-          catalogPrice: prijs
-
   - filename: emm-met-balken.xls
     template:
     tabs:

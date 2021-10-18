@@ -1,0 +1,19 @@
+{
+  "name": "Metalak",
+  "description": "Metalak",
+  "version": "0.0.1",
+  "content_scripts": [
+    {
+      "matches": ["https://portal.metalak.nl/NL/*"],
+      "js": ["import.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "activeTab"
+  ],
+  "browser_action": {
+    "default_title": "Import"
+  },
+  "manifest_version": 2
+}

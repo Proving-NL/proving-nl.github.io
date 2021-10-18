@@ -1,0 +1,18 @@
+{
+  "name": "AIRO Import",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": ["https://www.airo-chemie.com/nl_*"],
+      "js": ["import.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "activeTab"
+  ],
+  "browser_action": {
+    "default_title": "Import AIRO"
+  },
+  "manifest_version": 2
+}

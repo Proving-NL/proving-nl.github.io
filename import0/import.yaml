@@ -4,13 +4,14 @@ import:
     tabs:
       - tabname: AAD Prijslijst
         colRow: 1
+        artcode: 3M
         data:
           supplier: Metalak
           purchaseDiscount: 40
           brand: 3M
         cols:
-          orderCode: SAP NR
-          partNr: Partnr.
+          ordercode: SAP NR
+          artcode: Partnr.
 
           partEan: EAN Code Kleinverpakking
           description: Productomschrijving

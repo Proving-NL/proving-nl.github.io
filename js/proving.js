@@ -74,8 +74,9 @@ $(window).on('drop', async e => {
         reader.readAsBinaryString(file);
         reader.onload = async e => {
           const workbook = XLSX.read(e.target.result, { type: 'binary' });
-          console.log(fileConfig.tabs);
+          // console.log(fileConfig.tabs);
           for (let tab of fileConfig.tabs) {
+            console.log(tab.tabname);
             const data = {
               rows: [],
             };
@@ -92,10 +93,16 @@ $(window).on('drop', async e => {
             for (var c=0; c<=colEnd; c++) {
               toprow[c] = rowvalue(tab.colRow,c);
             }
-            const cols = [];
-            for (var name in tab.cols) {
-              cols[toprow.indexOf(tab.cols[name])] = name;
-            }
+            // const cols = [];
+            // for (var name in tab.cols) {
+            //   if (Array.isArray(tab.cols[name])) {
+            //     tab.cols[name].forEach(c => cols[XLSX.utils.decode_col(c)] = name);
+            //   } else {
+            //     cols[toprow.indexOf(tab.cols[name])] = name;
+            //   }
+            // }
+            // console.log(tab.cols,cols);
+            // return;
             const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
             const infoElem = $('footer>.main');
             const rowStart = tab.colRow;
@@ -104,16 +111,32 @@ $(window).on('drop', async e => {
             for (var r = tab.colRow+1; r<=rowEnd; r++) {
               progressElem.value(r);
               let row;
-              cols.forEach((name,c) => {
-                const value = rowvalue(r, c);
+
+              for (var name in tab.cols) {
+                var value;
+                if (Array.isArray(tab.cols[name])) {
+                  value = tab.cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+                } else {
+                  value = rowvalue(r, toprow.indexOf(tab.cols[name]));
+                }
                 if (value !== undefined) {
                   row = row || Object.assign({},tab.data);
                   row[name] = value;
                 }
-              });
-              if (row && row.orderCode && row.description && row.catalogPrice) {
-                row.orderCode = (tab.orderCode || '') + row.orderCode;
-                data.rows.push(row);
+              }
+              if (row) {
+                // console.log(row)
+                row.keyname = row.keyname || row.orderCode;
+                if (row.keyname && (row.catalogPrice || row.purchasePrice || row.partPrice)) {
+                  // if (row && row.orderCode && row.description && row.catalogPrice) {
+                  row.keyname = (tab.keyname || '') + row.keyname;
+                  row.orderCode = (tab.orderCode || '') + row.orderCode;
+                  if (tab.calc) {
+                    tab.calc.forEach(c => row[c.name] *= c.faktor)
+                  }
+                  data.rows.push(row);
+                }
+
               }
             };
             console.log(data);

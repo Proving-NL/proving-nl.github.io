@@ -4,56 +4,310 @@ import:
     tabs:
       - tabname: AAD Prijslijst
         colRow: 1
+        keyname: ML3M
+        orderCode: 3M
         data:
           supplier: Metalak
-          purchaseDiscount: 40
         cols:
-          orderCode: SAP NR
+          keyname: SAP NR
+          orderCode: Partnr.
+
           description: Productomschrijving
           catalogPrice: Prijs per 1 sept 2021
 
-          partNr: Partnr.
           partEan: EAN Code Kleinverpakking
           commodityClass: Commodity Class
           commodityCode: Commodity Code
-          packageUnit: Verkoop-eenheid (VE)
-          packageQuantity: Stuks per verkoop-eenheid
-          packageEan: EAN Code Overdoos
-          packageMbe: MBE in aantal VE's
+          packUnit: Verkoop-eenheid (VE)
+          packQuantity: Stuks per verkoop-eenheid
+          packEan: EAN Code Overdoos
+          packMbe: MBE in aantal VE's
           palletQuantity: Stuks per pallet
           pictureLowResUrl: Main Picture URL to Low Respicture
           pictureHighResUrl: Main Picture URL to Hi Res picture
   - filename: metalak-kovax.xlsx
+    template: Kovax Europe_Prijslijst 2021
+    todo: aanpassen kolom B naar Productomschrijving, prijs spatie weghalen
     tabs:
       - tabname: Prijslijst 2021
         colRow: 8
+        keyname: MLKOV
         orderCode: KOV
         data:
           supplier: Metalak
-          purchaseDiscount: 40
         cols:
           orderCode: Artikel nr.
-          description: Productomschrijving
-          packageQuantity: Inhoud verp.
-          catalogPrice: prijs
 
+          description: Productomschrijving
+          packQuantity: Inhoud verp.
+          catalogPrice: prijs
+  - filename: metalak-axalta.xlsx
+    tabs:
+      - tabname: Prijslijst
+        colRow: 5
+        keyname: ML
+        data:
+          supplier: Metalak
+        cols:
+          orderCode: Artikel
+          description: Omschrijving
+          packUnit: Eenheid
+          catalogPrice: Verkoopprijs
+          purchaseDiscount: Korting %
+  - filename: airo-netto.xls
+    template: AiroNL_Netto
+    todo: Prijzen in xlsx bestand zijn netto prijzen. aanpassen naar bruto
+    tabs:
+      - tabname: Seite 1
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 2
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 3
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 4
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 5
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 6
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 7
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          palletQuantity: [K]
+          purchasePrice: [L]
+      - tabname: Seite 8
+        colRow: 3
+        keyname: AIR
+        data:
+          manufacturer: Airo
+          supplier: Airo
+        cols:
+          orderCode: [A]
+          description: [B,C,D,E]
+          partQuantity: [F]
+          partUnit: [G]
+          packQuantity: [H]
+          packUnit: [J]
+          # palletQuantity: [K]
+          purchasePrice: [K]
   - filename: emm-met-balken.xls
-    template:
+    template: EMM Prijslijst NL 2021 27-09-2021 met gele balken
+    todo: Meerdere Fabrikanten,leverancier is EMM. Sommige producten hebben Staffelkorting
     tabs:
       - tabname: EMM BASIS
         colRow: 16
+        keyname: EMM
         data:
           supplier: EMM
+        calc:
+          - name: purchaseDiscount
+            faktor: 100
         cols:
           orderCode: Art. nummer
-          brand: Groep
+          manufacturer: Groep
 
           catalogPage: Catalogus pag.
           description: NL Product Omschrijving
-          packageQuantity: NL Verpakking/Bestelhoeveelheid
+          packUnit: NL Verpakking/Bestelhoeveelheid
           catalogPrice: NL
           purchaseDiscount: Korting
           scaleDiscountStart: Vanaf
           scaleDiscount: Staffelkorting
-          packageUnit: NL prijs per
+          packUnit: NL prijs per
           partEan: EAN-code
+  - filename: ppg.xlsx
+    template: PPG alle producten Prijslijst
+    tabs:
+      - tabname: Sheet1
+        colRow: 5
+        keyname: PPG
+        cols:
+          orderCode: [B]
+          description: [C]
+          catalogPrice: [G]
+          purchaseDiscount: [I]
+  - filename: ppg-car.xlsx
+    template: PPG Car Prijs en bestellijst 2021-06
+    todo: Prijzen uitzoeken. Bruto/Netto/Kortingspercentage
+    tabs:
+      - tabname: PPG CAR
+        colRow: 3
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]
+  - filename: rhiwa.xlsx
+    template: Rhiwa Prijslijst
+    todo: kortingen opvragen
+    tabs:
+      - tabname: Mirka schuurmaterialen
+        colRow: 1
+        keyname: RHI
+        data:
+          brand: Mirka
+          supplier: Rhiwa
+        cols:
+          orderCode: Art. Nr
+          description: Omschrijving
+          artCode: Mirka_nr
+          catalogPrice: Catalogusprijs
+          artGroep: Art_groep
+          korrel: Korrel
+          packQuantity: VE_stuks
+          ean: EAN
+      - tabname: machines en gereedschappen
+        colRow: 1
+        keyname: RHI
+        cols:
+          orderCode: Art. Nr
+          description: Omschrijving
+          artCode: Mirka_nr
+          packUnit: Eenheid
+          catalogPrice: Catalogusprijs
+          artGroep: Art_groep
+          ean: EAN
+      - tabname: Mirka rollen & banden
+        colRow: 1
+        keyname: RHI
+        cols:
+          orderCode: Art. Nr
+          description: Omschrijving
+          korrel: Korrel
+          packQuantity: VE_stuks
+          artCode: Mirka_nr
+          packUnit: Eenheid
+          catalogPrice: Catalogusprijs
+          artGroep: Art_groep
+          ean: EAN
+      - tabname: Sundstrom adembescherming
+        colRow: 1
+        keyname: RHI
+        cols:
+          orderCode: Art. Nr
+          description: Omschrijving
+          catalogPrice: Bruto €
+          packQuantity: Eenheid
+          artGroep: Art_groep
+          ean: EAN
+      - tabname: poets en reinigingsmaterialen
+        colRow: 1
+        keyname: RHI
+        cols:
+          orderCode: Artikelnr
+          description: Omschrijving
+          partQuantity: Inhoud
+          catalogPrice: Catalogusprijs
+      - tabname: Perslucht
+        colRow: 1
+        keyname: RHI
+        cols:
+          orderCode: Artikelnr
+          description: Omschrijving
+          partQuantity: VE_Stuks
+          color: Korrel
+          artCode: Origineel nr.
+          catalogPrice: Catalogusprijs
+          artGroep: Art_groep
+          ean: EAN
+      - tabname: Div non paint
+        colRow: 1
+        keyname: RHI
+        cols:
+          orderCode: Artikelnr
+          description: Omschrijving
+          partQuantity: VE_Stuks
+          catalogPrice: Catalogusprijs
+          artGroep: Art_groep
+          ean: EAN

@@ -322,3 +322,235 @@ import:
           orderCode: [A]
           descriptionPart: [B]
           partPrice: [C]
+  - filename: capautomotive.xlsx
+    template: Proving PRIJSLIJST CAP Automotive
+    todo:
+    tabs:
+      - tabname: Prijslijst
+        colRow: 49
+        keyname: CAP
+        data:
+          supplier: capautomotive
+        calc:
+          - name: purchaseDiscount
+            faktor: 100
+        cols:
+          orderCode: ARTIKELNUMMER
+          descriptionPart: OMSCHRIJVING
+          partQuantity: verpakkingeenheid
+          catalogPrice: Catalogusprijs
+          purchaseDiscount: Korting
+          scaleDiscount: Proving Prijsafspraak 2021
+  - filename: chemicar.xlsx
+    template: Prijslijst Chemicar
+    todo:
+    tabs:
+      - tabname: BPM_PRL_Export
+        colRow: 1
+        keyname: CHE
+        data:
+          supplier: Chemicar
+        cols:
+          orderCode: Item Code
+          manufacturer: Chemicar
+
+          catalogPage: Catalogue Page Nr
+          description: Item Desc
+          packUnit: Qty
+          packQuantity: Sales Unit
+          catalogPrice: Price
+          purchaseDiscount: Discount Perc
+  - filename: dynabride.xlsx
+    template: Dynabrade EURO Price List
+    todo:
+    tabs:
+      - tabname: Feuil1
+        colRow: 8
+        keyname: DYN
+        data:
+          supplier: Dynabrade
+        cols:
+          orderCode: ITEM
+
+          description: SO DESC1
+          catalogPrice: EURO 2021
+          partEan: EAN CODE
+  - filename: emm-onderdelen.xlsx
+    template: EMM Onderdelen
+    todo:
+    tabs:
+      - tabname: Onderdelen
+        colRow: 11
+        keyname: EMM
+        data:
+          supplier: EMM
+        cols:
+          orderCode: Artikelnr.
+
+          description: Omschrijving
+          catalogPrice: Verkoopprijs
+  - filename: endstra.xls
+    template: Prijslijst Endstra
+    todo: Kolom H gebruiken, daarna G, Daarna C
+    tabs:
+      - tabname: Brutoprijs 2021
+        colRow: 1
+        keyname: END
+        data:
+          supplier: Endstra
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          partUnit: [D]
+          catalogPrice: [H]
+          packQuantity: [E]
+          partEan: [F]
+  - filename: gerko.xlsx
+    template: gerko airo nederland april
+    todo:
+    tabs:
+      - tabname: Blad1
+        colRow: 2
+        keyname: GER
+        data:
+          supplier: Gerko
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          catalogPrice: [C]
+  - filename: inp.xlsx
+    template: INP SMART - NL.inkoop
+    todo:
+    tabs:
+      - tabname: Blad1
+        colRow: 1
+        keyname: INP
+        data:
+          supplier: INP
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          packUnit: [C]
+          partUnit: [D]
+          partPrice: [E]
+  - filename: iwata.xlsx
+    template: Iwata AI_Fahrzeuglackierung_Preisliste
+    todo:
+    tabs:
+      - tabname: Fahrzeuglackierung
+        colRow: 1
+        keyname: IWA
+        data:
+          supplier: Iwata
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          packUnit: [C]
+          catalogPrice: [E]
+          purchaseDiscount: [F]
+  - filename: kemtex.xlsx
+    template: KEMTEX PRIJSLIJST
+    todo:
+    tabs:
+      - tabname: PRIJSLIJST 2021
+        colRow: 1
+        keyname: KEM
+        data:
+          supplier: Kemtex
+        cols:
+          orderCode: [A]
+
+          description: [C]
+          packUnit: [D]
+          catalogPrice: [F]
+          purchaseDiscount: [G]
+          packUnit: [E]
+          partEan: [B]
+  - filename: metalak-teroson.xlsx
+    template: TEROSON PRIJSLIJST DISTRIBUTEURS 2021_BNL
+    todo:
+    tabs:
+      - tabname: PRIJSLIJST DISTRIBUTEURS 2021
+        colRow: 4
+        keyname: MLTER
+        orderCode: TER
+        data:
+          supplier: Metalak
+        cols:
+  - filename:  motip.xlsx
+    template: Motip-Baten prijslijst
+    todo:
+    tabs:
+      - tabname: BNL 6
+        colRow: 11
+        keyname: MOT
+        data:
+          supplier: Motip Baten
+        cols:
+          orderCode: Artikel
+
+          catalogPage: Catalogus pag.
+          description: Omschrijving NL
+          packUnit: Verpakking
+          catalogPrice: Advies-Prijs excl.
+          partPrice: Netto prijs  excl.
+          partEan: EAN code
+          partunit: Gewichtinhoud
+  - filename: ppg-delfleet.xlsx
+    template: PPG Delfleet Prijslijst 2021-06
+    todo:
+    tabs:
+      - tabname: PPG CT
+        colRow: 3
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]
+  - filename: ppg-delfleet-one.xlsx
+    template: PPG Delfleet One Prijslijst 2021-06
+    todo:
+    tabs:
+      - tabname: PPG Delfleet One
+        colRow: 2
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          partPrice: [F]
+  - filename: ppg-korting.xlsx
+    template: Lijst met alle PPG merken en producten ingaande juli 2021 prijs korting netto prijs
+    todo:
+    tabs:
+      - tabname: Blad1
+          colRow: 1
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partPrice: [E]
+          purchasePrice: [C]
+          purchaseDiscount: [D]
+  - filename: ppg-maxmeyer.xlsx
+    template: MaxMeyer Prijs en bestellijstlijst 2021
+    todo:
+    tabs:
+      - tabname: MM CAR
+        colRow: 4
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]

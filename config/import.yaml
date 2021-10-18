@@ -481,7 +481,7 @@ import:
         data:
           supplier: Metalak
         cols:
-  - filename:  motip.xlsx
+  - filename: motip.xlsx
     template: Motip-Baten prijslijst
     todo:
     tabs:
@@ -554,3 +554,59 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
+  - filename: ppg-nexa-autocolor.xlsx
+    template: Nexa Autocolor 2021-06 non compliant
+    todo:
+    tabs:
+      - tabname: NEXA NC
+        colRow: 2
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]
+  - filename: wsb-sata.xlsx
+    template: WSB - SATA Advies Verkoopprijslijst
+    tabs:
+      - tabname: SATA BJ 2021
+        colRow: 4
+        keyname: WSB
+        orderCode: WSB
+        data:
+        supplier: WSB
+        cols:
+          orderCode: WSB Artikel nummer
+
+          description: Omschrijving Nederlands
+          catalogPrice: Bruto Advies Verkoopprijs 2021
+          partEan: EAN Code
+          packUnit: Verkoop-eenheid (VE)
+  - filename: ppg-nexa-autocolor-car.xlsx
+    template: Nexa Autocolor Car Prijs en bestellijst 2021-06
+    tabs:
+      - tabname: NEXA CAR
+        colRow: 2
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]
+  - filename: ppg-nexa-autocolor-ct.xlsx
+    template: NEXA AUTOCOLOR CT Prijslijst 2021-06
+    tabs:
+      - tabname: NEXA CT
+        colRow: 2
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [D]
+          partUnit: [E]
+          packQuantity: [F]
+          partPrice: [H]

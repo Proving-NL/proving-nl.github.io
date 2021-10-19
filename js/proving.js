@@ -1,18 +1,18 @@
 $().on('load', async e => {
-  supplierproduct = await fetch('product.json').then( response => response.json() );
-  // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
-  supplierproduct.forEach(row => {
-    row.description = row.description || row.title;
-    if (row.catalogPrice) {
-      row.saleDiscount = row.saleDiscount || Math.floor((row.purchaseDiscount || 0) * 0.3);
-    }
-    if (row.description.match(/tape/i)) row.brand = '3M';
-    if (row.description.match(/folie/i)) row.brand = '3MB';
-    // row.afmeting = (row.description.replace(/\s/g,'').match(/((\d+|\.|,?)(mm|m?)x(\d+|\.|,?)(mm|m))|((\d+|\.|,?)(mm|m))/)||[])[1] || '';
-    row.afmeting = (( row.description.match(/((([\d|\.|,]+?)\s*?(mm|cm|m)\s*?x\s*|)?(([\d|\.|,]+?)\s*?(mm|cm|m)\s*?x\s*|)?([\d|\.|,]+?)\s*?(mm|cm|m))/i) || [] )[1] || '').replace(/\s/g,'').toLowerCase();
-    row.gaten = (( row.description.match(/(\d+)\s*?(?=gaten)/i) || [] )[1] || '');
-    row.korrel = (( row.description.match(/\b(P\d+)\b/i) || [] )[1] || '');
-  })
+  // supplierproduct = await fetch('product.json').then( response => response.json() );
+  // // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
+  // supplierproduct.forEach(row => {
+  //   row.description = row.description || row.title;
+  //   if (row.catalogPrice) {
+  //     row.saleDiscount = row.saleDiscount || Math.floor((row.purchaseDiscount || 0) * 0.3);
+  //   }
+  //   if (row.description.match(/tape/i)) row.brand = '3M';
+  //   if (row.description.match(/folie/i)) row.brand = '3MB';
+  //   // row.afmeting = (row.description.replace(/\s/g,'').match(/((\d+|\.|,?)(mm|m?)x(\d+|\.|,?)(mm|m))|((\d+|\.|,?)(mm|m))/)||[])[1] || '';
+  //   row.afmeting = (( row.description.match(/((([\d|\.|,]+?)\s*?(mm|cm|m)\s*?x\s*|)?(([\d|\.|,]+?)\s*?(mm|cm|m)\s*?x\s*|)?([\d|\.|,]+?)\s*?(mm|cm|m))/i) || [] )[1] || '').replace(/\s/g,'').toLowerCase();
+  //   row.gaten = (( row.description.match(/(\d+)\s*?(?=gaten)/i) || [] )[1] || '');
+  //   row.korrel = (( row.description.match(/\b(P\d+)\b/i) || [] )[1] || '');
+  // })
   function num(value, dig = 2){
     return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
   }
@@ -46,14 +46,17 @@ $().on('load', async e => {
       // );
     }
   }
-
+  //
 })
 
 $(window).on('popstate', async e => {
+  const documentSearchParams = new URLSearchParams(document.location.search);
   const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
-  if (searchParams.get('$search')) {
-    const search = searchParams.get('$search').split(' ')
-    aim.om.listview(null, supplierproduct.filter(p => search.every(s => [p.artcode,p.title,p.description].filter(Boolean).join().toLowerCase().includes(s))));
+  if (!documentSearchParams.get('l') && !searchParams.get('l') && searchParams.get('$search')) {
+    // console.log('https://aliconnect.nl/api/abis/data?request_type=article&$search='+searchParams.get('$search'));
+    const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=article&$search='+searchParams.get('$search')).then(res => res.json());
+    console.log(data.rows);
+    aim.om.listview(null, data.rows);
   }
 })
 
@@ -69,6 +72,7 @@ $(window).on('drop', async e => {
       body: await fetch('config/import.yaml').then(res => res.text()),
     }).then(res => res.json());
     Array.from(files).forEach(file => {
+      console.log(file.name);
       config.import.filter(fileConfig => fileConfig.filename === file.name).forEach(fileConfig => {
         const reader = new FileReader();
         reader.readAsBinaryString(file);

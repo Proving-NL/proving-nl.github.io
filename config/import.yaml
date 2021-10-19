@@ -610,3 +610,104 @@ import:
           partUnit: [E]
           packQuantity: [F]
           partPrice: [H]
+  - filename: ppg-nexa-turbo-vision.xlsx
+    template: NEXA TURBO VISION Prijslijst 2021-06
+    tabs:
+      - tabname: NEXA Turbo Vision
+        colRow: 3
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          partPrice: [F]
+  - filename: ppg-nexa-turbo-vision.xlsx
+    template: PPG Prijs en bestellijst 2021-06 non compliant
+    tabs:
+      - tabname: PPG NC
+        colRow: 4
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]
+  - filename: ppg-producten.xlsx
+    template: PPG Car Prijs en bestellijst 2021-06
+    todo: PPG alle producten aanpassing 1 oktober prijslijst
+    tabs:
+      - tabname: Sheet1
+        colRow: 4
+        keyname: PPG
+        cols:
+          orderCode: PPG Item Code
+          manufacturer: Price List Description
+
+          description: PPG Item Description
+          catalogPrice: Bruto prijs per 1 okt
+          purchaseDiscount: Adjustment Value (1)
+  - filename: ppg-selemix.xlsx
+    template: Selemix Prijs- en Bestellijst 2021-06
+    tabs:
+      - tabname: SELEMIX
+        colRow: 1
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [C]
+          partQuantity: [D]
+          partUnit: [E]
+          packQuantity: [F]
+          partPrice: [H]
+  - filename: ppg-selemix-aqua.xlsx
+    template: Selemix Aqua Prijs- en Bestellijst 2021-06
+    tabs:
+      - tabname: SELEMIX AQUA
+        colRow: 5
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [C]
+          partQuantity: [E]
+          partUnit: [F]
+          packQuantity: [G]
+          partPrice: [I]
+  - filename: shi.xlsx
+    template: SHI Bruto prijslijst non paint
+    tabs:
+      - tabname: Compleet
+        colRow: 6
+        keyname: SHI
+        orderCode: SHI
+        data:
+          supplier: SHI
+        cols:
+          orderCode: Bestel nummer
+
+          description: Omschrijving
+          catalogPrice: Bruto prijs vanaf                 01-03-'21
+
+          partEan: EAN
+          packUnit: BE
+          packQuantity: BE
+  - filename: wsb-rupes.xlsx
+    template: WSB - RUPES Bruto Advies Verkoopprijslijst
+    tabs:
+      - tabname: WSB - RUPES Prijslijst 2021
+        colRow: 4
+        keyname: WSB
+        orderCode: WSB
+        data:
+          supplier: WSB
+        cols:
+          orderCode: Art. nr. WSB
+
+          description: Artikelomschrijving Nederlands
+          catalogPrice: Adviesprijs 2021
+
+          partEan: EAN Codes
+          packUnit: Verkoop-eenheid (VE)
+          purchaseDiscount: Korting

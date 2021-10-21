@@ -711,3 +711,47 @@ import:
           partEan: EAN Codes
           packUnit: Verkoop-eenheid (VE)
           purchaseDiscount: Korting
+  - filename: Airo Duitsland Scuff rollen.xlsx
+    template: Vlies - Flex Neue Preise 2021
+    tabs:
+      - tabname: Tabelle1
+        colRow: 7
+        keyname: Air
+        cols:
+          orderCode: [B]
+          descriptionPart: [C]
+          partQuantity: [H]
+          partPrice: [I]
+  - filename: Deerfos Preise 08 - 2021.xlsx
+    template: Sergio-Deerfos Preise 2021
+    tabs:
+      - tabname: Tabelle1
+        colRow: 8
+        keyname: Air
+        cols:
+          orderCode: [C]
+          descriptionPart: [D]
+          partQuantity: [I]
+          partPrice: [K]
+          packageQuantity: [J]
+  - filename: Majestic Prijslijst Q4 2021.xlsx
+    template: Kopie van Majestic Prijslijst Q4 2021
+    tabs:
+      - tabname: Prijslijstbestand
+        colRow: 16
+        keyname: MAJ
+        data:
+          supplier: MAJ
+        calc:
+          - name: purchaseDiscount
+            faktor: 100
+        cols:
+          orderCode: Art.nr met puntjes
+          manufacturer: Merk
+
+          description: Omschrijving
+          packUnit: Dooshoeveelheid
+          catalogPrice: Brutoprijs met maattoeslag
+          purchaseDiscount: Korting%
+          packUnit: Leverings hvh
+          partEan: EAN

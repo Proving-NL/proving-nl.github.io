@@ -532,7 +532,7 @@ import:
     todo:
     tabs:
       - tabname: Blad1
-          colRow: 1
+        colRow: 1
         keyname: PPG
         cols:
           orderCode: [A]

@@ -83,7 +83,7 @@ $(window).on('drop', async e => {
   if (data.types.includes('Files')) {
     const config = await fetch('https://aliconnect.nl/yaml.php', {
       method: 'POST',
-      body: await fetch('/config/import.yaml').then(res => res.text()),
+      body: await fetch('config/import.yaml').then(res => res.text()),
     }).then(res => res.json());
     console.log(1, config);
     Array.from(files).forEach(file => {

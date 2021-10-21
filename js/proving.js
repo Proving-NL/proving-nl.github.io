@@ -85,8 +85,9 @@ $(window).on('drop', async e => {
       method: 'POST',
       body: await fetch('config/import.yaml').then(res => res.text()),
     }).then(res => res.json());
-    console.log(1, config);
-    Array.from(files).forEach(file => {
+    console.log(1, config, files);
+    Array.from(files).forEach((file,i) => {
+      console.log(i,file);
       config.import.filter(fileConfig => file.name.match(fileConfig.filename)).forEach(fileConfig => {
         console.log(fileConfig.filename, file.name);
         const reader = new FileReader();
@@ -103,7 +104,8 @@ $(window).on('drop', async e => {
             tab.colRow = tab.colRow || 1;
             const sheet = workbook.Sheets[tab.tabname];
             const toprow = [];
-            var [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
+            console.log(sheet);
+            let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
             colEnd = XLSX.utils.decode_col(colEnd);
             function rowvalue(r,c){
               var cell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];

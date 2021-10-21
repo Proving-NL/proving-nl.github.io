@@ -203,7 +203,7 @@ import:
           scaleDiscount: Staffelkorting
           packUnit: NL prijs per
           partEan: EAN-code
-  - filename: ppg
+  - filename: ppg-basis
     template: PPG alle producten Prijslijst
     tabs:
       - tabname: Sheet1
@@ -568,22 +568,6 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: wsb-sata
-    template: WSB - SATA Advies Verkoopprijslijst
-    tabs:
-      - tabname: SATA BJ 2021
-        colRow: 4
-        keyname: WSB
-        orderCode: WSB
-        data:
-        supplier: WSB
-        cols:
-          orderCode: WSB Artikel nummer
-
-          description: Omschrijving Nederlands
-          catalogPrice: Bruto Advies Verkoopprijs 2021
-          partEan: EAN Code
-          packUnit: Verkoop-eenheid (VE)
   - filename: ppg-nexa-autocolor-car
     template: Nexa Autocolor Car Prijs en bestellijst 2021-06
     tabs:
@@ -610,6 +594,22 @@ import:
           partUnit: [E]
           packQuantity: [F]
           partPrice: [H]
+  - filename: wsb-sata
+    template: WSB - SATA Advies Verkoopprijslijst
+    tabs:
+      - tabname: SATA BJ 2021
+        colRow: 4
+        keyname: WSB
+        orderCode: WSB
+        data:
+        supplier: WSB
+        cols:
+          orderCode: WSB Artikel nummer
+
+          description: Omschrijving Nederlands
+          catalogPrice: Bruto Advies Verkoopprijs 2021
+          partEan: EAN Code
+          packUnit: Verkoop-eenheid (VE)
   - filename: ppg-nexa-turbo-vision
     template: NEXA TURBO VISION Prijslijst 2021-06
     tabs:

@@ -228,6 +228,20 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
+  - filename: ppg-maxmeyer
+    template: MaxMeyer Prijs en bestellijstlijst 2021
+    todo:
+    tabs:
+      - tabname: MM CAR
+        colRow: 4
+        keyname: PPG
+        cols:
+          orderCode: [A]
+          descriptionPart: [B]
+          partQuantity: [C]
+          partUnit: [D]
+          packQuantity: [E]
+          partPrice: [G]
   - filename: rhiwa
     template: Rhiwa Prijslijst
     todo: kortingen opvragen
@@ -420,7 +434,7 @@ import:
 
           description: [B]
           catalogPrice: [C]
-  - filename: inp
+  - filename: inp-basis
     template: INP SMART - NL.inkoop
     todo:
     tabs:
@@ -540,20 +554,6 @@ import:
           partPrice: [E]
           purchasePrice: [C]
           purchaseDiscount: [D]
-  - filename: ppg-maxmeyer
-    template: MaxMeyer Prijs en bestellijstlijst 2021
-    todo:
-    tabs:
-      - tabname: MM CAR
-        colRow: 4
-        keyname: PPG
-        cols:
-          orderCode: [A]
-          descriptionPart: [B]
-          partQuantity: [C]
-          partUnit: [D]
-          packQuantity: [E]
-          partPrice: [G]
   - filename: ppg-nexa-autocolor-basis
     template: Nexa Autocolor 2021-06 non compliant
     todo:
@@ -755,3 +755,50 @@ import:
           purchaseDiscount: Korting%
           packUnit: Leverings hvh
           partEan: EAN
+  - filename: INP-Inkoop
+    template: INP SMART - NL.inkoop
+    todo:
+    tabs:
+      - tabname: Blad1
+        colRow: 76
+        keyname: INP
+        data:
+          supplier: INP
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          packUnit: [C]
+          partUnit: [D]
+          partPrice: [E]
+  - filename: INP-Verkoop
+    template: INP SMART - NL.inkoop
+    todo:
+    tabs:
+      - tabname: Blad1
+        colRow: 68
+        keyname: INP
+        data:
+          supplier: INP
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          packUnit: [C]
+          partUnit: [D]
+          catalogPrice: [E]
+  - filename: Majestic-Maandprijslijst
+    template: Majestic maandprijslijst november 2021
+    todo:
+    tabs:
+      - tabname: per maat
+        colRow: 1
+        keyname: MAJ
+        data:
+          supplier: MAJ
+        cols:
+          orderCode: [B]
+
+          description: [D]
+          packQuantity: [F]
+          partPrice: [G]

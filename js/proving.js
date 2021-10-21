@@ -16,31 +16,46 @@ $().on('load', async e => {
   function num(value, dig = 2){
     return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
   }
-  aim.om.catalogPrice = function (row, div) {
-    if (row.catalogPrice) {
-      const listprice = row.catalogPrice;
-      const price = row.saleDiscount ? listprice * (100 - Number(row.saleDiscount)) / 100 : listprice;
+  // console.log(aim);
+  aim.catalogPrice = function (row, div) {
+    if ('catalogPrice' in row) {
+      // console.log(row);
+      // const elem = $('div').class('price');
+      const listPrice = row.catalogPrice;
+      var price = listPrice;
+      if (row.clientDiscount) {
+        div.append($('div').class('clientDiscount'));
+        var price = listPrice * (100 - row.clientDiscount) / 100;
+      } else if (row.clientNetPrice) {
+        div.append($('div').class('clientNetPrice'));
+        var price = row.clientNetPrice;
+      }
+      const discount = listPrice - price;
+      const discountPerc = (listPrice - price) / listPrice;
+      // const price = row.saleDiscount ? listPrice * (100 - Number(row.saleDiscount)) / 100 : listPrice;
       const fatprice = price * 1.21;
       // if (row.saleDiscount) div.class('discount');
       const attr = {
-        listprice: listprice,
-        fatprice: num(price * 1.21),
-        discountperc: row.saleDiscount ? num(row.saleDiscount,0) : null,
-        discount: row.saleDiscount ? num(listprice - price) : null,
+        listPrice: listPrice,
+        // clientNetPrice: row.clientNetPrice,
+        // clientDiscount: row.clientDiscount,
+        fatprice: num(fatprice),
+        discountperc: discountPerc ? discountPerc : null,//row.saleDiscount ? num(row.saleDiscount,0) : null,
+        discount: discount ? discount : null,//row.saleDiscount ? num(listPrice - price) : null,
         // price: row.saleDiscount ? row.catalogPrice * (100 - Number(row.saleDiscount)) / 100 : row.catalogPrice;
       }
-      if (row.saleDiscount) {
-        div.append($('div').class('discount').attr('value', row.saleDiscount));
-      }
+      // if (row.saleDiscount) {
+      //   div.append($('div').class('discount').attr('value', row.saleDiscount));
+      // }
       return $('div').class('price').append(
         $('div').attr(attr).append(
           $('span').text(num(price)),
         ),
         $('input').type('number').min(0),
       )
-      //   row.saleDiscount ? $('span').class('listprice').text(row.catalogPrice) : null,
+      //   row.saleDiscount ? $('span').class('listPrice').text(row.catalogPrice) : null,
       //   $('span').class('price').text(num(price)),
-      //   row.saleDiscount ? $('span').class('discount').text(num(listprice - price)) : null,
+      //   row.saleDiscount ? $('span').class('discount').text(num(listPrice - price)) : null,
       //   row.saleDiscount ? $('span').class('discountperc').text(row.saleDiscount + '%') : null,
       //   $('span').class('fatprice').text(num(fatprice)),
       // );
@@ -53,10 +68,9 @@ $(window).on('popstate', async e => {
   const documentSearchParams = new URLSearchParams(document.location.search);
   const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
   if (!documentSearchParams.get('l') && !searchParams.get('l') && searchParams.get('$search')) {
-    // console.log('https://aliconnect.nl/api/abis/data?request_type=article&$search='+searchParams.get('$search'));
-    const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=article&$search='+searchParams.get('$search')).then(res => res.json());
-    console.log(data.rows);
-    aim.om.listview(null, data.rows);
+    aim.search(searchParams.get('$search'));
+
+    // aim.api('/abis/data').query({request_type: 'article',$search: searchParams.get('$search')}).get().then(response => response.json().then(data => aim.listview(data.rows)));
   }
 })
 
@@ -69,10 +83,10 @@ $(window).on('drop', async e => {
   if (data.types.includes('Files')) {
     const config = await fetch('https://aliconnect.nl/yaml.php', {
       method: 'POST',
-      body: await fetch('config/import.yaml').then(res => res.text()),
+      body: await fetch('/config/import.yaml').then(res => res.text()),
     }).then(res => res.json());
+    console.log(1, config);
     Array.from(files).forEach(file => {
-      console.log(file.name);
       config.import.filter(fileConfig => fileConfig.filename === file.name).forEach(fileConfig => {
         const reader = new FileReader();
         reader.readAsBinaryString(file);

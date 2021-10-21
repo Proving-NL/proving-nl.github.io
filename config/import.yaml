@@ -1,5 +1,5 @@
 import:
-  - filename: metalak-3m.xlsx
+  - filename: metalak-3m
     template: 3M AAD Prijslijst
     tabs:
       - tabname: AAD Prijslijst
@@ -25,7 +25,7 @@ import:
           palletQuantity: Stuks per pallet
           pictureLowResUrl: Main Picture URL to Low Respicture
           pictureHighResUrl: Main Picture URL to Hi Res picture
-  - filename: metalak-kovax.xlsx
+  - filename: metalak-kovax
     template: Kovax Europe_Prijslijst 2021
     todo: aanpassen kolom B naar Productomschrijving, prijs spatie weghalen
     tabs:
@@ -41,7 +41,7 @@ import:
           description: Productomschrijving
           packQuantity: Inhoud verp.
           catalogPrice: prijs
-  - filename: metalak-axalta.xlsx
+  - filename: metalak-axalta
     tabs:
       - tabname: Prijslijst
         colRow: 5
@@ -54,7 +54,7 @@ import:
           packUnit: Eenheid
           catalogPrice: Verkoopprijs
           purchaseDiscount: Korting %
-  - filename: airo-netto.xls
+  - filename: airo-netto
     template: AiroNL_Netto
     todo: Prijzen in xlsx bestand zijn netto prijzen. aanpassen naar bruto
     tabs:
@@ -178,7 +178,7 @@ import:
           packUnit: [J]
           # palletQuantity: [K]
           purchasePrice: [K]
-  - filename: emm-met-balken.xls
+  - filename: emm-met-balken
     template: EMM Prijslijst NL 2021 27-09-2021 met gele balken
     todo: Meerdere Fabrikanten,leverancier is EMM. Sommige producten hebben Staffelkorting
     tabs:
@@ -203,7 +203,7 @@ import:
           scaleDiscount: Staffelkorting
           packUnit: NL prijs per
           partEan: EAN-code
-  - filename: ppg.xlsx
+  - filename: ppg
     template: PPG alle producten Prijslijst
     tabs:
       - tabname: Sheet1
@@ -214,7 +214,7 @@ import:
           description: [C]
           catalogPrice: [G]
           purchaseDiscount: [I]
-  - filename: ppg-car.xlsx
+  - filename: ppg-car
     template: PPG Car Prijs en bestellijst 2021-06
     todo: Prijzen uitzoeken. Bruto/Netto/Kortingspercentage
     tabs:
@@ -228,7 +228,7 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: rhiwa.xlsx
+  - filename: rhiwa
     template: Rhiwa Prijslijst
     todo: kortingen opvragen
     tabs:
@@ -311,7 +311,7 @@ import:
           catalogPrice: Catalogusprijs
           artGroep: Art_groep
           ean: EAN
-  - filename: ani.xlsx
+  - filename: ani
     template: Ani Prijzen netto
     todo: Prijzen zijn Netto. Aanpassen naar Brutoprijs
     tabs:
@@ -322,7 +322,7 @@ import:
           orderCode: [A]
           descriptionPart: [B]
           partPrice: [C]
-  - filename: capautomotive.xlsx
+  - filename: capautomotive
     template: Proving PRIJSLIJST CAP Automotive
     todo:
     tabs:
@@ -341,7 +341,7 @@ import:
           catalogPrice: Catalogusprijs
           purchaseDiscount: Korting
           scaleDiscount: Proving Prijsafspraak 2021
-  - filename: chemicar.xlsx
+  - filename: chemicar
     template: Prijslijst Chemicar
     todo:
     tabs:
@@ -360,7 +360,7 @@ import:
           packQuantity: Sales Unit
           catalogPrice: Price
           purchaseDiscount: Discount Perc
-  - filename: dynabride.xlsx
+  - filename: dynabride
     template: Dynabrade EURO Price List
     todo:
     tabs:
@@ -375,7 +375,7 @@ import:
           description: SO DESC1
           catalogPrice: EURO 2021
           partEan: EAN CODE
-  - filename: emm-onderdelen.xlsx
+  - filename: emm-onderdelen
     template: EMM Onderdelen
     todo:
     tabs:
@@ -389,7 +389,7 @@ import:
 
           description: Omschrijving
           catalogPrice: Verkoopprijs
-  - filename: endstra.xlsx
+  - filename: endstra
     template: Prijslijst Endstra
     todo: Kolom H gebruiken, daarna G, Daarna C
     tabs:
@@ -406,7 +406,7 @@ import:
           catalogPrice: [I]
           packQuantity: [E]
           partEan: [F]
-  - filename: gerko.xlsx
+  - filename: gerko
     template: gerko airo nederland april
     todo:
     tabs:
@@ -420,7 +420,7 @@ import:
 
           description: [B]
           catalogPrice: [C]
-  - filename: inp.xlsx
+  - filename: inp
     template: INP SMART - NL.inkoop
     todo:
     tabs:
@@ -436,7 +436,7 @@ import:
           packUnit: [C]
           partUnit: [D]
           partPrice: [E]
-  - filename: iwata.xlsx
+  - filename: iwata
     template: Iwata AI_Fahrzeuglackierung_Preisliste
     todo:
     tabs:
@@ -452,7 +452,7 @@ import:
           packUnit: [C]
           catalogPrice: [E]
           purchaseDiscount: [F]
-  - filename: kemtex.xlsx
+  - filename: kemtex
     template: KEMTEX PRIJSLIJST
     todo:
     tabs:
@@ -470,7 +470,7 @@ import:
           purchaseDiscount: [G]
           packUnit: [E]
           partEan: [B]
-  - filename: metalak-teroson.xlsx
+  - filename: metalak-teroson
     template: TEROSON PRIJSLIJST DISTRIBUTEURS 2021_BNL
     todo:
     tabs:
@@ -481,7 +481,7 @@ import:
         data:
           supplier: Metalak
         cols:
-  - filename: motip.xlsx
+  - filename: motip
     template: Motip-Baten prijslijst
     todo:
     tabs:
@@ -500,7 +500,7 @@ import:
           partPrice: Netto prijs  excl.
           partEan: EAN code
           partunit: Gewichtinhoud
-  - filename: ppg-delfleet.xlsx
+  - filename: ppg-delfleet-basis
     template: PPG Delfleet Prijslijst 2021-06
     todo:
     tabs:
@@ -514,7 +514,7 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: ppg-delfleet-one.xlsx
+  - filename: ppg-delfleet-one
     template: PPG Delfleet One Prijslijst 2021-06
     todo:
     tabs:
@@ -540,7 +540,7 @@ import:
           partPrice: [E]
           purchasePrice: [C]
           purchaseDiscount: [D]
-  - filename: ppg-maxmeyer.xlsx
+  - filename: ppg-maxmeyer
     template: MaxMeyer Prijs en bestellijstlijst 2021
     todo:
     tabs:
@@ -554,7 +554,7 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: ppg-nexa-autocolor.xlsx
+  - filename: ppg-nexa-autocolor-basis
     template: Nexa Autocolor 2021-06 non compliant
     todo:
     tabs:
@@ -568,7 +568,7 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: wsb-sata.xlsx
+  - filename: wsb-sata
     template: WSB - SATA Advies Verkoopprijslijst
     tabs:
       - tabname: SATA BJ 2021
@@ -584,7 +584,7 @@ import:
           catalogPrice: Bruto Advies Verkoopprijs 2021
           partEan: EAN Code
           packUnit: Verkoop-eenheid (VE)
-  - filename: ppg-nexa-autocolor-car.xlsx
+  - filename: ppg-nexa-autocolor-car
     template: Nexa Autocolor Car Prijs en bestellijst 2021-06
     tabs:
       - tabname: NEXA CAR
@@ -597,7 +597,7 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: ppg-nexa-autocolor-ct.xlsx
+  - filename: ppg-nexa-autocolor-ct
     template: NEXA AUTOCOLOR CT Prijslijst 2021-06
     tabs:
       - tabname: NEXA CT
@@ -610,7 +610,7 @@ import:
           partUnit: [E]
           packQuantity: [F]
           partPrice: [H]
-  - filename: ppg-nexa-turbo-vision.xlsx
+  - filename: ppg-nexa-turbo-vision
     template: NEXA TURBO VISION Prijslijst 2021-06
     tabs:
       - tabname: NEXA Turbo Vision
@@ -622,7 +622,7 @@ import:
           partQuantity: [C]
           partUnit: [D]
           partPrice: [F]
-  - filename: ppg-nexa-turbo-vision.xlsx
+  - filename: ppg-nexa-turbo-vision
     template: PPG Prijs en bestellijst 2021-06 non compliant
     tabs:
       - tabname: PPG NC
@@ -635,7 +635,7 @@ import:
           partUnit: [D]
           packQuantity: [E]
           partPrice: [G]
-  - filename: ppg-producten.xlsx
+  - filename: ppg-producten
     template: PPG Car Prijs en bestellijst 2021-06
     todo: PPG alle producten aanpassing 1 oktober prijslijst
     tabs:
@@ -649,7 +649,11 @@ import:
           description: PPG Item Description
           catalogPrice: Bruto prijs per 1 okt
           purchaseDiscount: Adjustment Value (1)
+<<<<<<< Updated upstream
   - filename: ppg-selemix-basis
+=======
+  - filename: ppg-selemix
+>>>>>>> Stashed changes
     template: Selemix Prijs- en Bestellijst 2021-06
     tabs:
       - tabname: SELEMIX
@@ -675,7 +679,7 @@ import:
           partUnit: [F]
           packQuantity: [G]
           partPrice: [I]
-  - filename: shi.xlsx
+  - filename: shi
     template: SHI Bruto prijslijst non paint
     tabs:
       - tabname: Compleet
@@ -693,7 +697,7 @@ import:
           partEan: EAN
           packUnit: BE
           packQuantity: BE
-  - filename: wsb-rupes.xlsx
+  - filename: wsb-rupes
     template: WSB - RUPES Bruto Advies Verkoopprijslijst
     tabs:
       - tabname: WSB - RUPES Prijslijst 2021
@@ -711,7 +715,7 @@ import:
           partEan: EAN Codes
           packUnit: Verkoop-eenheid (VE)
           purchaseDiscount: Korting
-  - filename: Airo Duitsland Scuff rollen.xlsx
+  - filename: Airo Duitsland Scuff rollen
     template: Vlies - Flex Neue Preise 2021
     tabs:
       - tabname: Tabelle1
@@ -722,7 +726,7 @@ import:
           descriptionPart: [C]
           partQuantity: [H]
           partPrice: [I]
-  - filename: Deerfos Preise 08 - 2021.xlsx
+  - filename: Deerfos Preise 08 - 2021
     template: Sergio-Deerfos Preise 2021
     tabs:
       - tabname: Tabelle1
@@ -734,7 +738,7 @@ import:
           partQuantity: [I]
           partPrice: [K]
           packageQuantity: [J]
-  - filename: Majestic Prijslijst Q4 2021.xlsx
+  - filename: Majestic Prijslijst Q4 2021
     template: Kopie van Majestic Prijslijst Q4 2021
     tabs:
       - tabname: Prijslijstbestand

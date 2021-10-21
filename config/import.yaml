@@ -649,11 +649,7 @@ import:
           description: PPG Item Description
           catalogPrice: Bruto prijs per 1 okt
           purchaseDiscount: Adjustment Value (1)
-<<<<<<< Updated upstream
   - filename: ppg-selemix-basis
-=======
-  - filename: ppg-selemix
->>>>>>> Stashed changes
     template: Selemix Prijs- en Bestellijst 2021-06
     tabs:
       - tabname: SELEMIX

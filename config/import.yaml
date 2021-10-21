@@ -389,7 +389,7 @@ import:
 
           description: Omschrijving
           catalogPrice: Verkoopprijs
-  - filename: endstra.xls
+  - filename: endstra.xlsx
     template: Prijslijst Endstra
     todo: Kolom H gebruiken, daarna G, Daarna C
     tabs:
@@ -403,7 +403,7 @@ import:
 
           description: [B]
           partUnit: [D]
-          catalogPrice: [H]
+          catalogPrice: [I]
           packQuantity: [E]
           partEan: [F]
   - filename: gerko.xlsx

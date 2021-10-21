@@ -527,7 +527,7 @@ import:
           partQuantity: [C]
           partUnit: [D]
           partPrice: [F]
-  - filename: ppg-korting.xlsx
+  - filename: ppg-korting
     template: Lijst met alle PPG merken en producten ingaande juli 2021 prijs korting netto prijs
     todo:
     tabs:
@@ -649,7 +649,7 @@ import:
           description: PPG Item Description
           catalogPrice: Bruto prijs per 1 okt
           purchaseDiscount: Adjustment Value (1)
-  - filename: ppg-selemix.xlsx
+  - filename: ppg-selemix-basis
     template: Selemix Prijs- en Bestellijst 2021-06
     tabs:
       - tabname: SELEMIX
@@ -662,7 +662,7 @@ import:
           partUnit: [E]
           packQuantity: [F]
           partPrice: [H]
-  - filename: ppg-selemix-aqua.xlsx
+  - filename: ppg-selemix-aqua
     template: Selemix Aqua Prijs- en Bestellijst 2021-06
     tabs:
       - tabname: SELEMIX AQUA

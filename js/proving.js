@@ -87,7 +87,8 @@ $(window).on('drop', async e => {
     }).then(res => res.json());
     console.log(1, config);
     Array.from(files).forEach(file => {
-      config.import.filter(fileConfig => fileConfig.filename === file.name).forEach(fileConfig => {
+      config.import.filter(fileConfig => file.name.match(fileConfig.filename)).forEach(fileConfig => {
+        console.log(fileConfig.filename, file.name);
         const reader = new FileReader();
         reader.readAsBinaryString(file);
         reader.onload = async e => {

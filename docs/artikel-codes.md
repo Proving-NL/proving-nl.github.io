@@ -214,6 +214,82 @@ verpakking / unit
 - `Non-paint/Machines/Poetsen`
 - `Paint/Lak/Grondlak`
 
+ 1. Kop 1,
+    **Schadeherstel**
+        **Reinigen**
+            Ontvetters/Thinners
+            Poetspapier
+          **Schuren**
+              Schuurmateriaal
+                Schijven
+                Stroken
+                Blokken
+                Scuff
+              Schuurmachines
+                Elektrisch
+                Pneumatisch
+                Accesoires
+          **Plamuren**
+              Plamuur
+                1-k
+                2-K
+              Plamuurmessen
+              Controle
+
+    **Lakproces**
+        **Maskeren**
+            Maskeerpapier
+            Papierdispensers
+            Maskeerfoliesysteem
+            Foliedispensers
+            Maskeerfoliesysteem
+            Maskeertap
+        **Schuren**
+            Mobiel schuursysteem
+            Schuurmateriaal
+              Schijven
+              Stroken
+              Blokken
+              Scuff
+            Schuurmachines
+              Elektrisch
+              Pneumatisch
+            Stofzuigers
+            Accesoires stofzuiger
+        **Oppervlaktebehandeling**
+            Pompvloeistofspuiten
+            Kleefdoeken
+            Ontvettingsdoeken
+            Ontvetters
+        **Lakvoorbereiding**
+            Mengbekers
+            Roerstokjes
+            Lakcontrole
+            Inzetbekers
+            Spuitstaaltjes
+            Filters
+        **Spuiten**
+            Non Paint
+              Snaplid systeem
+              Spuitpistolen
+              Accesoires
+            Paint
+              Primers/Grondverfen
+              Blanke lakken
+              Acryl verdunners
+              Etch Primers
+              Wash Primers              
+        **Poetsen**
+            Poetsmidellen
+            Foampads
+            Poetsdoeken
+            Spot Repair
+    **Persoonlijke Bescherming**
+        **Overalls**
+        **Handschoenen**
+        **Handreiniging**
+        **Maskers**
+        **Hoofbescherming**
 
 # Merk
 
@@ -230,7 +306,7 @@ verpakking / unit
 - APL: Aplex
 - APP: Applied
 - AQU: Aquamax
-- AQU: Aquamax extra
+- AQE: Aquamax extra
 - ASG: ASG
 - ASS: Assilex
 - ATL: Atlas

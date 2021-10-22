@@ -215,6 +215,7 @@ verpakking / unit
 - `Paint/Lak/Grondlak`
 
  1. Kop 1,
+
     **Schadeherstel**
         **Reinigen**
             Ontvetters/Thinners
@@ -278,18 +279,35 @@ verpakking / unit
               Blanke lakken
               Acryl verdunners
               Etch Primers
+              Mengkleuren
+                  Readymix
+                  Thinner-basis
+                  Water-basis
+                  industrieel
               Wash Primers              
         **Poetsen**
             Poetsmidellen
             Foampads
             Poetsdoeken
             Spot Repair
+            Poetsmachines
+
     **Persoonlijke Bescherming**
         **Overalls**
         **Handschoenen**
         **Handreiniging**
         **Maskers**
         **Hoofbescherming**
+
+    **Spuitbussen**
+        Maatwerk
+        Primers
+        Blanke lak
+          1-K
+          2-K
+        Pre-fill
+        Overig
+
 
 # Merk
 

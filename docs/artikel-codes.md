@@ -7,6 +7,7 @@
 
 - ArtNr: `artNr`
 - Merk: `merk`
+- Code: `code`
 - Tekst: `tekst`
 - Inhoud: `inhoud`
 - InhoudEenheid: `inhoudEenheid`
@@ -16,9 +17,10 @@
 - ArtGroep: `artGroep`
 - Bedrijf: `bedrijf`
 - Voorraad: `voorraad`
-- Code: `code`
+- Veiligheidsblad: `x`
+- Technischbal: `x`
 
-## Artikel
+## (Inkoop) Artikel
 
 - Artikel code: Product `artNr`
 - Eenheid: `eenheid`
@@ -27,9 +29,9 @@
 - Bestel code: `bestelCode`:
 - EAN barcode: `barCode`:
 - Gewicht: `gewicht`:
-- Bruto: `InkBruto`:
-- Kort.: `InkKorting`:
-- Netto: `InkNetto`:
+- Bruto: `inkBruto`:
+- Kort.: `inkKorting`:
+- Netto: `inkNetto`:
 - Datum (inkoop aanpassing): `d_netto`: `inkoopLastModifiedDateTime`:
 - Marge: `marge`:
 - Verkoop: `bruto`:
@@ -43,11 +45,64 @@
 - Leverancier Inkoop Korting %: `supDiscount`:
 - Leverancier Netto Prijs €: `supNetPrice`:
 
+# Aantekeningen
+
+- **Bruto stuksprijs**: Verkoop prijs per eenheid,
+- **Bruto prijs**: Verkoop prijs verpakking
+- **Netto prijs**: Verkoop prijs per eenheid,
+
+
+- 1 st €1,10
+- 12 st €1,03    14
+- 1 doos (12st) **12,00** (**1,00**/st) (**13,56** incl btw)
+
+- listPrice (24,00),
+- korting/discountPerc 50%, discount 12,00
+- klant-korting 60%, klant-discount 24,00
+- pack = doos, packQuantity 12, packPrice = 12,00, _unitPrice = 1,00_, fatPrice = 13,56
+
+
+-
+
+
+
+
+
+- `net` netto wordt genoemd
+- `unit` Part / Unit
+- `pack` Package
+
+# Data velden
+
+- `listPrice`: **Bruto Prijs** `catalogPrice`: Catalogus lijst prijs van het product / verpakking `cp`
+
+- `unitPrice`: **Stuks prijs** _eenheidsprijs_ `partPrice`: eenheidsprijs, prijs van 1 artikel in een meer verpakking zoals doos
+
+- `netPrice`: **Netto Prijs** _netto ex_
+- `fatPrice`: **Netto Incl BTW Prijs** _netto_
+
+inkoop prijs
+
+verpakking / unit
+
+- `client` `customer` Klant
+- `discount` Korting
+- Klant korting: `clientDiscount`, `customerDiscount`
+- Inkoop korting: `purchaseDiscount`,
+
+
+
+- `packPrice`: Prijs van de verpakking
+- `packQuantity`: Aantal units/producten in de verapkking
+
+
+
+
 # Artikel code
 
     1. Fabrikant/Merk:
     1. Fabrikant/Merk code:
-    1. Aantal stuks: Indien 1 negeren
+    1. Aantal stuks:
     1. Leverancier: Indien gelijk aan Fabrikant/Merk negeren
 
 ## Voorbeelden
@@ -149,9 +204,10 @@
 
 # Artikel groep
 
-1. Linker lijst
-1. Kop
-1. Product groep
+1. Kop 1, Linker lijst, Hoofdgroep
+1. Kop 2, rechter lijst
+1. Kop 3, Product groep
+1. Product namen
 
 - `Non-paint/Schuurmaterialen/Schuurschijven`
 - `Non-paint/Plamuren/Kitten`
@@ -163,7 +219,7 @@
 
 - 3M: 3M
 - AC: AC
-- AIR: AirGunza
+- AGU: AirGunza
 - AIR: Airo
 - ALL: Allway
 - AME: Amercoat
@@ -459,7 +515,7 @@
 - AIB: Airo Belgie
 - AIC: Airo Chemie
 - AJC: A.J. Coatings
-- ALI: AliExpress
+- ALE: AliExpress
 - ALI: all-in
 - ALP: Allpro
 - ALR: Alrotec
@@ -467,7 +523,7 @@
 - ANI: Ani
 - ANN: Annest Iwata
 - APC: APC
-- AUT: autoplex
+- AUT: Autoplex
 - AVD: AVD Zevenaar
 - BAS: BASF
 - BAT: Baten

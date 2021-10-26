@@ -362,15 +362,15 @@ verpakking / unit
 - DEB: Debrasel
 - DEK: Dekalin
 - DEL: Delta
-- DEL: Delta Plus
-- DEL: Deltalyo
+- DLP: Delta Plus
+- DTY: Deltalyo
 - DEV: DeVilbiss
 - DIN: Dinitrol
 - DRA: Draeger
 - DUA: Dual
 - DUP: Dupli color
 - DUP: Dupli-color
-- DUP: DuPont
+- DPN: DuPont
 - DUR: Duro
 - DYM: Dymo
 - DYN: dynabrade
@@ -393,7 +393,7 @@ verpakking / unit
 - FER: Ferro
 - FES: Festool
 - FIL: Filgraf
-- FIL: Fillon pichon
+- FLP: Fillon pichon
 - FIN: Finixa
 - FIN: Finxia
 - FIR: First Choice
@@ -406,12 +406,12 @@ verpakking / unit
 - G3 : G3
 - GER: Gerco
 - GER: Gerko
-- GER: Gerson
+- GSN: Gerson
 - GSI: GSI
 - GTI: GTI
 - HAM: Hamach
 - HEM: Hempel
-- HER: Herkules
+- HKL: Herkules
 - HER: Hermes
 - HIO: Hiolit
 - HIS: Histor
@@ -424,7 +424,7 @@ verpakking / unit
 - IM-: Im-pro
 - IND: Indasa
 - INP: INP
-- INT: Interchem
+- ITC: Interchem
 - INT: intergreen
 - IRP: IRP
 - IRT: IRT
@@ -433,7 +433,7 @@ verpakking / unit
 - JUM: Jumbo
 - JW: JW
 - KEM: Kem
-- KEM: Kematyl
+- KTL: Kematyl
 - KEM: Kemtex
 - KIM: Kimberley Clark
 - KIM: Kimberly Clark
@@ -454,21 +454,21 @@ verpakking / unit
 - LYO: Lyon
 - MAH: Mahotec
 - MAJ: Majestic
-- MAR: Marigold
+- MGL: Marigold
 - MAR: Marston
 - MAX: Max Meyer
 - MAX: Maxair
 - MAX: MaxMeyer
 - MEG: Meguro
-- MET: Metaflux
+- MFX: Metaflux
 - MET: Metalino
 - MH: MH
 - MIA: Miarco
 - MIL: Milwaukee
 - MIP: Mipa
 - MIR: Mirka
-- MIR: Mirkon
-- MIR: Mirlon
+- MKN: Mirkon
+- MLN: Mirlon
 - MOL: Moldex
 - MOT: Motip
 - MS4: MS4
@@ -489,23 +489,23 @@ verpakking / unit
 - POR: Portwest
 - PP : PP
 - PPG: PPG
-- PRE: Prevastar
+- PEV: Prevastar
 - PRE: Prevost
-- PRO: Procaneutre
-- PRO: Procar
-- PRO: Proflow
-- PRO: ProGun
-- PRO: Promask
-- PRO: Proshield
-- PRO: Protek
-- PRO: Protex
+- PCN: Procaneutre
+- PCR: Procar
+- PFL: Proflow
+- PGN: ProGun
+- PMK: Promask
+- PSH: Proshield
+- PTK: Protek
+- PTX: Protex
 - PUM: Puma
 - RED: Redbrick
-- RHI: Rhilan
-- RHI: Rhimex
-- RHI: Rhitex
+- RLN: Rhilan
+- RMX: Rhimex
+- RTX: Rhitex
 - RHI: Rhiwa
-- RIT: Ritex
+- RTX: Ritex
 - RM: RM
 - ROD: Rodac
 - RON: RoninTools
@@ -515,7 +515,7 @@ verpakking / unit
 - SAL: Saline
 - SAM: Sam
 - SAT: Sata
-- SAT: Satajet
+- STJ: Satajet
 - SCO: Scott
 - SEL: Selemix
 - SEM: SEM
@@ -550,13 +550,13 @@ verpakking / unit
 - SPE: Speedy P
 - SPI: Spies Hecker
 - SPR: Spralac
-- SPR: Spraymaster
-- SPR: Spraymax
+- SMT: Spraymaster
+- SMX: Spraymax
 - SPR: Sprint
 - STA: Standox
 - STA: Star
 - STA: Starchem
-- STA: Staubli
+- SBL: Staubli
 - STE: Steinel
 - SUM: Sumake
 - SUN: Sundström

@@ -217,19 +217,11 @@ verpakking / unit
  1. Kop 1,
 
     **Voorbewerken**
+
         **Reinigen**
             Ontvetters/Thinners
             Poetspapier
-          **Schuren**
-              Schuurmateriaal
-                Schijven
-                Stroken
-                Blokken
-                Scuff
-              Schuurmachines
-                Elektrisch
-                Pneumatisch
-                Accesoires
+
           **Plamuren**
               Plamuur
                 1-k

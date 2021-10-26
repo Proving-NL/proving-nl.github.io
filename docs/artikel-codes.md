@@ -582,7 +582,7 @@ verpakking / unit
 - TYV: Tyvek Pro
 - UF-: UF-Texco
 - UNI: Uni
-- UNI: Unimark
+- UNM: Unimark
 - UVE: Uvex
 - VAL: Valresa
 - VAT: Vattex

@@ -216,7 +216,7 @@ verpakking / unit
 
  1. Kop 1,
 
-    **Schadeherstel**
+    **Voorbewerken**
         **Reinigen**
             Ontvetters/Thinners
             Poetspapier
@@ -316,8 +316,8 @@ verpakking / unit
 - AGU: AirGunza
 - AIR: Airo
 - ALL: Allway
-- AME: Amercoat
-- AME: Amerlock
+- AMC: Amercoat
+- AML: Amerlock
 - AND: Andrea
 - ANI: Ani
 - ANS: Ansell
@@ -334,31 +334,31 @@ verpakking / unit
 - BLA: Black Diamond
 - BOD: BodyMagic
 - CAP: CAP
-- CAR: Car System
-- CAR: carbon
-- CAR: CarBrite
-- CAR: Cars Rallye
-- CAR: Cartool
+- CSY: Car System
+- CBO: carbon
+- CBR: CarBrite
+- CRA: Cars Rallye
+- CTO: Cartool
 - CEN: Central
 - CHE: Chemicar
 - CLE: Cleantec
 - CM : CM
 - CMT: CMT
 - COL: Colad
-- COL: Color Matic
-- COL: Colormatic
-- COL: Colour
+- CMA: Color Matic
+- CMA: Colormatic
+- CLR: Colour
 - COL: Columbus
-- COM: Commandant
-- COM: compact
+- CMN: Commandant
+- CMP: compact
 - COP: Copenhagen
 - COX: Cox
 - CRE: Creeper
-- CRE: Crepe
+- CRP: Crepe
 - CRO: Cromax
-- DE : De Beer
-- DE : De Jong
-- DE : De Vilbiss
+- DEB: De Beer
+- DEJ: De Jong
+- DEV: De Vilbiss
 - DEB: Debrasel
 - DEK: Dekalin
 - DEL: Delta
@@ -402,8 +402,8 @@ verpakking / unit
 - FÖR: Förster
 - FRI: Friess
 - FUT: Futura
-- FUT: Future paint
-- G3: G3
+- FTP: Future paint
+- G3 : G3
 - GER: Gerco
 - GER: Gerko
 - GER: Gerson

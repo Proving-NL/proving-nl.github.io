@@ -1,7 +1,7 @@
-- Paint
-    - Wel
-        - [Paint](/Paint)
-        - [Non paint](/Non-paint)
+- Voorbewerken
+    - Reinigen
+        - [Ontvetters/Thinners](/Paint)
+        - [Poetspapier](/Non-paint)
         - [Paint](/Paint)
         - [Non paint](/Non-paint)
         - [Non paint](/Non-paint)

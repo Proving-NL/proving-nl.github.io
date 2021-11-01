@@ -1,17 +1,19 @@
 # **Inkoopproces**
 
-## Invullen inkoopOrder
-## Plaatsen Order
-## Ontvangen Order/Controleren Order
-## Afboeken Order
+  ## Invullen inkoopOrder
+  ## Plaatsen Order
+  ## Ontvangen Order/Controleren Order
+  ## Afboeken Order
 
 # **Verkoopproces**
 
-## Aanmaken order in Abis PC
-## Doorsturen Order naar magazijn
-## Picken van Order
-## Leveren Order
-## Order Afhandelen als zijnde Geleverd
+  ## Aanmaken order in Abis PC
+  ## Doorsturen Order naar magazijn
+  ## Picken van Order
+  ## Leveren Order
+  ## Order Afhandelen als zijnde Geleverd
+
+
 
 # **Inkoopproces**
 

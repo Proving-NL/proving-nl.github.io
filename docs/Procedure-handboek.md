@@ -63,7 +63,7 @@
     - *wijze van Levering*
 
       - *Accountmanager*:
-        in ABIS, tijdens het maken van een order, wordt in het kopje User ingevuld welk verkoopkanaal verantwoordelijk is voor die order. Dit om een overzicht te krijgen bij wie, welke order vandaan komt. Ook om een beeld van alle Proving klanten te krijgen. welke accountmanager aan hun gekoppeld is of dat er nog een accountmanager aan ze gekoppeld moet worden. 
+        in ABIS, tijdens het maken van een order, wordt in het kopje User ingevuld welk verkoopkanaal verantwoordelijk is voor die order. Dit om een overzicht te krijgen bij wie, welke order vandaan komt. Ook om een beeld van alle Proving klanten te krijgen. welke accountmanager aan hun gekoppeld is of dat er nog een accountmanager aan ze gekoppeld moet worden.
         De Verkoopkanalen:
         Erik v Asselt (EA)
         Eric Joosten  (EJ)
@@ -74,7 +74,7 @@
 
       - *Wijze van bestellen*:
         In ABIS, vullen we onder kopje Route in, op welke wijze er besteld wordt. dit vullen we in aan de hand van een cijfer.
-        De Wijzen van Bestellen + code:
+        De Wijze van Bestellen + code:
         Telefonisch =1
         Whatsapp    =2
         Email order =3
@@ -90,7 +90,7 @@
 
       - *Wijze van Levering*:
         In ABIS, vullen we onder het kopje volgnummer in, op welke wijze de order geleverd moet worden. Dit vullen we in aan de hand van een cijfer.
-        de Wijzen van Leveren + code:
+        de Wijze van Leveren + code:
         Default                     =0
         Transport post              =1
         Transport Visser            =2
@@ -121,11 +121,10 @@
 # Aantekeningen
 
 -  Happy Flow: ideale proces
-- Unhappy flow ( Uitzonderingen)
 - JP = Binnendienst verkoop/ Inkoop
 - Alle bestelling moeten op een inkooporder komen
 - Verschillende vormen van bestellen benoemen in ABIS PC:
-  - invullen in Kopje Route:
+  - invullen in Kopje Route:Manier van Bestellen
     - Tel=1
     - Whats app=2
     - Email order=3

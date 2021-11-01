@@ -63,7 +63,7 @@
     - *wijze van Levering*
 
       - *Accountmanager*:
-        in ABIS, tijdens het maken van een order, wordt in het kopje User ingevuld welk verkoopkanaal verantwoordelijk is voor die order. Dit om een overzicht te krijgen bij wie, welke order vandaan komt.
+        in ABIS, tijdens het maken van een order, wordt in het kopje User ingevuld welk verkoopkanaal verantwoordelijk is voor die order. Dit om een overzicht te krijgen bij wie, welke order vandaan komt. Ook om een beeld van alle Proving klanten te krijgen. welke accountmanager aan hun gekoppeld is of dat er nog een accountmanager aan ze gekoppeld moet worden. 
         De Verkoopkanalen:
         Erik v Asselt (EA)
         Eric Joosten  (EJ)

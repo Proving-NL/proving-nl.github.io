@@ -802,3 +802,20 @@ import:
           description: [D]
           packQuantity: [F]
           partPrice: [G]
+  - filename: NonPaint24 RED-LINE Prijslijst
+    template: NonPaint24 RED LINE Prijslijst
+    todo:
+    tabs:
+      - tabname: Blad1
+        colRow: 1
+        keyname: AIR
+        data:
+          supplier: NON
+        cols:
+          orderCode: [A]
+
+          description: [B]
+          catalogPrice: [D]
+          packQuantity: [C]
+          saleDiscount: [E]
+          partPrice: [F]

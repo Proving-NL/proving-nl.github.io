@@ -91,11 +91,11 @@
       - *Wijze van Levering*:
         In ABIS, vullen we onder het kopje volgnummer in, op welke wijze de order geleverd moet worden. Dit vullen we in aan de hand van een cijfer.
         de Wijzen van Leveren + code:
-        Afhaal                      =1
-        Transport post              =2
-      Transport Visser              =3
-        Transport Route             =4
-        Mee met vertegenwoordiger   =5
+        Default                     =0
+        Transport post              =1
+        Transport Visser            =2
+        Transport Route             =3
+        Afgehaald                   =4
 ## Doorsturen order Magazijn
 
 ## **Operationeel proces**   

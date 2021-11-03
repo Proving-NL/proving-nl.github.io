@@ -6,11 +6,11 @@ html {
 }
 body>header{
   /* margin-top:48px; */
-  background: url(/img/top-bg.jpg);
+  background: url(/assets/img/top-bg.jpg);
   z-index:1;
 }
 body>header>article {
-  background: url(/img/logo-proving.png) no-repeat 0 20px;
+  background: url(/assets/img/logo-proving.png) no-repeat 0 20px;
   height:200px;
   /* height:100px; */
 }

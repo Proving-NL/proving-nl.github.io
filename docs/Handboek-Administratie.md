@@ -1,10 +1,10 @@
 Handboek met procedures voor administratie
 
-# Inhoud
+- Facturen die binnen komen worden door Mieke gecontroleerd met de bonnen die in map **(X)** zitten
+  Facturen die binnenkomen zonder Bon: **Actie Mieke>Jordie**
+- Facturen worden Betaald
 
-    1. Afas
-        1. Export
-            1. [Openstaande debiteuren](#Openstaande-debiteuren)
+
 
 
 # Afas
@@ -15,4 +15,4 @@ Handboek met procedures voor administratie
 
 1. asjdhfakjshdflkjha
 1. asjdhfakjshdflkjha
-1. zie [Handboek Order afhandeling Opstarten ABIS Web](Handboek-Order-afhandeling#Opstarten-ABIS-Web)
+1. [Opstarten ABIS Web](Handboek-Order-afhandeling#Opstarten-ABIS-Web)

@@ -189,6 +189,6 @@
     1. Upload sheet naar web server
         1. Stuur email + bijlage naar `leverancier.Wiltec.inkoopEmailaddress`
 - WSB
-1. Maak excel sheet: aantal, bestelcode, omschrijving
-1. Upload sheet naar web server
-    1. Stuur email + bijlage naar `leverancier.WSB.inkoopEmailaddress`
+    1. Maak excel sheet: aantal, bestelcode, omschrijving
+    1. Upload sheet naar web server
+        1. Stuur email + bijlage naar `leverancier.WSB.inkoopEmailaddress`

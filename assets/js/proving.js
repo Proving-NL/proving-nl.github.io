@@ -1,3 +1,15 @@
+aim.libraries.init = () => {
+  // console.log('JA');
+  aim.config.navleft = {
+    'Mijn Proving': {
+      Winkelmandje() {
+      },
+      Boodschappenlijst() {
+      },
+    },
+  }
+}
+
 $().on('load', async e => {
   // supplierproduct = await fetch('product.json').then( response => response.json() );
   // // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
@@ -62,6 +74,85 @@ $().on('load', async e => {
     }
   }
   //
+  if (['84.83.118.234'].includes(aim.config.client.ip)) {
+    function list(){
+      document.location.hash = `#?l=${aim.urlToId($().url('https://aliconnect.nl/api/abis/data').query(Object.assign(...arguments)).toString())}`;
+    }
+    const listdata = {
+      client: {
+        request_type: 'client',
+        $select: `schemaName,id,header0,header1,header2,color,scale,grow,accountName,accountManager,keyName,companyName,debNr,invoiceAddress1,businessAddressStreet,businessAddressPostalCode,businessAddressCity,businessAddressContact,otherAddressStreet,otherAddressCity,otherAddressContact,id,loc,geolocatie`,
+        $filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`,
+        $search: ``,
+      },
+      salesorder: {
+        request_type: 'salesorder',
+        // $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
+        // $select: clientKeyName,clientId,orderNr,status,orderDate
+        $select: 'schemaName,geolocatie,id,orderNr,clientKeyName,clientId,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,invoiceDate,invoiceNr,invoicePrintDate,invoiceSendDate,payCash,payPin',
+        $filter: 'orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1',
+        $order: 'clientKeyName',
+        $search: '*',
+      },
+    };
+    aim.om.treeview({
+      Magazijn: {
+        Aangemaakt(){
+          list(listdata.salesorder,{$filter: `orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1`});
+        },
+        Printen(){
+          list(listdata.salesorder,{$filter: `orderPrintDate EQ NULL AND active NE 0 AND isOffer NE 1`});
+        },
+        Pakken(){
+          list(listdata.salesorder,{$filter: `orderPickDate EQ NULL AND orderPrintDate NE NULL`});
+        },
+        Verzenden(){
+          list(listdata.salesorder,{$filter: `orderSendDate EQ NULL AND orderPickDate NE NULL`});
+        },
+        Geleverd(){
+          list(listdata.salesorder,{$filter: `orderDeliverDate EQ NULL AND orderSendDate NE NULL`});
+        },
+        Factureren(){
+          list(listdata.salesorder,{$filter: `invoiceDate EQ NULL AND orderDeliverDate NE NULL`});
+        },
+        Boeken(){
+          list(listdata.salesorder,{$filter: `invoiceBookDate EQ NULL AND invoiceNr GT 0`});
+        },
+        TeBetalen(){
+          list(listdata.salesorder,{$filter: `invoicePayDate EQ NULL AND invoiceBookDate NE NULL`});
+        },
+      },
+      Sales: {
+        Relaties() {
+          list(listdata.client,{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+        },
+        Klanten() {
+          list(listdata.client,{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+        },
+        Overig() {
+          list(listdata.client,{$filter: `accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+        },
+        Archief() {
+          list(listdata.client,{$filter: `archiefDT NE NULL OR companyName LIKE '%vervallen%'`});
+        },
+        Analyse: {
+          Klant() {
+            document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/client').toString())}`;
+          },
+          Voorraad() {
+            document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/voorraad').toString())}`;
+          },
+          Verloop() {
+            document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/verkoop_verloop').toString())}`;
+          },
+        }
+      },
+      Administratie: {
+
+      },
+    });
+  }
+  // console.log(111, aim.config);
 })
 
 $(window).on('popstate', async e => {

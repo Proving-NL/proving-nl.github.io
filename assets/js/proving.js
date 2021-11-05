@@ -25,10 +25,25 @@ $().on('load', async e => {
   //   row.gaten = (( row.description.match(/(\d+)\s*?(?=gaten)/i) || [] )[1] || '');
   //   row.korrel = (( row.description.match(/\b(P\d+)\b/i) || [] )[1] || '');
   // })
+
+
+  aim.config.components.schemas.salesorder.app = {
+    nav(row) {
+      console.log(row);
+      return [
+        $('button').text('Print').on('click', e => console.log('Printen')),
+        $('button').text('Gepakt en verzonden').on('click', e => console.log('Gepakt en verzonden')),
+        $('button').text('Factureren').disabled(true).on('click', e => console.log('Factureren')),
+      ]
+    }
+  }
+
+
+
   function num(value, dig = 2){
     return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
   }
-  // console.log(aim);
+  // console.log(aim.config);
   aim.catalogPrice = function (row, div) {
     if ('catalogPrice' in row) {
       // console.log(row);
@@ -74,66 +89,78 @@ $().on('load', async e => {
     }
   }
   //
-  if (['84.83.118.234'].includes(aim.config.client.ip)) {
-    function list(){
-      document.location.hash = `#?l=${aim.urlToId($().url('https://aliconnect.nl/api/abis/data').query(Object.assign(...arguments)).toString())}`;
+  if (aim.config.whitelist.includes(aim.config.client.ip)) {
+    function list(selector, options){
+      const args = Array.from(arguments);
+      const url = args.shift();
+      document.location.hash = `#?l=${aim.urlToId($().url('https://aliconnect.nl/api/'+selector).query(Object.assign(listdata[selector],options)).toString())}`;
     }
     const listdata = {
+      product: {
+        $select: `schemaName,id,bedrijf,manufacturer,brand,productTitle,description,productGroup,supplier`,
+        $search: ``,
+      },
+      article: {
+        $select: `*`,
+        $search: ``,
+      },
       client: {
-        request_type: 'client',
         $select: `schemaName,id,header0,header1,header2,color,scale,grow,accountName,accountManager,keyName,companyName,debNr,invoiceAddress1,businessAddressStreet,businessAddressPostalCode,businessAddressCity,businessAddressContact,otherAddressStreet,otherAddressCity,otherAddressContact,id,loc,geolocatie`,
-        $filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`,
         $search: ``,
       },
       salesorder: {
-        request_type: 'salesorder',
-        // $select: clientKeyName,clientId,orderNr,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,payCash,payPin,orderDoneDate,invoiceNr,invoiceDate,invoiceSendDate,invoiceBookDate,invoicePayDate,payBank,clientId
-        // $select: clientKeyName,clientId,orderNr,status,orderDate
-        $select: 'schemaName,geolocatie,id,orderNr,clientKeyName,clientId,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,invoiceDate,invoiceNr,invoicePrintDate,invoiceSendDate,payCash,payPin',
-        $filter: 'orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1',
+        $select: 'schemaName,id,geolocatie,orderNr,clientKeyName,clientId,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,invoiceDate,invoiceNr,invoicePrintDate,invoiceSendDate,payCash,payPin',
         $order: 'clientKeyName',
         $search: '*',
       },
     };
     aim.om.treeview({
+      Shop: {
+        Proving(){
+          list('product',{$filter: `bedrijf EQ 'proving'`});
+        },
+        Alles(){
+          list('article');
+        },
+      },
       Magazijn: {
         Aangemaakt(){
-          list(listdata.salesorder,{$filter: `orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1`});
+          list('salesorder',{$filter: `orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1`});
         },
         Printen(){
-          list(listdata.salesorder,{$filter: `orderPrintDate EQ NULL AND active NE 0 AND isOffer NE 1`});
+          list('salesorder',{$filter: `orderPrintDate EQ NULL AND active NE 0 AND isOffer NE 1`});
         },
         Pakken(){
-          list(listdata.salesorder,{$filter: `orderPickDate EQ NULL AND orderPrintDate NE NULL`});
+          list('salesorder',{$filter: `orderPickDate EQ NULL AND orderPrintDate NE NULL`});
         },
         Verzenden(){
-          list(listdata.salesorder,{$filter: `orderSendDate EQ NULL AND orderPickDate NE NULL`});
+          list('salesorder',{$filter: `orderSendDate EQ NULL AND orderPickDate NE NULL`});
         },
         Geleverd(){
-          list(listdata.salesorder,{$filter: `orderDeliverDate EQ NULL AND orderSendDate NE NULL`});
+          list('salesorder',{$filter: `orderDeliverDate EQ NULL AND orderSendDate NE NULL`});
         },
         Factureren(){
-          list(listdata.salesorder,{$filter: `invoiceDate EQ NULL AND orderDeliverDate NE NULL`});
+          list('salesorder',{$filter: `invoiceDate EQ NULL AND orderDeliverDate NE NULL`});
         },
         Boeken(){
-          list(listdata.salesorder,{$filter: `invoiceBookDate EQ NULL AND invoiceNr GT 0`});
+          list('salesorder',{$filter: `invoiceBookDate EQ NULL AND invoiceNr GT 0`});
         },
         TeBetalen(){
-          list(listdata.salesorder,{$filter: `invoicePayDate EQ NULL AND invoiceBookDate NE NULL`});
+          list('salesorder',{$filter: `invoicePayDate EQ NULL AND invoiceBookDate NE NULL`});
         },
       },
       Sales: {
         Relaties() {
-          list(listdata.client,{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+          list('client',{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
         },
         Klanten() {
-          list(listdata.client,{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+          list('client',{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
         },
         Overig() {
-          list(listdata.client,{$filter: `accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+          list('client',{$filter: `accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
         },
         Archief() {
-          list(listdata.client,{$filter: `archiefDT NE NULL OR companyName LIKE '%vervallen%'`});
+          list('client',{$filter: `archiefDT NE NULL OR companyName LIKE '%vervallen%'`});
         },
         Analyse: {
           Klant() {
@@ -148,7 +175,27 @@ $().on('load', async e => {
         }
       },
       Administratie: {
+        Openstaande_debiteuren() {
 
+        },
+        AFas: {
+          Export: {
+            Facturen: {
+              Airo() {
+              },
+              Proving() {
+              },
+            },
+          },
+          Import: {
+            Openstaande_Debiteuren: {
+              Airo() {
+              },
+              Proving() {
+              },
+            },
+          },
+        },
       },
     });
   }

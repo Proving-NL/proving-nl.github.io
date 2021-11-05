@@ -178,24 +178,15 @@ $().on('load', async e => {
         Openstaande_debiteuren() {
 
         },
-        AFas: {
-          Export: {
-            Facturen: {
-              Airo() {
-              },
-              Proving() {
-              },
-            },
+        Afas: {
+          Export_Facturen_Airo: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
+          Export_Facturen_Proving: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=proving',
+          Import_Openstaande_Debiteuren_Airo() {
           },
-          Import: {
-            Openstaande_Debiteuren: {
-              Airo() {
-              },
-              Proving() {
-              },
-            },
+          Import_Openstaande_Debiteuren_Proving() {
           },
         },
+        Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
       },
     });
   }

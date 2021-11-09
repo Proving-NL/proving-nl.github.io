@@ -107,7 +107,7 @@ $().on('load', async e => {
     rows = rows.filter(row => row.orderNr === salesorder.nr);
     return $('div').append(
       orderPageElem(salesorder, rows, {title: 'PAKBON INTERN'}).style('page-break-before:always;').append(
-        salesorder.clientOpmerking ? $('div').text(salesorder.clientOpmerking).style('padding:10px;border:solid 1px red;') : null,
+        // salesorder.clientOpmerking ? $('div').text(salesorder.clientOpmerking).style('padding:10px;border:solid 1px red;') : null,
         salesorder.remark ? $('div').text(salesorder.remark).style('padding:10px;border:solid 1px red;') : null,
       ),
       orderPageElem(salesorder, rows, {title: 'PAKBON'}).style('page-break-before:always;'),
@@ -195,54 +195,54 @@ $().on('load', async e => {
   // console.log(aim.config);
   aim.cols = {
     catalogPrice(row, div) {
-    if ('catalogPrice' in row) {
-      // console.log(row);
-      // const elem = $('div').class('price');
-      const listPrice = row.catalogPrice;
-      var price = listPrice;
-      if (row.clientDiscount) {
-        div.append($('div').class('clientDiscount'));
-        var price = listPrice * (100 - row.clientDiscount) / 100;
-      } else if (row.clientNetPrice) {
-        div.append($('div').class('clientNetPrice'));
-        var price = row.clientNetPrice;
+      if ('catalogPrice' in row) {
+        // console.log(row);
+        // const elem = $('div').class('price');
+        const listPrice = row.catalogPrice;
+        var price = listPrice;
+        if (row.clientDiscount) {
+          div.append($('div').class('clientDiscount'));
+          var price = listPrice * (100 - row.clientDiscount) / 100;
+        } else if (row.clientNetPrice) {
+          div.append($('div').class('clientNetPrice'));
+          var price = row.clientNetPrice;
+        }
+        const discount = listPrice - price;
+        const discountPerc = (listPrice - price) / listPrice;
+        // const price = row.saleDiscount ? listPrice * (100 - Number(row.saleDiscount)) / 100 : listPrice;
+        const fatprice = price * 1.21;
+        // if (row.saleDiscount) div.class('discount');
+        const attr = {
+          listPrice: listPrice,
+          // clientNetPrice: row.clientNetPrice,
+          // clientDiscount: row.clientDiscount,
+          fatprice: num(fatprice),
+          discountperc: discountPerc ? discountPerc : null,//row.saleDiscount ? num(row.saleDiscount,0) : null,
+          discount: discount ? discount : null,//row.saleDiscount ? num(listPrice - price) : null,
+          // price: row.saleDiscount ? row.catalogPrice * (100 - Number(row.saleDiscount)) / 100 : row.catalogPrice;
+        }
+        // if (row.saleDiscount) {
+        //   div.append($('div').class('discount').attr('value', row.saleDiscount));
+        // }
+        return $('div').class('price').append(
+          $('div').attr(attr).append(
+            $('span').text(num(price)),
+          ),
+          $('input').type('number').min(0),
+        )
+        //   row.saleDiscount ? $('span').class('listPrice').text(row.catalogPrice) : null,
+        //   $('span').class('price').text(num(price)),
+        //   row.saleDiscount ? $('span').class('discount').text(num(listPrice - price)) : null,
+        //   row.saleDiscount ? $('span').class('discountperc').text(row.saleDiscount + '%') : null,
+        //   $('span').class('fatprice').text(num(fatprice)),
+        // );
       }
-      const discount = listPrice - price;
-      const discountPerc = (listPrice - price) / listPrice;
-      // const price = row.saleDiscount ? listPrice * (100 - Number(row.saleDiscount)) / 100 : listPrice;
-      const fatprice = price * 1.21;
-      // if (row.saleDiscount) div.class('discount');
-      const attr = {
-        listPrice: listPrice,
-        // clientNetPrice: row.clientNetPrice,
-        // clientDiscount: row.clientDiscount,
-        fatprice: num(fatprice),
-        discountperc: discountPerc ? discountPerc : null,//row.saleDiscount ? num(row.saleDiscount,0) : null,
-        discount: discount ? discount : null,//row.saleDiscount ? num(listPrice - price) : null,
-        // price: row.saleDiscount ? row.catalogPrice * (100 - Number(row.saleDiscount)) / 100 : row.catalogPrice;
-      }
-      // if (row.saleDiscount) {
-      //   div.append($('div').class('discount').attr('value', row.saleDiscount));
-      // }
-      return $('div').class('price').append(
-        $('div').attr(attr).append(
-          $('span').text(num(price)),
-        ),
-        $('input').type('number').min(0),
-      )
-      //   row.saleDiscount ? $('span').class('listPrice').text(row.catalogPrice) : null,
-      //   $('span').class('price').text(num(price)),
-      //   row.saleDiscount ? $('span').class('discount').text(num(listPrice - price)) : null,
-      //   row.saleDiscount ? $('span').class('discountperc').text(row.saleDiscount + '%') : null,
-      //   $('span').class('fatprice').text(num(fatprice)),
-      // );
-    }
-  },
+    },
 
   }
   //
   if (aim.config.whitelist.includes(aim.config.client.ip)) {
-    function list(selector, options){
+    function list(selector, options={}){
       console.log(selector, aim.config.components.schemas[selector]);
       const args = Array.from(arguments);
       const url = args.shift();
@@ -259,6 +259,9 @@ $().on('load', async e => {
           list('article');
         },
       },
+      Orders: e => list('salesorder',{
+        $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0 && payDateTime EQ NULL`,
+      }),
       Abis: {
         Klanten() {
           list('client');
@@ -285,33 +288,43 @@ $().on('load', async e => {
           list('account');
         },
       },
-      Orders: {
+      Orders1: {
+        Actief: e => list('salesorder',{
+          $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
+        }),
         Aanbieding: e => list('salesorder',{
           $filter: `isQuote EQ 1 && isOrder NE 1`,
+        }),
+        Aanbieding2: e => list('salesorder',{
+          $filter: `orderstatus IN(1,2)`,
         }),
         Winkelmandje: e => list('salesorder',{
           $filter: `isQuote NE 1 && isOrder NE 1`,
         }),
         Printen: e => list('salesorder',{
-          $filter: `isOrder EQ 1 && printDateTime EQ NULL`,
+          $filter: `printDateTime EQ NULL && isOrder EQ 1`,
         }),
         Pakken: e => list('salesorder',{
-          $filter: `printDateTime NE NULL && pickDateTime EQ NULL`,
+          $filter: `pickDateTime EQ NULL && printDateTime NE NULL`,
         }),
         Verzenden: e => list('salesorder',{
-          $filter: `pickDateTime NE NULL && sendDateTime EQ NULL`,
+          $filter: `sendDateTime EQ NULL && pickDateTime NE NULL`,
         }),
         Verzonden: e => list('salesorder',{
-          $filter: `sendDateTime NE NULL && deliverDateTime EQ NULL`,
+          $filter: `deliverDateTime EQ NULL && sendDateTime NE NULL`,
         }),
         Geleverd: e => list('salesorder',{
-          $filter: `deliverDateTime NE NULL && invoiceNr EQ 0`,
+          $filter: `invoiceNr EQ 0 && deliverDateTime NE NULL`,
+        }),
+        Factureren: e => list('salesorder',{
+          $filter: `verwerkt=1 and aanbieding <> 1 and isnull(factuurnr,0) = 0 and isnull(faktuurnr,0) = 0`,
+          $filter: `isOrder EQ 1 && isQuote NE 1 && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
         }),
         Gefactureerd: e => list('salesorder',{
-          $filter: `invoiceNr GT 0 && bookDateTime EQ NULL`,
+          $filter: `bookDateTime EQ NULL && invoiceNr GT 0`,
         }),
         Geboekt: e => list('salesorder',{
-          $filter: `bookDateTime NE NULL && payDateTime EQ NULL`,
+          $filter: `payDateTime EQ NULL && bookDateTime NE NULL`,
         }),
         Betaald: e => list('salesorder',{
           $filter: `payDateTime NE NULL`,
@@ -319,10 +332,16 @@ $().on('load', async e => {
         Alles: e => list('salesorder'),
       },
       Sales: {
-        Klanten() {
-          // list('client',{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
-          list('client');
-        },
+        Klanten: e => list('client',{
+          $filter: `archivedDateTime EQ NULL`,
+        }),
+        Archief: e => list('client',{
+          $filter: `archivedDateTime NE NULL`,
+        }),
+        // Klanten() {
+        //   // list('client',{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+        //   list('client');
+        // },
         // Klanten() {
         //   list('client',{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
         // },

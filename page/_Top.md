@@ -1,9 +1,0 @@
-- Producten
-    - [Paint](/Paint)
-    - [Non paint](/Non-paint)
-- Aanbiedingen
-    - [Premium füller](/sale/premium-fuller)
-- [Tips](/Tips)
-- Over Proving
-    - [Duurzaam](/Duurzaam)
-- [Contact](/Contact)

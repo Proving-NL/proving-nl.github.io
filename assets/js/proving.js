@@ -44,14 +44,14 @@ $().on('load', async e => {
     },200);
 
   }
-  function orderPageElem(salesorder,rows) {
+  function orderPageElem(salesorder,rows,options) {
     return $('div').append(
       $('div').append(
         $('img').src(`https://${salesorder.accountCompanyName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountCompanyName.toLowerCase()}.png`),
       ),
       $('table').append(
         $('tr').append(
-          $('td').style('width:11cm;').append(
+          $('td').style('width:11cm;padding-top:2cm;').append(
             $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
             $('div').text(salesorder.clientBusinessContactName),
             $('div').text(salesorder.clientBusinessAddressStreet),
@@ -63,13 +63,27 @@ $().on('load', async e => {
           ),
         )
       ),
-      $('div').text('PAKBON', salesorder.nr).style('font-weight:bold;font-size:2em;'),
+      $('div').text(options.title).style('font-weight:bold;font-size:2em;'),
       $('table').append(
         $('thead').append(
-          $('tr').append(['OrderNr','Datum','Status','Transport','Factuur','Gewicht'].map(n => $('th').text(n))),
+          $('tr').append([
+            'OrderNr',
+            'Datum',
+            // 'Status',
+            'Transport',
+            // 'Factuur',
+            'Gewicht'
+          ].map(n => $('th').text(n))),
         ),
         $('tbody').append(
-          $('tr').append([salesorder.nr,salesorder.orderDateTime,salesorder.status,salesorder.routeNr,salesorder.invoiceNr,salesorder.weight].map(n => $('td').text(n))),
+          $('tr').append([
+            salesorder.nr,
+            new Date(salesorder.orderDateTime).toLocaleDateString(),
+            // salesorder.status,
+            ['Niet ingevuld', 'Post', 'Visser', 'Route', 'Afhalen', 'Brengen'][salesorder.routeNr] || 'Onbekend',
+            // salesorder.invoiceNr,
+            salesorder.weight
+          ].map(n => $('td').text(n))),
         ),
       ),
       $('table').append(
@@ -92,8 +106,11 @@ $().on('load', async e => {
     console.log(salesorder.nr, rows)
     rows = rows.filter(row => row.orderNr === salesorder.nr);
     return $('div').append(
-      orderPageElem(salesorder, rows).style('page-break-before:always;'),
-      orderPageElem(salesorder, rows).style('page-break-before:always;'),
+      orderPageElem(salesorder, rows, {title: 'PAKBON INTERN'}).style('page-break-before:always;').append(
+        salesorder.clientOpmerking ? $('div').text(salesorder.clientOpmerking).style('padding:10px;border:solid 1px red;') : null,
+        salesorder.remark ? $('div').text(salesorder.remark).style('padding:10px;border:solid 1px red;') : null,
+      ),
+      orderPageElem(salesorder, rows, {title: 'PAKBON'}).style('page-break-before:always;'),
     );
   }
 
@@ -268,48 +285,38 @@ $().on('load', async e => {
           list('account');
         },
       },
-      Magazijn: {
-        Winkelmandje(){
-          list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 1 AND isQuote NE 1`});
-        },
-        Paklijst: {
-          Post(){
-            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 1`});
-          },
-          Visser(){
-            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 2`});
-          },
-          Route(){
-            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 3`});
-          },
-          Afhalen(){
-            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 4`});
-          },
-          Brengen(){
-            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 5`});
-          },
-          Overig(){
-            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr NOT IN (1,2,3,4,5)`});
-          },
-        },
-        // Pakken(){
-        //   list('salesorder',{$filter: `pickDateTime EQ NULL AND printDateTime NE NULL`});
-        // },
-        // Verzenden(){
-        //   list('salesorder',{$filter: `sendDateTime EQ NULL AND pickDateTime NE NULL`});
-        // },
-        Geleverd(){
-          list('salesorder',{$filter: `deliverDateTime EQ NULL AND sendDateTime NE NULL`});
-        },
-        Factureren(){
-          list('salesorder',{$filter: `invoiceDateTime EQ NULL AND deliverDateTime NE NULL`});
-        },
-        Boeken(){
-          list('salesorder',{$filter: `bookDateTime EQ NULL AND invoiceNr GT 0`});
-        },
-        TeBetalen(){
-          list('salesorder',{$filter: `payDateTime EQ NULL AND bookDateTime NE NULL`});
-        },
+      Orders: {
+        Aanbieding: e => list('salesorder',{
+          $filter: `isQuote EQ 1 && isOrder NE 1`,
+        }),
+        Winkelmandje: e => list('salesorder',{
+          $filter: `isQuote NE 1 && isOrder NE 1`,
+        }),
+        Printen: e => list('salesorder',{
+          $filter: `isOrder EQ 1 && printDateTime EQ NULL`,
+        }),
+        Pakken: e => list('salesorder',{
+          $filter: `printDateTime NE NULL && pickDateTime EQ NULL`,
+        }),
+        Verzenden: e => list('salesorder',{
+          $filter: `pickDateTime NE NULL && sendDateTime EQ NULL`,
+        }),
+        Verzonden: e => list('salesorder',{
+          $filter: `sendDateTime NE NULL && deliverDateTime EQ NULL`,
+        }),
+        Geleverd: e => list('salesorder',{
+          $filter: `deliverDateTime NE NULL && invoiceNr EQ 0`,
+        }),
+        Gefactureerd: e => list('salesorder',{
+          $filter: `invoiceNr GT 0 && bookDateTime EQ NULL`,
+        }),
+        Geboekt: e => list('salesorder',{
+          $filter: `bookDateTime NE NULL && payDateTime EQ NULL`,
+        }),
+        Betaald: e => list('salesorder',{
+          $filter: `payDateTime NE NULL`,
+        }),
+        Alles: e => list('salesorder'),
       },
       Sales: {
         Klanten() {

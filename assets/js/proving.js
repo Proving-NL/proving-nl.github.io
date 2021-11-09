@@ -9,7 +9,6 @@ aim.libraries.init = () => {
     },
   }
 }
-
 $().on('load', async e => {
   // supplierproduct = await fetch('product.json').then( response => response.json() );
   // // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
@@ -26,6 +25,79 @@ $().on('load', async e => {
   //   row.korrel = (( row.description.match(/\b(P\d+)\b/i) || [] )[1] || '');
   // })
 
+  async function printElem(elem){
+    $('.pv').append($('iframe').style('visibility: hidden;'));
+    iframe = document.querySelector('iframe');
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    const style = await fetch('https://proving-nl.aliconnect.nl/assets/css/print.css').then(res => res.text());
+    doc.write(`<body><style>${style}</style></body>`);
+    doc.close();
+    // doc.contentWindow
+    doc.body.append(elem.elem);
+    setTimeout(e => {
+      console.log(doc.body);
+      iframe.focus();
+      iframe.contentWindow.print();
+      setTimeout(e => iframe.remove(), 500);
+      // iframe.addEventListener('blur', e => iframe.remove());
+    },200);
+
+  }
+  function orderPageElem(salesorder,rows) {
+    return $('div').append(
+      $('div').append(
+        $('img').src(`https://${salesorder.accountCompanyName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountCompanyName.toLowerCase()}.png`),
+      ),
+      $('table').append(
+        $('tr').append(
+          $('td').style('width:11cm;').append(
+            $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
+            $('div').text(salesorder.clientBusinessContactName),
+            $('div').text(salesorder.clientBusinessAddressStreet),
+            $('div').text(salesorder.clientBusinessAddressPostalCode, salesorder.clientBusinessAddressCity),
+          ),
+          $('td').append(
+            $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
+            $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;'),
+          ),
+        )
+      ),
+      $('div').text('PAKBON', salesorder.nr).style('font-weight:bold;font-size:2em;'),
+      $('table').append(
+        $('thead').append(
+          $('tr').append(['OrderNr','Datum','Status','Transport','Factuur','Gewicht'].map(n => $('th').text(n))),
+        ),
+        $('tbody').append(
+          $('tr').append([salesorder.nr,salesorder.orderDateTime,salesorder.status,salesorder.routeNr,salesorder.invoiceNr,salesorder.weight].map(n => $('td').text(n))),
+        ),
+      ),
+      $('table').append(
+        $('thead').append(
+          $('tr').append(['Aantal','Code','Artikel','Mag'].map(n => $('th').text(n))),
+        ),
+        $('tbody').append(
+          rows.map(row => $('tr').append(
+            $('td').text(row.quant),
+            $('td').text(row.artNr),
+            $('td').text(row.title),
+            $('td').text(row.prodStockLocation),
+            // $('td').text([row.artNr,row.title].join('; ')),
+          ))
+        ),
+      ),
+    )
+  }
+  function orderElem(salesorder,rows) {
+    console.log(salesorder.nr, rows)
+    rows = rows.filter(row => row.orderNr === salesorder.nr);
+    return $('div').append(
+      orderPageElem(salesorder, rows).style('page-break-before:always;'),
+      orderPageElem(salesorder, rows).style('page-break-before:always;'),
+    );
+  }
+
+
 
   aim.config.components.schemas.salesorder.app = {
     nav(row) {
@@ -33,7 +105,67 @@ $().on('load', async e => {
       return [
         $('button').text('Print').on('click', e => console.log('Printen')),
         $('button').text('Gepakt en verzonden').on('click', e => console.log('Gepakt en verzonden')),
-        $('button').text('Factureren').disabled(true).on('click', e => console.log('Factureren')),
+        $('button').text('Paklijst').on('click', e => {
+          // console.log(aim.listRows.map(row => row.orderNr));
+          $().url('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + aim.listRows.map(row => row.nr).join(',')).get().then(e => {
+            const rows = e.body.regels;
+            const artlist = rows.map(row => row.artId).unique().map(artId => Object({srtId: artId, rows: rows.filter(row => row.artId === artId)}));
+            artlist.forEach(row => row.prodStockLocation = row.rows[0].prodStockLocation || '?');
+            artlist.sort((a,b)=>a.prodStockLocation.localeCompare(b.prodStockLocation) )
+            console.log(artlist);
+
+
+            printElem($('div').append(
+              $('div').append(
+                $('h1').text('Paklijst'),
+                $('ol').append(
+                  artlist.map(art => $('li').append(
+                    $('div').text(art.prodStockLocation, art.rows[0].artNr, art.rows[0].title),
+                    $('ol').append(
+                      art.rows.map(r => $('li').text(r.orderNr, r.quant)),
+                    ),
+                  )),
+                )
+              ),
+              e.body.salesorder.map(salesorder => orderElem(salesorder, rows))
+            ));
+            // printElem(orderElem(salesorder.shift(), rows));
+            //
+            // printElem($('div').append(
+            //
+            //   bonElem(e.body.salesorder, e.body.regels),
+            //   bonElem(e.body.salesorder, e.body.regels),
+            // ));
+            // console.log(e.body);
+          });
+          // $().url('https://aliconnect.nl/api/abis/data?request_type=paklijst&id=' + row.id).get().then(e => {
+        }),
+        $('button').text('Bon').on('click', e => {
+          $().url('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.nr).get().then(e => {
+            console.log(e.body);
+            // const salesorder = e.body.salesorder[0];
+            // const rows = e.body.regels.filter(row => row.orderNr === salesorder.orderNr);
+            // const html = 'HALLO';
+            // const win = window.open('', '_blank', 'width=450, height=470, left=400, top=100, menubar=yes, toolbar=no, location=no, scrollbars=yes');
+    				// win.document.open();
+    				// win.document.write("<!doctype html><html><head><title>Print<\/title><\/head><body onload=\"print();\">" + innerHTML + "<\/body><\/html>");
+    				// win.document.close();
+            printElem($('div').append(
+              e.body.salesorder.map(salesorder => orderElem(salesorder, e.body.regels))
+            ));
+
+
+            // const win = window.open('','bon');
+            // console.log(iframe);
+          })
+          // window.open('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.id, 'salesorder');
+        }),
+        $('button').text('Factureren').on('click', e => {
+          $().url('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.nr).get().then(e => {
+            console.log(e.body);
+          })
+          // window.open('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.id, 'salesorder');
+        }),
       ]
     }
   }
@@ -44,7 +176,8 @@ $().on('load', async e => {
     return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
   }
   // console.log(aim.config);
-  aim.catalogPrice = function (row, div) {
+  aim.cols = {
+    catalogPrice(row, div) {
     if ('catalogPrice' in row) {
       // console.log(row);
       // const elem = $('div').class('price');
@@ -87,33 +220,19 @@ $().on('load', async e => {
       //   $('span').class('fatprice').text(num(fatprice)),
       // );
     }
+  },
+
   }
   //
   if (aim.config.whitelist.includes(aim.config.client.ip)) {
     function list(selector, options){
+      console.log(selector, aim.config.components.schemas[selector]);
       const args = Array.from(arguments);
       const url = args.shift();
-      document.location.hash = `#?l=${aim.urlToId($().url('https://aliconnect.nl/api/'+selector).query(Object.assign(listdata[selector],options)).toString())}`;
+      options.$select = aim.config.components.schemas[selector].cols.filter(col => col.header || col.filter).map(col => col.name).join(',')
+      options.$search = '';
+      document.location.hash = `#?l=${aim.urlToId($().url('https://aliconnect.nl/api/'+selector).query(options).toString())}`;
     }
-    const listdata = {
-      product: {
-        $select: `schemaName,id,bedrijf,manufacturer,brand,productTitle,description,productGroup,supplier`,
-        $search: ``,
-      },
-      article: {
-        $select: `*`,
-        $search: ``,
-      },
-      client: {
-        $select: `schemaName,id,header0,header1,header2,color,scale,grow,accountName,accountManager,keyName,companyName,debNr,invoiceAddress1,businessAddressStreet,businessAddressPostalCode,businessAddressCity,businessAddressContact,otherAddressStreet,otherAddressCity,otherAddressContact,id,loc,geolocatie`,
-        $search: ``,
-      },
-      salesorder: {
-        $select: 'schemaName,id,geolocatie,orderNr,clientKeyName,clientId,status,orderDate,orderPrintDate,orderPickDate,orderSendDate,orderDeliverDate,invoiceDate,invoiceNr,invoicePrintDate,invoiceSendDate,payCash,payPin',
-        $order: 'clientKeyName',
-        $search: '*',
-      },
-    };
     aim.om.treeview({
       Shop: {
         Proving(){
@@ -123,45 +242,89 @@ $().on('load', async e => {
           list('article');
         },
       },
+      Abis: {
+        Klanten() {
+          list('client');
+        },
+        Pakbonnen() {
+          list('salesorder');
+        },
+        Pakbon_regels() {
+          list('salesorderrow');
+        },
+        Fakturen() {
+          list('invoice');
+        },
+        Producten() {
+          list('prod');
+        },
+        Artikelen() {
+          list('art');
+        },
+        Klant_artikelen() {
+          list('clientart');
+        },
+        Bedrijven() {
+          list('account');
+        },
+      },
       Magazijn: {
-        Aangemaakt(){
-          list('salesorder',{$filter: `orderPrintDate EQ NULL AND active NE 1 AND isOffer NE 1`});
+        Winkelmandje(){
+          list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 1 AND isQuote NE 1`});
         },
-        Printen(){
-          list('salesorder',{$filter: `orderPrintDate EQ NULL AND active NE 0 AND isOffer NE 1`});
+        Paklijst: {
+          Post(){
+            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 1`});
+          },
+          Visser(){
+            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 2`});
+          },
+          Route(){
+            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 3`});
+          },
+          Afhalen(){
+            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 4`});
+          },
+          Brengen(){
+            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr EQ 5`});
+          },
+          Overig(){
+            list('salesorder',{$filter: `printDateTime EQ NULL AND isOrder NE 0 AND isQuote NE 1 && RouteNr NOT IN (1,2,3,4,5)`});
+          },
         },
-        Pakken(){
-          list('salesorder',{$filter: `orderPickDate EQ NULL AND orderPrintDate NE NULL`});
-        },
-        Verzenden(){
-          list('salesorder',{$filter: `orderSendDate EQ NULL AND orderPickDate NE NULL`});
-        },
+        // Pakken(){
+        //   list('salesorder',{$filter: `pickDateTime EQ NULL AND printDateTime NE NULL`});
+        // },
+        // Verzenden(){
+        //   list('salesorder',{$filter: `sendDateTime EQ NULL AND pickDateTime NE NULL`});
+        // },
         Geleverd(){
-          list('salesorder',{$filter: `orderDeliverDate EQ NULL AND orderSendDate NE NULL`});
+          list('salesorder',{$filter: `deliverDateTime EQ NULL AND sendDateTime NE NULL`});
         },
         Factureren(){
-          list('salesorder',{$filter: `invoiceDate EQ NULL AND orderDeliverDate NE NULL`});
+          list('salesorder',{$filter: `invoiceDateTime EQ NULL AND deliverDateTime NE NULL`});
         },
         Boeken(){
-          list('salesorder',{$filter: `invoiceBookDate EQ NULL AND invoiceNr GT 0`});
+          list('salesorder',{$filter: `bookDateTime EQ NULL AND invoiceNr GT 0`});
         },
         TeBetalen(){
-          list('salesorder',{$filter: `invoicePayDate EQ NULL AND invoiceBookDate NE NULL`});
+          list('salesorder',{$filter: `payDateTime EQ NULL AND bookDateTime NE NULL`});
         },
       },
       Sales: {
-        Relaties() {
-          list('client',{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
-        },
         Klanten() {
-          list('client',{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+          // list('client',{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+          list('client');
         },
-        Overig() {
-          list('client',{$filter: `accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
-        },
-        Archief() {
-          list('client',{$filter: `archiefDT NE NULL OR companyName LIKE '%vervallen%'`});
-        },
+        // Klanten() {
+        //   list('client',{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+        // },
+        // Overig() {
+        //   list('client',{$filter: `accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
+        // },
+        // Archief() {
+        //   list('client',{$filter: `archiefDT NE NULL OR companyName LIKE '%vervallen%'`});
+        // },
         Analyse: {
           Klant() {
             document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/client').toString())}`;
@@ -192,7 +355,6 @@ $().on('load', async e => {
   }
   // console.log(111, aim.config);
 })
-
 $(window).on('popstate', async e => {
   const documentSearchParams = new URLSearchParams(document.location.search);
   const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
@@ -202,7 +364,6 @@ $(window).on('popstate', async e => {
     // aim.api('/abis/data').query({request_type: 'article',$search: searchParams.get('$search')}).get().then(response => response.json().then(data => aim.listview(data.rows)));
   }
 })
-
 $(window).on('dragover', e => e.preventDefault())
 $(window).on('drop', async e => {
   e.preventDefault();

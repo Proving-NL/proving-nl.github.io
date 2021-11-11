@@ -302,8 +302,9 @@ $().on('load', async e => {
     }).input({
       from: from,
       bcc: from,
+      to: 'max.van.kampen@alicon.nl',
       to: salesorder.clientOtherMailAddress,
-      // to: 'max.van.kampen@alicon.nl',
+      invoiceNr: invoiceNr,
       chapters: [
         {
           title: `${salesorder.accountCompanyName} factuur ${invoiceNr} voor ${salesorder.clientCompanyName}`,
@@ -357,7 +358,6 @@ $().on('load', async e => {
     const pageId = new URLSearchParams(document.location.search).get('id');
     document.location.href = '#?id=';
     document.location.href = '#?id='+pageId;
-
   }
   async function lijstPakken() {
     const data = await $().url('https://aliconnect.nl/api/abis/data').post({

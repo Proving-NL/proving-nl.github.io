@@ -33,11 +33,11 @@ table {
 .herinner:after {
   content: "NIET BETAALD";
 }
-@media not print {
+/* @media not print {
   body {
     background: #eee;
   }
-}
+} */
 @font-face {
   font-family: barcode;
   src: url('fonts/Code39Azalea.eot') format('embedded-opentype'), url('fonts/Code39Azalea.woff') format('woff'), url('fonts/Code39Azalea.ttf') format('truetype'), url('fonts/Code39Azalea.svg#Code39Azalea') format('svg');
@@ -52,28 +52,21 @@ label {
   display: block;
   position: center;
 }
-tr.hdr td {
-  font-size: 8pt;
-  padding: 5px;
-  background-color: #eee;
-  font-weight: bold;
-}
-td {
+
+td,th {
   vertical-align: top;
+}
+table.grid {
+  margin-top:2mm;
+}
+table.grid th {
+  font-size: 0.9em;
+}
+table.grid td,table.grid th {
+  border: solid 1px #eee;
   padding: 2px 5px;
 }
-table.art td {
-  border: solid 1px #eee;
-}
-table.art1 {
-  border: solid 1px #eee;
-}
-table.art1 td {
-  border-bottom: solid 1px #eee;
-}
-th{
-  text-align: left;
-}
+
 h1 {
   margin-top: 0;
 }
@@ -88,8 +81,3 @@ div.header {
   top: 0;
   width: 100%;
 }
-body,table{font-family:sans-serif;}
-.Omschrijving {width:100%;}
-.Aantal,.Netto,.Totaal,.Bedrag {text-align:right;white-space:nowrap;}
-.ArtNr,.Eenheid,.OrderDatum,.FactuurDatum {white-space:nowrap;}
-table.hdrow tr>:last-child{width:100%;}

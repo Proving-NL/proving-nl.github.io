@@ -25,33 +25,16 @@ $().on('load', async e => {
   //   row.korrel = (( row.description.match(/\b(P\d+)\b/i) || [] )[1] || '');
   // })
 
-  async function printElem(elem){
-    $('.pv').append($('iframe').style('visibility: hidden;'));
-    iframe = document.querySelector('iframe');
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    const style = await fetch('https://proving-nl.aliconnect.nl/assets/css/print.css').then(res => res.text());
-    doc.write(`<body><style>${style}</style></body>`);
-    doc.close();
-    // doc.contentWindow
-    doc.body.append(elem.elem);
-    setTimeout(e => {
-      console.log(doc.body);
-      iframe.focus();
-      iframe.contentWindow.print();
-      setTimeout(e => iframe.remove(), 500);
-      // iframe.addEventListener('blur', e => iframe.remove());
-    },200);
 
-  }
-  function orderPageElem(salesorder,rows,options) {
-    return $('div').append(
+  aim.Elem.prototype.briefkop = function (salesorder, title){
+    return this.append(
       $('div').append(
-        $('img').src(`https://${salesorder.accountCompanyName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountCompanyName.toLowerCase()}.png`),
+        $('img').src(`https://${salesorder.accountCompanyName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountCompanyName.toLowerCase()}.png`
+        ),
       ),
-      $('table').append(
+      $('table').style('margin-bottom:15mm;').append(
         $('tr').append(
-          $('td').style('width:11cm;padding-top:2cm;').append(
+          $('td').style('width:11cm;padding-left:10mm;padding-top:25mm').append(
             $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
             $('div').text(salesorder.clientBusinessContactName),
             $('div').text(salesorder.clientBusinessAddressStreet),
@@ -59,42 +42,54 @@ $().on('load', async e => {
           ),
           $('td').append(
             $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
-            $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;'),
+            $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;font-size:0.8em;'),
           ),
         )
       ),
-      $('div').text(options.title).style('font-weight:bold;font-size:2em;'),
-      $('table').append(
+      $('div').text(title).style('font-weight:bold;font-size:1.2em;'),
+    )
+  }
+  function orderPage(salesorder,rows,options) {
+    rows = rows.filter(row => row.orderNr === salesorder.nr);
+    rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
+    return $('div').briefkop(salesorder, options.title).append(
+      options.remark,
+      $('table').class('grid').append(
         $('thead').append(
-          $('tr').append([
-            'OrderNr',
-            'Datum',
-            // 'Status',
-            'Transport',
+          $('tr').append(
+            $('th').align('left').text('Datum'),
+            $('th').align('left').text('OrderNr'),
+            $('th').align('left').text('Ref'),
+            $('th').align('left').text('Transport'),
             // 'Factuur',
-            'Gewicht'
-          ].map(n => $('th').text(n))),
+            $('th').align('left').text('Gewicht'),
+          ),
         ),
         $('tbody').append(
-          $('tr').append([
-            salesorder.nr,
-            new Date(salesorder.orderDateTime).toLocaleDateString(),
+          $('tr').append(
+            $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
+            $('td').text(salesorder.nr),
+            $('td').text(salesorder.ref),
             // salesorder.status,
-            ['Niet ingevuld', 'Post', 'Visser', 'Route', 'Afhalen', 'Brengen'][salesorder.routeNr] || 'Onbekend',
+            $('td').text(['Niet ingevuld', 'Post', 'Visser', 'Route', 'Afhalen', 'Brengen'][salesorder.routeNr] || 'Onbekend'),
             // salesorder.invoiceNr,
-            salesorder.weight
-          ].map(n => $('td').text(n))),
+            $('td').text(salesorder.weight),
+          ),
         ),
       ),
-      $('table').append(
+      $('table').class('grid').append(
         $('thead').append(
-          $('tr').append(['Aantal','Code','Artikel','Mag'].map(n => $('th').text(n))),
+          $('tr').append(
+            $('th').align('left').text('Omschrijving, Code, Verpakking'),
+            // $('th').align('left').text('Code'),
+            $('th').align('left').text('Aantal'),
+            $('th').align('left').text('Mag'),
+          ),
         ),
         $('tbody').append(
           rows.map(row => $('tr').append(
+            $('td').text([row.title, row.artNr, row.unit].filter(Boolean).join(', ')),
             $('td').text(row.quant),
-            $('td').text(row.artNr),
-            $('td').text(row.title),
             $('td').text(row.prodStockLocation),
             // $('td').text([row.artNr,row.title].join('; ')),
           ))
@@ -102,87 +97,259 @@ $().on('load', async e => {
       ),
     )
   }
-  function orderElem(salesorder,rows) {
-    console.log(salesorder.nr, rows)
-    rows = rows.filter(row => row.orderNr === salesorder.nr);
-    return $('div').append(
-      orderPageElem(salesorder, rows, {title: 'PAKBON INTERN'}).style('page-break-before:always;').append(
-        // salesorder.clientOpmerking ? $('div').text(salesorder.clientOpmerking).style('padding:10px;border:solid 1px red;') : null,
-        salesorder.remark ? $('div').text(salesorder.remark).style('padding:10px;border:solid 1px red;') : null,
-      ),
-      orderPageElem(salesorder, rows, {title: 'PAKBON'}).style('page-break-before:always;'),
+  async function order(orderNr) {
+    const data = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'salesorder',
+      id: orderNr,
+    }).then(e => e.body);
+    const [salesorders,rows] = data;
+    const [salesorder] = salesorders;
+    console.log(salesorder,rows);
+    // rows = rows.filter(row => row.orderNr === salesorder.nr);
+
+
+    return $('iframe').printbody().append(
+      $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
+      orderPage(salesorder, rows, {
+        title: 'PAKBON INTERN',
+        remark: salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+      }).style('page-break-before:always;'),
+      orderPage(salesorder, rows, {
+        title: 'PAKBON',
+      }).style('page-break-before:always;'),
     );
   }
 
+  let factuurData;
+  let facturenElem;
+  async function factuur(factuurNr) {
+    factuurData = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'factuur',
+      factuurNr: factuurNr,
+    }).then(e => e.body);
+    const [clientOrders,rows] = factuurData;
+    rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
+    const [salesorder] = clientOrders;
+    const mailtext = ''; // Exta tekst op mail naar klant
+    let sum = rows.reduce((s,row) => s + row.quant * row.netto, 0);
 
+    function cur(value){
+      return value ? '€ ' + Number(value).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : '';
+    }
+
+    // sum = 100;
+    // salesorder.clientKortingContant = 1;
+    // salesorder.clientVrachtkosten = 10;
+
+    return $('iframe').printbody().append(
+      $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
+    ).briefkop(salesorder, 'FACTUUR').append(
+      $('table').class('grid').style('margin-bottom:2mm;').append(
+        $('thead').append(
+          $('tr').append(
+            $('th').align('left').text('Datum'),
+            $('th').align('left').text('FactuurNr'),
+            $('th').align('right').text('Totaal'),
+            // $('th').align('right').text('Vrachtkosten'),
+            // $('th').align('right').text(`Korting contant ${salesorder.clientKortingContant || 0}%`),
+            $('th').align('right').text(`BTW ${salesorder.clientBtw}%`),
+            $('th').align('right').text('TE BETALEN'),
+          )
+        ),
+        $('tbody').append(
+          $('tr').append(
+            $('td').text(new Date(salesorder.invoiceDateTime).toLocaleDateString()),
+            $('td').text(factuurNr),
+            $('td').align('right').text(cur(sum)),
+            // $('td').align('right').text(cur(salesorder.clientVrachtkosten, sum += Number(salesorder.clientVrachtkosten||0))),
+            // $('td').align('right').text(cur(salesorder.kortingContant = salesorder.clientKortingContant ? sum * salesorder.clientKortingContant / 100 : 0, sum -= salesorder.kortingContant)),
+            $('td').align('right').text(cur(salesorder.btwbedrag = sum * salesorder.clientBtw/100)),
+            $('td').align('right').text(cur(sum + salesorder.btwbedrag)),
+          ),
+        ),
+      ),
+      $('table').class('grid').append(
+        $('thead').append(
+          $('tr').append(
+            $('th').align('left').text('Omschrijving, Code, Verpakking'),
+            $('th').align('right').text('Aantal'),
+            $('th').align('right').text('Excl'),
+          ),
+        ),
+        $('tbody').append(
+          ...clientOrders.map(order => [
+            $('tr').append(
+              $('td').style('font-style:italic;').text(`order: ${order.nr}`, order.ref ? `ref: ${order.ref}`: ''),
+              $('td'),
+              $('td'),
+            )
+          ].concat(rows.filter(row => row.orderNr === order.nr).map(row => $('tr').append(
+            $('td').text([row.title, row.artNr, row.unit].filter(Boolean).join(', ')),
+            $('td').align('right').text(row.quant),
+            $('td').align('right').text(!row.netto ? '' : '€ ' + Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
+          ))))
+        ),
+      ),
+    );
+  }
+  async function factuurSend(data, html) {
+    const [clientOrders,rows] = data;
+    const [salesorder] = clientOrders;
+    const invoiceNr = salesorder.invoiceNr || salesorder.invoiceNrAbis;
+    const from = `invoice@${salesorder.accountCompanyName.toLowerCase()}.nl`;
+    console.log(from,html);
+    await $().url('https://aliconnect.nl/api/abis/data').query({
+      request_type: 'sendfactuur',
+    }).input({
+      from: from,
+      bcc: from,
+      // to: salesorder.clientOtherMailAddress,
+      to: 'max.van.kampen@alicon.nl',
+      chapters: [
+        {
+          title: `${salesorder.accountCompanyName} factuur ${invoiceNr} voor ${salesorder.clientCompanyName}`,
+          content: aim.markdown().render(`Geachte heer / mevrouw,
+
+          Hierbij ontvangt ${salesorder.clientCompanyName} een factuur aangaande de door ${salesorder.accountCompanyName} geleverde goederen.
+
+          Voor automatische verwerking van uw digitale facturen is uw factuur bijgevoegd als bijlage.
+          Wij willen u graag erop attenderen dat digitale factuurbestanden gedurende zeven jaar bewaard dienen te worden.
+          Meer informatie vindt u op [belastingdienst.nl](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/administratie_bijhouden/administratie_bewaren/administratie_bewaren).
+          Het bewaren van (alleen) een afdruk van de digitaal ontvangen facturen op papier is niet voldoende,
+          U dient uw digitale factuur ook digitaal te bewaren.
+
+          Voor eventuele vragen kunt u zich richten tot onze financiële administratie
+          via e-mail: [invoice@${salesorder.accountCompanyName}.nl](mailto:invoice@${salesorder.accountCompanyName}.nl?SUBJECT=Vraag over factuur ${invoiceNr}&BODY=Beste administratie,%0A%0AIk heb een vraag aangaande factuur ${invoiceNr}%0A%0AMijn vraag is )
+          of telefonisch: ${salesorder.accountPhone}
+
+          Met vriendelijke groet,  \nAdministratie  \n${salesorder.accountCompanyName}`),
+        },
+      ],
+      attachements: [
+        {
+          content: html,
+          name: `${salesorder.accountCompanyName}-factuur-${invoiceNr}-${salesorder.clientName}.pdf`.toLowerCase(),
+        }
+      ]
+    }).post().then(e => {
+      console.log(e.body);
+    })
+  }
+  async function factureren(salesorder, id){
+    const data = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'newfactuur',
+      accountCompanyName: salesorder.accountCompanyName,
+      ordernummers: id,
+    }).then(e => e.body);
+    const accountCompany = data.shift().shift();
+    const invoiceNr = accountCompany.invoiceNr;
+    const factuurElem = await factuur(invoiceNr);
+    const [clientOrders,rows] = factuurData;
+    [salesorder] = clientOrders;
+    // console.log(salesorder);
+    facturenElem = facturenElem || $('iframe').printbody();
+    if (salesorder.clientOtherMailAddress) {
+      await factuurSend(factuurData, factuurElem.elem.innerHTML);
+      factuurElem.remove();
+    } else {
+      facturenElem.append(factuurElem.style('page-break-before:always;'))
+    }
+  }
 
   aim.config.components.schemas.salesorder.app = {
     nav(row) {
-      console.log(row);
+      // console.log(row);
       return [
-        $('button').text('Print').on('click', e => console.log('Printen')),
-        $('button').text('Gepakt en verzonden').on('click', e => console.log('Gepakt en verzonden')),
-        $('button').text('Paklijst').on('click', e => {
-          // console.log(aim.listRows.map(row => row.orderNr));
-          $().url('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + aim.listRows.map(row => row.nr).join(',')).get().then(e => {
-            const rows = e.body.regels;
-            const artlist = rows.map(row => row.artId).unique().map(artId => Object({srtId: artId, rows: rows.filter(row => row.artId === artId)}));
-            artlist.forEach(row => row.prodStockLocation = row.rows[0].prodStockLocation || '?');
-            artlist.sort((a,b)=>a.prodStockLocation.localeCompare(b.prodStockLocation) )
-            console.log(artlist);
+        // $('button').text('Print').on('click', e => console.log('Printen')),
+        // $('button').text('Gepakt en verzonden').on('click', e => console.log('Gepakt en verzonden')),
+        $('button').class('abtn print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
 
+        row.invoiceNrAbis || row.invoiceNr
+        ? $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNrAbis || row.invoiceNr)).print())
+        : $('button').text('Factureren').on('click', async e => {
+          await factureren(row, row.nr);
+          // console.log(facturenElem);
+          facturenElem.print();
+          facturenElem = null;
+        }),
 
-            printElem($('div').append(
-              $('div').append(
+        (row.invoiceNr = row.invoiceNrAbis || row.invoiceNr) && row.clientOtherMailAddress
+        ? $('button').class('abtn mail-send').title('Factuur verzenden').on('click', async e => {
+          const factuurElem = await factuur(row.invoiceNr);
+          const [clientOrders,rows] = factuurData;
+          [salesorder] = clientOrders;
+          if (salesorder.clientOtherMailAddress) {
+            await factuurSend(factuurData, factuurElem.elem.innerHTML);
+            factuurElem.remove();
+          }
+        })
+        : null,
+      ]
+    },
+    navList() {
+      return [
+        $('button').text('Bonnen').append(
+          $('div').append(
+            $('button').text('Paklijst').on('click', async e => {
+              const data = await $().url('https://aliconnect.nl/api/abis/data').post({
+                request_type: 'salesorder',
+                id: aim.listRows.map(row => row.nr).join(','),
+              }).then(e => e.body);
+              const [salesorders,rows] = data;
+              const [salesorder] = salesorders;
+              const artlist = rows.filter(row => row.quant).map(row => row.artId).unique().map(artId => Object({srtId: artId, rows: rows.filter(row => row.artId === artId)}));
+              artlist.forEach(row => row.prodStockLocation = row.rows[0].prodStockLocation || '?');
+              artlist.sort((a,b)=>a.prodStockLocation.localeCompare(b.prodStockLocation) )
+              console.log(artlist);
+              $('iframe').printbody().append(
+                $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
                 $('h1').text('Paklijst'),
-                $('ol').append(
-                  artlist.map(art => $('li').append(
-                    $('div').text(art.prodStockLocation, art.rows[0].artNr, art.rows[0].title),
-                    $('ol').append(
-                      art.rows.map(r => $('li').text(r.orderNr, r.quant)),
+                $('table').class('grid').append(
+                  $('thead').append(
+                    $('tr').append(
+                      $('th').align('left').text('Mag'),
+                      $('th').align('left').text('Omschrijving, Code, Verpakking'),
+                      // $('th').align('left').text('Code'),
+                      // $('th').align('left').text('Aantal'),
+                      // $('th').align('left').text('Mag'),
                     ),
-                  )),
-                )
-              ),
-              e.body.salesorder.map(salesorder => orderElem(salesorder, rows))
-            ));
-            // printElem(orderElem(salesorder.shift(), rows));
-            //
-            // printElem($('div').append(
-            //
-            //   bonElem(e.body.salesorder, e.body.regels),
-            //   bonElem(e.body.salesorder, e.body.regels),
-            // ));
-            // console.log(e.body);
-          });
-          // $().url('https://aliconnect.nl/api/abis/data?request_type=paklijst&id=' + row.id).get().then(e => {
-        }),
-        $('button').text('Bon').on('click', e => {
-          $().url('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.nr).get().then(e => {
-            console.log(e.body);
-            // const salesorder = e.body.salesorder[0];
-            // const rows = e.body.regels.filter(row => row.orderNr === salesorder.orderNr);
-            // const html = 'HALLO';
-            // const win = window.open('', '_blank', 'width=450, height=470, left=400, top=100, menubar=yes, toolbar=no, location=no, scrollbars=yes');
-    				// win.document.open();
-    				// win.document.write("<!doctype html><html><head><title>Print<\/title><\/head><body onload=\"print();\">" + innerHTML + "<\/body><\/html>");
-    				// win.document.close();
-            printElem($('div').append(
-              e.body.salesorder.map(salesorder => orderElem(salesorder, e.body.regels))
-            ));
-
-
-            // const win = window.open('','bon');
-            // console.log(iframe);
-          })
-          // window.open('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.id, 'salesorder');
-        }),
-        $('button').text('Factureren').on('click', e => {
-          $().url('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.nr).get().then(e => {
-            console.log(e.body);
-          })
-          // window.open('https://aliconnect.nl/api/abis/data?request_type=salesorder&id=' + row.id, 'salesorder');
-        }),
+                  ),
+                  $('tbody').append(
+                    artlist.map(art => [
+                      $('tr').append(
+                        $('td').text(art.rows[0].prodStockLocation),
+                        $('td').text([art.rows[0].title, art.rows[0].artNr, art.rows[0].unit].filter(Boolean).join(', ')),
+                        // $('td'),
+                      )
+                    ].concat(art.rows.map(r => $('tr').append(
+                      $('td'),
+                      $('td').text(r.quant, '>', r.orderNr),
+                    )))),
+                  ),
+                ),
+                ...salesorders.map(salesorder => [
+                  orderPage(salesorder, rows, {
+                    title: 'PAKBON INTERN',
+                    remark: salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+                  }).style('page-break-before:always;'),
+                  orderPage(salesorder, rows, {
+                    title: 'PAKBON',
+                  }).style('page-break-before:always;'),
+                ]),
+              ).print();
+            }),
+            $('button').text('Factureren').on('click', async e => {
+              const orders = aim.listRows;
+              for (let clientName of orders.map(row => row.clientName).unique()) {
+                const clientOrders = orders.filter(row => row.clientName === clientName);
+                const [salesorder] = clientOrders;
+                await factureren(salesorder, clientOrders.map(o => o.nr).join(','));
+              }
+              facturenElem.print();
+              facturenElem = null;
+            }),
+          ),
+        ),
       ]
     }
   }
@@ -259,9 +426,17 @@ $().on('load', async e => {
           list('article');
         },
       },
-      Orders: e => list('salesorder',{
-        $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0 && payDateTime EQ NULL`,
-      }),
+      Orders: {
+        Actief: e => list('salesorder',{
+          $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0 && payDateTime EQ NULL`,
+          $order: `nr DESC`,
+        }),
+        Gefactureerd: e => list('salesorder',{
+          $filter: `ISNULL(invoiceNrAbis,0) GT 0 || ISNULL(invoiceNr,0) GT 0`,
+          $order: `nr DESC`,
+        }),
+
+      },
       Abis: {
         Klanten() {
           list('client');
@@ -380,6 +555,16 @@ $().on('load', async e => {
     });
   }
   // console.log(111, aim.config);
+
+  // const searchParams = new URLSearchParams(document.location.search);
+  // const factuurId = searchParams.get('fid');
+  // if (factuurId) {
+  //   const factuurUid = atob(factuurId);
+  // }
+  // console.log(factuurId, atob(factuurId));
+
+
+
 })
 $(window).on('popstate', async e => {
   const documentSearchParams = new URLSearchParams(document.location.search);

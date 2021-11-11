@@ -18,11 +18,19 @@
 
 
 
-# Paklijst maken
+# Paklijst
 1. Open Orders
 2. Zoek `*`
-3. Filter: Order Status = Opdracht
+3. Filter > Order Status > Opdracht
+3. Filter > Route Nr > 1 = Post, 2 = Visser
 4. [Paklijst]
+
+# Faktureren
+1. Open Orders
+2. Zoek `*`
+3. Filter > Order Status > Factureren
+3. Filter > Naam Klant > (optioneel)
+4. [Factureren]
 
 
 

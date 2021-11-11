@@ -3,23 +3,23 @@
 - Klant vervallen => opmerking = `vervallen` of in ABIS WEB archived date time = `datum van vandaag`
 
 
-1. Betaald: betaaldDT of betaaldatum
-1. Geboekt: geboektDT of boekdatum
-1. Gefactureerd: factuurdatum of factuurnr of faktuurnr
-1. Verwerkt: datumverwerkt
-1. Geleverd: leverdatum
-1. Verzonden: verstuurdDT
-1. Gepakt: orderpickDateTime
-1. Geprint: datumgeprint
-1. Opdracht: verwerkt
-1. Mandje: NIET verwerkt
-1. Aanbieding: aanbieding en NIET verwerkt
+1. **Betaald**: betaaldDT of betaaldatum
+1. **Geboekt**: geboektDT of boekdatum
+1. **Gefactureerd**: factuurdatum of factuurnr of faktuurnr
+1. **Verwerkt**: datumverwerkt
+1. **Geleverd**: leverdatum
+1. **Verzonden**: verstuurdDT
+1. **Gepakt**: orderpickDateTime
+1. **Geprint**: datumgeprint
+1. **Opdracht**: verwerkt
+1. **Mandje**: NIET verwerkt
+1. **Aanbieding**: aanbieding en NIET verwerkt
 1. Onbekend: overig
 
 
 
 # Paklijst
-1. Open Orders
+1. Open > Orders
 2. Zoek `*`
 3. Filter > Order Status > Opdracht
 3. Filter > Route Nr > 1 = Post, 2 = Visser

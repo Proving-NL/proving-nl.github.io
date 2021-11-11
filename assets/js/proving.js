@@ -80,7 +80,9 @@ $().on('load', async e => {
       $('table').class('grid').append(
         $('thead').append(
           $('tr').append(
-            $('th').align('left').text('Omschrijving, Code, Verpakking'),
+            $('th').align('left').text('Code'),
+            $('th').align('left').text('Verpakking'),
+            $('th').align('left').text('Omschrijving'),
             // $('th').align('left').text('Code'),
             $('th').align('left').text('Aantal'),
             $('th').align('left').text('Mag'),
@@ -88,7 +90,10 @@ $().on('load', async e => {
         ),
         $('tbody').append(
           rows.map(row => $('tr').append(
-            $('td').text([row.title, row.artNr, row.unit].filter(Boolean).join(', ')),
+            // $('td').text([row.title, row.artNr, row.unit].filter(Boolean).join(', ')),
+            $('td').text(row.artNr),
+            $('td').text(row.unit),
+            $('td').text(row.title),
             $('td').text(row.quant),
             $('td').text(row.prodStockLocation),
             // $('td').text([row.artNr,row.title].join('; ')),

@@ -1,0 +1,93 @@
+@page {
+  margin: 1cm 1cm 1cm 1cm;
+}
+body {
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+  padding: 0;
+  padding-left: 1cm;
+  align-items: center;
+  justify-content: center;
+}
+table {
+  width: 18cm;
+  border-collapse: collapse;
+  font-size: 10pt;
+  margin: auto;
+  background: white;
+}
+.herinner {
+  background: #DF554A;
+  width: 400px;
+  padding: 10px;
+  position: fixed;
+  top: -100px;
+  right: -230px;
+  transform: rotate(40deg);
+  color: white;
+  text-align: center;
+  font-size: 38px;
+  font-weight: bold;
+  border: solid 5px #AB312B;
+}
+.herinner:after {
+  content: "NIET BETAALD";
+}
+/* @media not print {
+  body {
+    background: #eee;
+  }
+} */
+@font-face {
+  font-family: barcode;
+  src: url('fonts/Code39Azalea.eot') format('embedded-opentype'), url('fonts/Code39Azalea.woff') format('woff'), url('fonts/Code39Azalea.ttf') format('truetype'), url('fonts/Code39Azalea.svg#Code39Azalea') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+* {
+  position: relative;
+}
+label {
+  font-size: 8pt;
+  display: block;
+  position: center;
+}
+
+td,th {
+  vertical-align: top;
+}
+table.grid {
+  margin-top:2mm;
+}
+table.grid th {
+  font-size: 0.9em;
+  border-top: solid 1px black;
+  border-bottom: solid 1px black;
+  background: #eee;
+}
+table.grid td,table.grid th {
+  border: solid 1px #eee;
+  padding: 2px 5px;
+}
+
+table.grid td {
+  white-space: nowrap;
+}
+/* table.grid td.wrap {
+  white-space: normal;
+} */
+
+h1 {
+  margin-top: 0;
+}
+h2 {
+  font-weight: 400;
+}
+.np {
+  page-break-before: always;
+}
+div.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}

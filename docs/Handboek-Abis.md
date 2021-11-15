@@ -1,3 +1,17 @@
+# Opbouw factuur
+
+1. Factuur X
+    1. Vrachtkosten
+        1. Pakbon A
+        1. Pakbon B
+        1. Pakbon C
+
+- Advies, stop met vrachtkosten op factuur, vrachtkosten horen bij pakbon.
+
+1. Factureren betekend altijd factuur direct verzende, geen aanpassingen mogelijk
+1. Dus als we klant korting willen op factuur moet dit ingesteld zijn VOOR het aanmaken van de factuur. Korting klant opgeven bij klant, wordt daarna overgenomen in factuur en direct verzonden.
+
+
 # Afspraken
 
 - Klant vervallen => opmerking = `vervallen` of in ABIS WEB archived date time = `datum van vandaag`

@@ -11,6 +11,8 @@
 1. Factureren betekend altijd factuur direct verzende, geen aanpassingen mogelijk
 1. Dus als we klant korting willen op factuur moet dit ingesteld zijn VOOR het aanmaken van de factuur. Korting klant opgeven bij klant, wordt daarna overgenomen in factuur en direct verzonden.
 
+1.
+
 
 # Afspraken
 

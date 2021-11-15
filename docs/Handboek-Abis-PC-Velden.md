@@ -1,0 +1,101 @@
+# Klanten
+- schema: `client`
+- **Naam (KlantID)**, `name`: Zoeknaam / Afkorting organisatie naam.
+- **Bedrijfsnaam (Firma)**, `companyName`: Organisatie naam.
+- **Telefoon (Tel)**, `companyPhone`: Algemeen organisatie telefoon nummer.
+- **Mobiel (Mobiel)**, `contactMobile`: Contact persoon mobiel nummer.
+- **Fax (Fax)**, `companyFax`: Algemeen organisatie fax nummer.
+- **Omschrijving (Omschrijving)**, `description`: Toelichting op bedrijf.
+- **Leverdag (Leverdag)**, `leverdag`: Dag van levering 0=Zondag, ..., 6= Zaterdag.
+- **Wijze van levering (RouteNr)**, `routeNr`: Standaard wijze van levering.. Opties: **0**=Niet ingevuld; **1**=Post; **2**=Visser; **3**=Route; **4**=Afhalen; **5**=Brengen(geen route); 
+- **Wijze van opdracht (VolgNr)**, `volgNr`: Standaard wijze van opdracht verkoop order.. Opties: **1**=Telefonisch; **2**=Whatsapp; **3**=Email-order; **4**=Email-tekst; **5**=Balie; 
+- **Opmerking (Opmerking)**, `opmerking`: Standaard opmerking op pakbon intern.
+- **Contactpersoon (Afleveradres Aanhef)**, `businessContactName`: Contactpersoon naam.
+- **Contact email (Afleveradres extra)**, `businessMailAddress`: Contactpersoon mail adres.
+- **Straat (Afleveradres Straat)**, `businessAddressStreet`: Organisatie bezoek adres straat.
+- **Postcode (Afleveradres postcode)**, `businessAddressPostalCode`: Organisatie bezoek adres postcode.
+- **Plaats (Afleveradres Plaats)**, `businessAddressCity`: Organisatie bezoek adres plaats.
+- **Factuur contactpersoon (Factuuradres Aanhef)**, `otherContactName`: Organisatie post adres contactpersoon.
+- **Factuur email (Factuuradres extra)**, `otherMailAddress`: Organisatie post/factuur mail adres.
+- **Postbus en Straat (Factuuradres Straat)**, `otherAddressStreet`: Organisatie post/factuur postbus of straat.
+- **Plaats (Factuuradres Plaats)**, `otherAddressCity`: Organisatie post/factuur postcode en plaats.
+- **Netto omzet (Totaal netto)**, `netTotal`: Netto omzet afgelopen 365 dagen.
+- **VOS totaal (Totaal VOS)**, `vosTotal`: Vervallen.
+- **VOS start (VOSlijst van)**, `vosStart`: VOS lijst start datum.
+- **VOS end (VOSlijst tot)**, `vosEnd`: VOS lijst eind datum.
+- **Debiteur nummer (Deb.nr.)**, `debNr`: AFAS Debiteur nummer.
+- **Vracht kosten (Vracht kosten)**, `vrachtkosten`: Klant BTW nummer.
+- **BTW tarief (btw)**, `btw`: Facturatie BTW tarief in %.
+- **BTW nummer (nummer)**, `btwNr`: Klant BTW nummer.
+- **Regio (regio)**, `regio`: Verkoop regio, tekst onbekend, account manager.
+- **Bedrijf (bedrijf)**, `accountName`: Bedrijf waar klant toe behoort. Opties: **airo**=Airo; **proving**=Proving; **broersen**=Broersen; 
+- **Korting contant (tekenbon)**, `kortingContant`: Standaard betalings korting over factuur.
+- **Nog te ontvangen (openstaand)**, `openstaand`: _readonly_ Totaal openstaand facturatie bedrag.
+# Pakbonnen
+- schema: `salesorder`
+- **Nr (PakBonId/bonnr)**, `nr`: _readonly_ Order nummer.
+- **Naam (KlantID)**, `clientName`: _readonly_ Klant naam.
+- **Referentie (Referentie)**, `ref`: Klant referentie.
+- **Opmerking (Opmerking)**, `remark`: Opmerking op pakbon intern.
+- **Verwacht op (levering)**, `plannedDateTime`: Datum van levering.
+- **Wijze van levering (RouteNr)**, `routeNr`: Standaard wijze van levering.. Opties: **0**=Niet ingevuld; **1**=Post; **2**=Visser; **3**=Route; **4**=Afhalen; **5**=Brengen(geen route); 
+- **Wijze van opdracht (VolgNr)**, `volgNr`: Standaard wijze van opdracht verkoop order.. Opties: **1**=Telefonisch; **2**=Whatsapp; **3**=Email-order; **4**=Email-tekst; **5**=Balie; 
+- **Besteld op (besteld)**, `orderDateTime`: Datum van opdracht door klant tot levering.
+- **UserName (User)**, `userName`: Naam gebruiker, naam van opdrachtgever / account manager.. Opties: **EA**=Erik v Asselt; **EJ**=Eric Joosten; **AK**=Arno vd Kant; **FI**=Frits v Ingen; **BR**=Broersen; **BA**=Balie verkoop; 
+- **Faktuur nummer (faktuur)**, `invoiceNr`: _readonly_ Faktuur nummer.
+- **Aanbieding (Aanbieding)**, `isQuote`: Order is aanbieding.
+- **In opdracht (Verwerkt)**, `isOrder`: Order in opdracht voor levering.
+- **Netto (verkoop)**, `nettoverk`: Omzet order verkoop.
+- **Netto (inkoop)**, `nettoink`: Kosten inkoop.
+- **Netto (opbrengst)**, `nettowinst`: Netto winst / resultaat verkoop order.
+# Artikelen-Boven
+- schema: `prod`
+- **ArtNr (ArtNr)**, `artNr`: .
+- **Merk/Brand (Merk)**, `brand`: .
+- **Code (Code)**, `code`: .
+- **Titel/Title (Tekst/Omschrijving)**, `title`: .
+- **Inhoud (Inhoud)**, `inhoud`: .
+- **Eenheid/Unit (InhoudEenheid)**, `inhoudEenheid`: .
+- **Bedrijf (Bedrijf)**, `bedrijf`: .
+- **lokatie (maglokatie)**, `stockLocation`: .
+- **VOS (VOC)**, `vos`: .
+# Artikelen-Onder
+- schema: `art`
+- **ArtNr (ArtNr)**, `artNr`: .
+- **Unit (Eenheid)**, `unit`: .
+- **Verpak aantal (AantalStuks)**, `quantity`: .
+- **Leverancier/supplier (Leverancier)**, `supplier`: .
+- **Bestelcode (bestelcode)**, `orderCode`: .
+- **EAN (EAN barcode)**, `ean`: .
+- **Gewicht/weight (gewicht)**, `weight`: .
+- **Bruto (bruto)**, `bruto`: .
+- **Korting (kort.)**, `discount`: .
+- **Net (netto)**, `net`: .
+- **Net gewijzigd (datum)**, `netLastModifiedDateTime`: .
+- **Marge (marge)**, `marge`: .
+- **Verkoop (verkoop)**, `salePrice`: .
+- **Verkoop aangepast (datum)**, `salePriceLastModifiedDateTime`: .
+- **ArtNr (ArtNr)**, `prodArtNr`: .
+- **Merk/Brand (Merk)**, `prodBrand`: .
+- **Code (Code)**, `prodCode`: .
+- **Titel/Title (Tekst/Omschrijving)**, `prodTitle`: .
+- **Inhoud (Inhoud)**, `prodInhoud`: .
+- **Eenheid/Unit (InhoudEenheid)**, `prodInhoudEenheid`: .
+- **Bedrijf (Bedrijf)**, `prodBedrijf`: .
+- **lokatie (maglokatie)**, `prodStockLocation`: .
+- **VOS (VOC)**, `prodVos`: .
+# Fakturen
+- schema: `invoice`
+- **KLANT Vrachtkosten (Vracht kosten)**, `clientVrachtkosten`: .
+- **KLANT Korting contant (tekenbon) %**, `clientKortingContant`: .
+- **Naam (KlantID)**, `clientName`: .
+- **Contactpersoon (Aanhef)**, `clientBusinessContactName`: .
+- **Contact email (extra)**, `clientBusinessMailAddress`: .
+- **Straat (Straat)**, `clientBusinessAddressStreet`: .
+- **Postcode (postcode)**, `clientBusinessAddressPostalCode`: .
+- **Plaats (Plaats)**, `clientBusinessAddressCity`: .
+- **Factuur contactpersoon (Aanhef)**, `clientOtherContactName`: .
+- **Factuur email (extra)**, `clientOtherMailAddress`: .
+- **Postbus en Straat (Straat)**, `clientOtherAddressCity`: .
+- **Unit (Eenheid)**, `artUnit`: .
+- **Verpak aantal (AantalStuks)**, `artQuantity`: .

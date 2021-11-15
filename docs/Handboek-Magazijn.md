@@ -3,9 +3,9 @@
 
     1. Opstarten ABIS PC
     1. Maak order (weet JP)
-        1. levering: Datum van levering (standaard zelfde dataum als aanmaken order)
-        1. route: _Wijze van levering_. Opties: 0=Niet ingevuld, 1=Post, 2=Visser, 3=Route, 4=Afhalen, 5=Brengen(geen route)
-        1. volgnr: _Wijze van inkoop_: 1=Telefonisch, 2=Whatsapp, 3=Email-order, 4=Email-tekst, 5=Balie.
+        1. **levering**: Datum van levering (standaard zelfde datum als aanmaken order)
+        1. **route**: _Wijze van levering_. Opties: 0=Niet ingevuld, 1=Post, 2=Visser, 3=Route, 4=Afhalen, 5=Brengen(geen route)
+        1. **volgnr**: _Wijze van inkoop_: 1=Telefonisch, 2=Whatsapp, 3=Email-order, 4=Email-tekst, 5=Balie.
             - Email-order: dit is een mail met een bestellijst waar heel duidelijk onze artikelnummers en producten opstaan.
             - Email-tekst: Dit zijn getypte bestellingen met minder complete informatie.
             - Doel hiervan is dat we bij Emailorders het gevoel hebben, dat deze klanten meer open staan om te gaan bestellen via een Webportaal. deze klanten zullen hier dus ook als eerste voor benaderd worden. JP maakt een overzicht van ongeveer 5 klanten waar we dit Portaal als eerste zouden kunnen aanbieden als test.

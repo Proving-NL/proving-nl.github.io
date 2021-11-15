@@ -1,0 +1,10 @@
+# account
+# client
+# salesorder
+# prod
+# art
+# invoice
+# salesorderrow
+# supplierproduct
+# article
+# aimproduct

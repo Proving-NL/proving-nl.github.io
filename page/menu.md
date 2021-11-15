@@ -1,6 +1,7 @@
 - Voorbewerken
     - Reinigen
-        - [Ontvetters/Thinners](/page/Paint)
+        - [Ontvetters/Thinners](#search=ontvetters+thinners)
+        - [Poetspapier](#search=Poetspapier)
         - [Poetspapier](/page/Non-paint)
         - [Paint](/page/Paint)
         - [Non paint](/page/Non-paint)

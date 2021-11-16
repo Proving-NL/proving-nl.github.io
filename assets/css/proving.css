@@ -14,9 +14,9 @@ body>header>article {
   height:200px;
   /* height:100px; */
 }
-.cards.cols>div span:not(:empty)::after {
+/* .cards.cols>div span:not(:empty)::after {
   content: ' ';
-}
+} */
 .cards.cols>div span.orderCode,
 .cards.cols>div span.supplier {
   font-size: 0.8em;

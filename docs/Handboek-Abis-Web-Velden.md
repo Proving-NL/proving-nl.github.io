@@ -1,9 +1,9 @@
 # account
 # client
 # salesorder
+# invoice
 # prod
 # art
-# invoice
 # salesorderrow
 # supplierproduct
 # article

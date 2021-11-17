@@ -87,9 +87,9 @@ $().on('load', async e => {
         $('thead').append(
           $('tr').append(
             $('th').align('left').text('Code'),
+            $('th').align('left').text('Aantal'),
             $('th').align('left').text('Verpakking'),
             $('th').align('left').text('Omschrijving'),
-            $('th').align('left').text('Aantal'),
             options.showPrice ? $('th').align('left').text('Prijs') : null,
             $('th').align('left').text('Mag'),
           ),
@@ -97,9 +97,9 @@ $().on('load', async e => {
         $('tbody').append(
           rows.map(row => $('tr').append(
             $('td').text(row.artNr),
+            $('td').text(row.quant),
             $('td').text(row.unit),
             $('td').text(row.title),
-            $('td').text(row.quant),
             options.showPrice
             ? $('td').align('right').text(!row.netto ? '' : '€ ' + Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}))
             : null,
@@ -179,6 +179,7 @@ $().on('load', async e => {
     const [clientInvoices,clientOrders,rows] = factuurData;
     const [invoice] = clientInvoices;
     const [salesorder] = clientOrders;
+    if (!salesorder) return alert('FACTUUR HEEFT GEEN PAKBONNEN');
 
     rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     const mailtext = ''; // Exta tekst op mail naar klant
@@ -447,9 +448,10 @@ $().on('load', async e => {
     for (let clientName of rows.map(row => row.clientName).unique()) {
       const clientInvoices = rows.filter(row => row.clientName === clientName);
       const [invoice] = clientInvoices;
-      const invoiceNrs = clientInvoices.map(row => row.nr).unique();
+      clientInvoices.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
+      const invoiceNrs = clientInvoices.filter(row => row.dagen>30).map(row => row.nr);
       const from = `invoice@${invoice.accountCompanyName.toLowerCase()}.nl`;
-      // console.log(clientName,clientOrders,invoiceNrs);
+      console.log(clientInvoices);
       const attachements = invoiceNrs.map(invoiceNr => Object({
         invoiceNr: invoiceNr,
       }));
@@ -457,6 +459,44 @@ $().on('load', async e => {
         attachement.iframe = await factuur(attachement.invoiceNr);
       }
       // console.log(salesorder.clientOtherMailAddress, salesorder.clientCompanyName, salesorder);
+      let totVervallen = 0;
+      const content = aim.markdown().render(`Geachte heer/mevrouw,
+
+        Onderstaand treft u het overzicht openstaande posten aan. Voor één of meerdere facturen is de betalingstermijn inmiddels
+        verstreken. Heeft u vragen omtrent het overzicht, is er een onopgelost probleem of mist u een factuur? Neemt u dan even
+        contact met ons op. Zoniet, dan stellen wij het op prijs als u het vervallen bedrag per omgaande aan ons overmaakt.
+
+        <table style="width:100%;">
+        <thead>
+        <tr><th>Factuurnr</th><th align=right>Factuurdatum</th><th align=right>Vervaldatum</th><th align=right>Bedrag</th><th align=right>Betaald</th><th align=right>Saldo</th><th align=right>Ouderdom</th><th align=right>Vervallen</th></tr>
+        </thead>
+        <tbody>
+        ${clientInvoices.map(invoice => `<tr><td align=right>${[
+          invoice.nr,
+          new Date(invoice.createdDateTime).toLocaleDateString(),
+          new Date(invoice.vervallenDateTime).toLocaleDateString(),
+          num(invoice.totIncl),
+          num(invoice.totIncl - invoice.saldo),
+          num(invoice.saldo),
+          invoice.dagen,
+          invoice.dagen > 30 && (totVervallen += Number(invoice.saldo)) ? num(invoice.saldo) : '',
+        ].join('</td><td align=right>')}</td></tr>`).join('')}
+        </tbody>
+        <tfoot>
+        <tr><th></th><th></th><th></th><th></th><th></th><th></th><th align=right>Totaal</th><th align=right>${num(totVervallen)}</th></tr>
+        </tfoot>
+        </table>
+
+        Mocht dit schrijven uw betaling kruisen dan kunt u deze herinnering als niet verzonden beschouwen.
+
+        Met vriendelijke groet,
+
+        ${invoice.accountCompanyName}  \nBoekhouding  \nTel: ${invoice.accountPhone} Email: [invoice@${invoice.accountCompanyName}.nl](mailto:invoice@${invoice.accountCompanyName}.nl?SUBJECT=Vraag over betalingsherinnerig&BODY=Beste administratie,%0A%0AIk heb een vraag over de betalinsherinnering.%0A%0A)
+        `
+      );
+      // $('.pv').text('').html(content);
+      // console.log(content);
+      // return;
       await $().url('https://aliconnect.nl/api/abis/data').query({
         request_type: 'send',
       }).input({
@@ -464,25 +504,10 @@ $().on('load', async e => {
         bcc: from,
         to: invoice.clientOtherMailAddress,
         to: 'max.van.kampen@alicon.nl',
-        chapters: [
-          {
-            title: `Betalingsherinnering voor ${invoice.clientCompanyName}`,
-            content: aim.markdown().render(`Geachte heer/mevrouw,
-
-          	Volgens onze administratie heeft ${invoice.clientCompanyName} nog een of meerdere facturen bij ons openstaan, waarvan de betalingstermijn inmiddels is verstreken.
-          	Wij vragen u vriendelijk om de facturen (zie bijlagen) te controleren en aan ons te voldoen.
-
-            Indien dit bericht uw betaling heeft gekruist dan kunt U deze e-mail als niet verzonden beschouwen.
-            Mochten er redenen zijn waarom u niet kunt overgaan tot betaling
-            dan verzoeken wij u om contact opnemen met onze financiële administratie
-            via e-mail: [invoice@${invoice.accountCompanyName}.nl](mailto:invoice@${invoice.accountCompanyName}.nl?SUBJECT=Vraag over betalingsherinnerig&BODY=Beste administratie,%0A%0AIk heb een vraag over de betalinsherinnering.%0A%0A)
-            of telefonisch: ${invoice.accountPhone}.
-
-            Met vriendelijke groet,
-
-            Debiteurenbeheer  \n${invoice.accountCompanyName}`),
-          },
-        ],
+        chapters: [{
+          title: `Betalingsherinnering voor ${invoice.clientCompanyName}`,
+          content: content,
+        }],
         attachements: attachements.map(row => Object({
           content: row.iframe.elem.innerHTML,
           name: `${invoice.accountCompanyName}-factuur-${row.invoiceNr}-${invoice.clientName}.pdf`.toLowerCase(),
@@ -546,10 +571,10 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.invoice.app = {
     nav: row => [
-      $('button').class('abtn print').title('Print').on('click', async e => (await factuur(row.nr)).print()),
+      $('button').class('abtn print').title('Print').on('click', async e => (await factuur(row.nr)).printpdf()),
     ],
     navList: () => [
-      $('button').text('Bonnen').append(
+      $('button').text('Facturen').append(
         $('div').append(
           $('button').text('Herinneren').on('click', lijstHerinneren),
         ),
@@ -642,11 +667,11 @@ $().on('load', async e => {
     },
     Facturatie: {
       Actueel: e => aim.list('invoice',{
-        $filter: `betaald EQ NULL`,
+        $filter: `isbetaald EQ 0`,
         $order: `nr DESC`,
       }),
       Betaald: e => aim.list('invoice',{
-        $filter: `betaald EQ 1`,
+        $filter: `isbetaald EQ 1`,
         $order: `nr DESC`,
       }),
     },
@@ -676,49 +701,49 @@ $().on('load', async e => {
         aim.list('account');
       },
     },
-    Orders1: {
-      Actief: e => aim.list('salesorder',{
-        $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
-      }),
-      Aanbieding: e => aim.list('salesorder',{
-        $filter: `isQuote EQ 1 && isOrder NE 1`,
-      }),
-      Aanbieding2: e => aim.list('salesorder',{
-        $filter: `orderstatus IN(1,2)`,
-      }),
-      Winkelmandje: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && isOrder NE 1`,
-      }),
-      Printen: e => aim.list('salesorder',{
-        $filter: `printDateTime EQ NULL && isOrder EQ 1`,
-      }),
-      Pakken: e => aim.list('salesorder',{
-        $filter: `pickDateTime EQ NULL && printDateTime NE NULL`,
-      }),
-      Verzenden: e => aim.list('salesorder',{
-        $filter: `sendDateTime EQ NULL && pickDateTime NE NULL`,
-      }),
-      Verzonden: e => aim.list('salesorder',{
-        $filter: `deliverDateTime EQ NULL && sendDateTime NE NULL`,
-      }),
-      Geleverd: e => aim.list('salesorder',{
-        $filter: `invoiceNr EQ 0 && deliverDateTime NE NULL`,
-      }),
-      Factureren: e => aim.list('salesorder',{
-        $filter: `verwerkt=1 and aanbieding <> 1 and isnull(factuurnr,0) = 0 and isnull(faktuurnr,0) = 0`,
-        $filter: `isOrder EQ 1 && isQuote NE 1 && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
-      }),
-      Gefactureerd: e => aim.list('salesorder',{
-        $filter: `bookDateTime EQ NULL && invoiceNr GT 0`,
-      }),
-      Geboekt: e => aim.list('salesorder',{
-        $filter: `payDateTime EQ NULL && bookDateTime NE NULL`,
-      }),
-      Betaald: e => aim.list('salesorder',{
-        $filter: `payDateTime NE NULL`,
-      }),
-      Alles: e => aim.list('salesorder'),
-    },
+    // Orders1: {
+    //   Actief: e => aim.list('salesorder',{
+    //     $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
+    //   }),
+    //   Aanbieding: e => aim.list('salesorder',{
+    //     $filter: `isQuote EQ 1 && isOrder NE 1`,
+    //   }),
+    //   Aanbieding2: e => aim.list('salesorder',{
+    //     $filter: `orderstatus IN(1,2)`,
+    //   }),
+    //   Winkelmandje: e => aim.list('salesorder',{
+    //     $filter: `isQuote NE 1 && isOrder NE 1`,
+    //   }),
+    //   Printen: e => aim.list('salesorder',{
+    //     $filter: `printDateTime EQ NULL && isOrder EQ 1`,
+    //   }),
+    //   Pakken: e => aim.list('salesorder',{
+    //     $filter: `pickDateTime EQ NULL && printDateTime NE NULL`,
+    //   }),
+    //   Verzenden: e => aim.list('salesorder',{
+    //     $filter: `sendDateTime EQ NULL && pickDateTime NE NULL`,
+    //   }),
+    //   Verzonden: e => aim.list('salesorder',{
+    //     $filter: `deliverDateTime EQ NULL && sendDateTime NE NULL`,
+    //   }),
+    //   Geleverd: e => aim.list('salesorder',{
+    //     $filter: `invoiceNr EQ 0 && deliverDateTime NE NULL`,
+    //   }),
+    //   Factureren: e => aim.list('salesorder',{
+    //     $filter: `verwerkt=1 and aanbieding <> 1 and isnull(factuurnr,0) = 0 and isnull(faktuurnr,0) = 0`,
+    //     $filter: `isOrder EQ 1 && isQuote NE 1 && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
+    //   }),
+    //   Gefactureerd: e => aim.list('salesorder',{
+    //     $filter: `bookDateTime EQ NULL && invoiceNr GT 0`,
+    //   }),
+    //   Geboekt: e => aim.list('salesorder',{
+    //     $filter: `payDateTime EQ NULL && bookDateTime NE NULL`,
+    //   }),
+    //   Betaald: e => aim.list('salesorder',{
+    //     $filter: `payDateTime NE NULL`,
+    //   }),
+    //   Alles: e => aim.list('salesorder'),
+    // },
     Sales: {
       Klanten: e => aim.list('client',{
         $filter: `archivedDateTime EQ NULL`,
@@ -752,15 +777,16 @@ $().on('load', async e => {
       }
     },
     Administratie: {
-      Openstaande_debiteuren() {
-
-      },
+      // Openstaande_debiteuren() {
+      //
+      // },
       Afas: {
         Export_Facturen_Airo: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
         Export_Facturen_Proving: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=proving',
-        Import_Openstaande_Debiteuren_Airo() {
-        },
-        Import_Openstaande_Debiteuren_Proving() {
+        Import_Openstaande_Debiteuren() {
+          $('input').type('file').multiple(false).accept('.xlsx').on('change', e => {
+            importFiles(e.target.files);
+          }).click().remove()
         },
       },
       Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
@@ -769,7 +795,7 @@ $().on('load', async e => {
 
   aim.config.import = aim.config.import || [];
   aim.config.import.push({
-    filename: 'airo-openstaande-debiteuren.xlsx',
+    filename: 'Openstaande posten debiteuren.xlsx',
     tabs: [{
       tabname: 'Openstaande posten debiteuren',
       cols: {
@@ -778,10 +804,11 @@ $().on('load', async e => {
         saldo: 'Saldo',
       },
       callback(rows) {
-        $().url('https://aliconnect.nl/api/abis/data').post({
+        rows.forEach(row => row.invoiceNr = row.invoiceNr.replace(/(\d+).*/, '$1'))
+        $().url('https://aliconnect.nl/api/abis/data').input(rows).query({
           request_type: 'facturen_openstaand',
-          invoiceNrs: rows.map(row => row.invoiceNr).join(','),
-        }).then(e => console.log(e.body));
+          // invoiceNrs: rows.map(row => row.invoiceNr).join(','),
+        }).post().then(e => console.log(e.body));
       },
     }]
   },{
@@ -801,8 +828,103 @@ $().on('load', async e => {
       },
     }]
   })
-
 })
+function importFiles(files){
+  Array.from(files).forEach((file,i) => {
+    console.log(i,file);
+    aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename)).forEach(fileConfig => {
+      console.log(fileConfig.filename, file.name);
+      const reader = new FileReader();
+      reader.readAsBinaryString(file);
+      reader.onload = async e => {
+        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+        console.log(fileConfig.tabs);
+        for (let tab of fileConfig.tabs) {
+          console.log(tab);
+          const data = {
+            rows: [],
+          };
+          const prefixArtcode = tab.artcode || '';
+          tab.colRow = tab.colRow || 1;
+          const sheet = workbook.Sheets[tab.tabname];
+          const toprow = [];
+          console.log(sheet);
+          let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
+          colEnd = XLSX.utils.decode_col(colEnd);
+          function rowvalue(r,c){
+            var cell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
+            if (cell) return cell.v;
+          }
+          for (var c=0; c<=colEnd; c++) {
+            toprow[c] = rowvalue(tab.colRow,c);
+          }
+          console.log(toprow);
+          // const cols = [];
+          // for (var name in tab.cols) {
+          //   if (Array.isArray(tab.cols[name])) {
+          //     tab.cols[name].forEach(c => cols[XLSX.utils.decode_col(c)] = name);
+          //   } else {
+          //     cols[toprow.indexOf(tab.cols[name])] = name;
+          //   }
+          // }
+          // console.log(tab.cols,cols);
+          // return;
+          const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
+          const infoElem = $('footer>.main');
+          const rowStart = tab.colRow;
+          // tab.colRow=700;
+          // rowEnd=715;
+          for (var r = tab.colRow+1; r<=rowEnd; r++) {
+            progressElem.value(r);
+            let row;
+            for (var name in tab.cols) {
+              var value;
+              if (Array.isArray(tab.cols[name])) {
+                value = tab.cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+              } else {
+                // console.log();
+                value = rowvalue(r, toprow.includes(name) ? toprow.indexOf(name) : toprow.indexOf(tab.cols[name]));
+              }
+              if (value !== undefined) {
+                row = row || Object.assign({},tab.data);
+                row[name] = value;
+              }
+            }
+            if (row) {
+              console.log(row)
+              data.rows.push(row);
+              // row.keyname = row.keyname || row.orderCode;
+              // if (row.keyname && (row.catalogPrice || row.purchasePrice || row.partPrice)) {
+              //   // if (row && row.orderCode && row.description && row.catalogPrice) {
+              //   row.keyname = (tab.keyname || '') + row.keyname;
+              //   row.orderCode = (tab.orderCode || '') + row.orderCode;
+              //   if (tab.calc) {
+              //     tab.calc.forEach(c => row[c.name] *= c.faktor)
+              //   }
+              //   data.rows.push(row);
+              // }
+            }
+          };
+          console.log(data);
+          if (tab.callback) {
+            tab.callback(data.rows);
+          }
+          return;
+          const res = await fetch("https://proving.aliconnect.nl/import.php?data=purchaseproduct", {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+          }).then(res => res.text())
+          console.log(res);
+        }
+      }
+    })
+  })
+}
 $(window).on('popstate', async e => {
   const documentSearchParams = new URLSearchParams(document.location.search);
   const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
@@ -817,109 +939,12 @@ $(window).on('drop', async e => {
   e.preventDefault();
   e.stopPropagation();
   const data = e.dataTransfer || e.clipboardData;
-  const files = data.files;
   if (data.types.includes('Files')) {
-
-
-
+    importFiles(data.files);
     // const config = await fetch('https://aliconnect.nl/yaml.php', {
     //   method: 'POST',
     //   body: await fetch('config/import.yaml').then(res => res.text()),
     // }).then(res => res.json());
     // console.log(1, config, files);
-    Array.from(files).forEach((file,i) => {
-      // console.log(i,file);
-      aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename)).forEach(fileConfig => {
-        console.log(fileConfig.filename, file.name);
-        const reader = new FileReader();
-        reader.readAsBinaryString(file);
-        reader.onload = async e => {
-          const workbook = XLSX.read(e.target.result, { type: 'binary' });
-          console.log(fileConfig.tabs);
-          for (let tab of fileConfig.tabs) {
-            console.log(tab);
-            const data = {
-              rows: [],
-            };
-            const prefixArtcode = tab.artcode || '';
-            tab.colRow = tab.colRow || 1;
-            const sheet = workbook.Sheets[tab.tabname];
-            const toprow = [];
-            console.log(sheet);
-            let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
-            colEnd = XLSX.utils.decode_col(colEnd);
-            function rowvalue(r,c){
-              var cell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
-              if (cell) return cell.v;
-            }
-            for (var c=0; c<=colEnd; c++) {
-              toprow[c] = rowvalue(tab.colRow,c);
-            }
-            console.log(toprow);
-            // const cols = [];
-            // for (var name in tab.cols) {
-            //   if (Array.isArray(tab.cols[name])) {
-            //     tab.cols[name].forEach(c => cols[XLSX.utils.decode_col(c)] = name);
-            //   } else {
-            //     cols[toprow.indexOf(tab.cols[name])] = name;
-            //   }
-            // }
-            // console.log(tab.cols,cols);
-            // return;
-            const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
-            const infoElem = $('footer>.main');
-            const rowStart = tab.colRow;
-            // tab.colRow=700;
-            // rowEnd=715;
-            for (var r = tab.colRow+1; r<=rowEnd; r++) {
-              progressElem.value(r);
-              let row;
-              for (var name in tab.cols) {
-                var value;
-                if (Array.isArray(tab.cols[name])) {
-                  value = tab.cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
-                } else {
-                  // console.log();
-                  value = rowvalue(r, toprow.includes(name) ? toprow.indexOf(name) : toprow.indexOf(tab.cols[name]));
-                }
-                if (value !== undefined) {
-                  row = row || Object.assign({},tab.data);
-                  row[name] = value;
-                }
-              }
-              if (row) {
-                console.log(row)
-                data.rows.push(row);
-                // row.keyname = row.keyname || row.orderCode;
-                // if (row.keyname && (row.catalogPrice || row.purchasePrice || row.partPrice)) {
-                //   // if (row && row.orderCode && row.description && row.catalogPrice) {
-                //   row.keyname = (tab.keyname || '') + row.keyname;
-                //   row.orderCode = (tab.orderCode || '') + row.orderCode;
-                //   if (tab.calc) {
-                //     tab.calc.forEach(c => row[c.name] *= c.faktor)
-                //   }
-                //   data.rows.push(row);
-                // }
-              }
-            };
-            console.log(data);
-            if (tab.callback) {
-              tab.callback(data.rows);
-            }
-            return;
-            const res = await fetch("https://proving.aliconnect.nl/import.php?data=purchaseproduct", {
-              method: 'POST', // *GET, POST, PUT, DELETE, etc.
-              mode: 'cors', // no-cors, *cors, same-origin
-              cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-              credentials: 'same-origin', // include, *same-origin, omit
-              redirect: 'follow', // manual, *follow, error
-              referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-              body: JSON.stringify(data) // body data type must match "Content-Type" header
-            }).then(res => res.text())
-            console.log(res);
-          }
-        }
-      })
-    })
   }
 });

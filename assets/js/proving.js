@@ -11,7 +11,6 @@ aim.libraries.init = () => {
 }
 $().on('load', async e => {
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
-
   // supplierproduct = await fetch('product.json').then( response => response.json() );
   // // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
   // supplierproduct.forEach(row => {
@@ -517,6 +516,19 @@ $().on('load', async e => {
     document.querySelectorAll('iframe').forEach(el => el.remove());
     alert('Herinneringen verstuurd');
   }
+  aim.config.components.schemas.client.app = {
+    nav: row => [
+      $('button').class('abtn print').title('Printen').on('click', e => {
+        const elem = $('article').parent('.lv').class('cover').append(
+          $('nav').append(
+            $('span'),
+            $('button').class('icn-close').on('click', e => elem.remove()),
+          ),
+          $('h1').text('Klant 1'),
+        )
+      }),
+    ],
+  }
   aim.config.components.schemas.salesorder.app = {
     nav: row => [
       $('button').class('abtn print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
@@ -581,8 +593,6 @@ $().on('load', async e => {
       ),
     ]
   }
-
-
   aim.cols = {
     catalogPrice(row, div) {
       if ('catalogPrice' in row) {
@@ -630,169 +640,6 @@ $().on('load', async e => {
     },
 
   }
-  aim.om.treeview({
-    Shop: {
-      Proving(){
-        list('product',{$filter: `bedrijf EQ 'proving'`});
-      },
-      Alles(){
-        list('article');
-      },
-    },
-    Orders: {
-      Mandje: e => aim.list('salesorder',{
-        $filter: `isOrder NE 1 && isQuote NE 1`,
-        $order: `nr DESC`,
-      }),
-      Nieuw: e => aim.list('salesorder',{
-        $filter: `isOrder EQ 1 && printDateTime EQ NULL`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
-      Actief: e => aim.list('salesorder',{
-        $filter: `printDateTime NE NULL && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0 && payDateTime EQ NULL`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
-      Overig: e => aim.list('salesorder',{
-        $filter: `ISNULL(invoiceNr,0) GT 0`,
-        $order: `nr DESC`,
-      }),
-      Alles: e => aim.list('salesorder',{
-        $order: `nr DESC`,
-        $top: 100,
-        $search: '',
-
-      }),
-    },
-    Facturatie: {
-      Actueel: e => aim.list('invoice',{
-        $filter: `isbetaald EQ 0`,
-        $order: `nr DESC`,
-      }),
-      Betaald: e => aim.list('invoice',{
-        $filter: `isbetaald EQ 1`,
-        $order: `nr DESC`,
-      }),
-    },
-    Abis: {
-      Klanten() {
-        aim.list('client');
-      },
-      Pakbonnen() {
-        aim.list('salesorder');
-      },
-      Pakbon_regels() {
-        aim.list('salesorderrow');
-      },
-      Fakturen() {
-        aim.list('invoice');
-      },
-      Producten() {
-        aim.list('prod');
-      },
-      Artikelen() {
-        aim.list('art');
-      },
-      Klant_artikelen() {
-        aim.list('clientart');
-      },
-      Bedrijven() {
-        aim.list('account');
-      },
-    },
-    // Orders1: {
-    //   Actief: e => aim.list('salesorder',{
-    //     $filter: `ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
-    //   }),
-    //   Aanbieding: e => aim.list('salesorder',{
-    //     $filter: `isQuote EQ 1 && isOrder NE 1`,
-    //   }),
-    //   Aanbieding2: e => aim.list('salesorder',{
-    //     $filter: `orderstatus IN(1,2)`,
-    //   }),
-    //   Winkelmandje: e => aim.list('salesorder',{
-    //     $filter: `isQuote NE 1 && isOrder NE 1`,
-    //   }),
-    //   Printen: e => aim.list('salesorder',{
-    //     $filter: `printDateTime EQ NULL && isOrder EQ 1`,
-    //   }),
-    //   Pakken: e => aim.list('salesorder',{
-    //     $filter: `pickDateTime EQ NULL && printDateTime NE NULL`,
-    //   }),
-    //   Verzenden: e => aim.list('salesorder',{
-    //     $filter: `sendDateTime EQ NULL && pickDateTime NE NULL`,
-    //   }),
-    //   Verzonden: e => aim.list('salesorder',{
-    //     $filter: `deliverDateTime EQ NULL && sendDateTime NE NULL`,
-    //   }),
-    //   Geleverd: e => aim.list('salesorder',{
-    //     $filter: `invoiceNr EQ 0 && deliverDateTime NE NULL`,
-    //   }),
-    //   Factureren: e => aim.list('salesorder',{
-    //     $filter: `verwerkt=1 and aanbieding <> 1 and isnull(factuurnr,0) = 0 and isnull(faktuurnr,0) = 0`,
-    //     $filter: `isOrder EQ 1 && isQuote NE 1 && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0`,
-    //   }),
-    //   Gefactureerd: e => aim.list('salesorder',{
-    //     $filter: `bookDateTime EQ NULL && invoiceNr GT 0`,
-    //   }),
-    //   Geboekt: e => aim.list('salesorder',{
-    //     $filter: `payDateTime EQ NULL && bookDateTime NE NULL`,
-    //   }),
-    //   Betaald: e => aim.list('salesorder',{
-    //     $filter: `payDateTime NE NULL`,
-    //   }),
-    //   Alles: e => aim.list('salesorder'),
-    // },
-    Sales: {
-      Klanten: e => aim.list('client',{
-        $filter: `archivedDateTime EQ NULL`,
-      }),
-      Archief: e => aim.list('client',{
-        $filter: `archivedDateTime NE NULL`,
-      }),
-      // Klanten() {
-      //   // list('client',{$filter: `archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
-      //   list('client');
-      // },
-      // Klanten() {
-      //   list('client',{$filter: `accountManager NE NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
-      // },
-      // Overig() {
-      //   list('client',{$filter: `accountManager EQ NULL AND archiefDT EQ NULL AND companyName NOT LIKE '%vervallen%'`});
-      // },
-      // Archief() {
-      //   list('client',{$filter: `archiefDT NE NULL OR companyName LIKE '%vervallen%'`});
-      // },
-      Analyse: {
-        Klant() {
-          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/client').toString())}`;
-        },
-        Voorraad() {
-          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/voorraad').toString())}`;
-        },
-        Verloop() {
-          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/verkoop_verloop').toString())}`;
-        },
-      }
-    },
-    Administratie: {
-      // Openstaande_debiteuren() {
-      //
-      // },
-      Afas: {
-        Export_Facturen_Airo: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
-        Export_Facturen_Proving: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=proving',
-        Import_Openstaande_Debiteuren() {
-          $('input').type('file').multiple(false).accept('.xlsx').on('change', e => {
-            importFiles(e.target.files);
-          }).click().remove()
-        },
-      },
-      Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
-    },
-  });
-
   aim.config.import = aim.config.import || [];
   aim.config.import.push({
     filename: 'Openstaande posten debiteuren.xlsx',
@@ -828,6 +675,204 @@ $().on('load', async e => {
       },
     }]
   })
+  async function analyseBedrijf (naam) {
+    const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-company&name=' + naam).then(res => res.json());
+    var [clients] = data;
+    clients.forEach(row => {
+      row.verschil = (row.lastYear||0) - (row.beforeLastYear||0);
+      row.groei = row.beforeLastYear ? ((row.lastYear||0)-row.beforeLastYear||0)/row.beforeLastYear*100 : 100;
+    })
+    clients = clients.filter(row => row.lastYear || row.beforeLastYear);
+    function val(value, dig = 0){
+      return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
+    }
+    function clienttable(rows, cols, options = {}){
+      // console.log(cols);
+      return $('table').style('width:100%;').append(
+        $('thead').append(
+          $('tr').append(
+            Object.keys(cols).map(title => $('th').text(title))
+          )
+        ),
+        $('tbody').append(
+          rows.map(row => $('tr').style(options.style ? options.style(row) : null).append(
+            Object.values(cols).map(fn => fn(row)),
+            // cols.map(col => $('td').text((col.calc || String)(row[col.name])).style(col.style||'')),
+          ))
+        )
+      );
+    }
+    const styleValCol = 'width:2cm;text-align:right;';
+    const cols = {
+      Firma: row => $('td').text(row.companyName),
+      AM: row => $('td').text(row.clientManager),
+      'Afgelopen periode': row => $('td').text(val(row.lastYear)).style(styleValCol),
+      'Periode daarvoor': row => $('td').text(val(row.beforeLastYear)).style(styleValCol),
+      'Verschil': row => $('td').text(val(row.verschil)).style(styleValCol+`color:${row.verschil<0 ? 'orange' : 'inherit'};`),
+      'Groei': row => $('td').text(val(row.groei)).style(styleValCol+`color:${row.groei<0 ? 'orange' : 'inherit'};`),
+      'Dagen': row => $('td').text(val(row.dagen)).style(styleValCol+`color:${row.dagen>30 ? 'orange' : 'inherit'};`),
+    };
+    const clientManagers = clients.map(row => row.clientManager).unique().sort();
+
+    const elem = $('div').parent(
+      $('div').parent(
+        $('.lv').text('').append(
+          $('nav').append(
+            $('span'),
+            $('button').class('icn-print').on('click', e => elem.print()),
+          ),
+        )
+      )
+    );
+
+    [
+      [naam, clients],
+    ]
+    .concat(clientManagers.map(cm => [cm, clients.filter(row => row.clientManager === cm)]))
+    .forEach(([cm,clients])=>{
+      const omzet1 = clients.map(row => row.lastYear).reduce((s,v) => s + v);
+      const omzet2 = clients.map(row => row.beforeLastYear).reduce((s,v) => s + v);
+      elem.append(
+        $('h1').text('Analyse', naam, 'Client Manager:', cm),
+        $('ul').append(
+          $('li').text( `Omzet afgelopen 365 dagen: ${val(omzet1)}`),
+          $('li').text( `Omzet jaar ervoor: ${val(omzet2)}`),
+          $('li').text( `Groei: ${num((omzet1-omzet2)/omzet2*100)}%`),
+        ),
+        $('details').append(
+          $('summary').text('Top Klanten omzet'),
+          clienttable(clients.filter(row => row.dagen !== null).sort((a,b)=> b.lastYear - a.lastYear).slice(0,20), cols),
+        ),
+        $('details').append(
+          $('summary').text('Klanten top dalers'),
+          clienttable(clients.sort((a,b)=> a.verschil - b.verschil).slice(0,30),  cols),
+        ),
+        $('details').append(
+          $('summary').text('Klanten top stijgers'),
+          clienttable(clients.sort((a,b)=> b.verschil - a.verschil).slice(0,30),  cols),
+        ),
+        $('details').append(
+          $('summary').text('Klanten niet actief'),
+          clienttable(clients.filter(row => row.dagen > 30).sort((a,b)=> a.dagen - b.dagen),  cols),
+        ),
+        //   {name: 'companyName'},
+        //   // {name: 'businessAddressCity'},
+        //   {name: 'lastYear', title: 'Afgelopen periode', calc: val, style: 'text-align:right;'},
+        //   {name: 'beforeLastYear', title: 'Periode daarvoor', calc: val, style: 'text-align:right;'},
+        //   {name: 'groei', calc: val, style: 'text-align:right;'},
+        //   {name: 'dagen'},
+        // ], {
+        //   style: row => `color:${row.groei<0 ? 'orange' : 'inherit'};`,
+        // }),
+        // klanten.map(row => $('details').append(
+        //   $('summary').text(row.companyName, row.dagen),
+        //   $('p').text(row.opmerking),
+        // ))
+      )
+    })
+  }
+  aim.om.treeview({
+    Shop: {
+      Proving(){
+        list('product',{$filter: `bedrijf EQ 'proving'`});
+      },
+      Alles(){
+        list('article');
+      },
+    },
+    Sales: {
+      Klanten: e => aim.list('client',{
+        $filter: `archivedDateTime EQ NULL`,
+        $search: ``,
+      }),
+      Archief: e => aim.list('client',{
+        $filter: `archivedDateTime NE NULL`,
+        $search: ``,
+      }),
+      Analyse: {
+        Airo: () => analyseBedrijf('Airo'),
+        Proving: () => analyseBedrijf('Proving'),
+        Voorraad() {
+          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/voorraad').toString())}`;
+        },
+        Verloop() {
+          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/verkoop_verloop').toString())}`;
+        },
+      }
+    },
+    Orders: {
+      Mandje: e => aim.list('salesorder',{
+        $filter: `isOrder NE 1 && isQuote NE 1`,
+        $order: `nr DESC`,
+      }),
+      Nieuw: e => aim.list('salesorder',{
+        $filter: `isOrder EQ 1 && printDateTime EQ NULL`,
+        $order: `nr DESC`,
+        $search: '*',
+      }),
+      Actief: e => aim.list('salesorder',{
+        $filter: `printDateTime NE NULL && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0 && payDateTime EQ NULL`,
+        $order: `nr DESC`,
+        $search: '*',
+      }),
+      Overig: e => aim.list('salesorder',{
+        $filter: `ISNULL(invoiceNr,0) GT 0`,
+        $order: `nr DESC`,
+      }),
+      Alles: e => aim.list('salesorder',{
+        $order: `nr DESC`,
+        $top: 100,
+        $search: '',
+
+      }),
+    },
+    Administratie: {
+      'Facturen Actueel': e => aim.list('invoice',{
+        $filter: `isbetaald EQ 0`,
+        $order: `nr DESC`,
+      }),
+      'Facturen Betaald': e => aim.list('invoice',{
+        $filter: `isbetaald EQ 1`,
+        $order: `nr DESC`,
+      }),
+      Afas: {
+        'Export Facturen Airo': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
+        'Export Facturen Proving': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=proving',
+        'Import'() {
+          $('input').type('file').multiple(false).accept('.xlsx').on('change', e => {
+            importFiles(e.target.files);
+          }).click().remove()
+        },
+      },
+      // Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
+    },
+    Abis: {
+      Klanten() {
+        aim.list('client');
+      },
+      Pakbonnen() {
+        aim.list('salesorder');
+      },
+      Pakbon_regels() {
+        aim.list('salesorderrow');
+      },
+      Fakturen() {
+        aim.list('invoice');
+      },
+      Producten() {
+        aim.list('prod');
+      },
+      Artikelen() {
+        aim.list('art');
+      },
+      Klant_artikelen() {
+        aim.list('clientart');
+      },
+      Bedrijven() {
+        aim.list('account');
+      },
+    },
+  });
 })
 function importFiles(files){
   Array.from(files).forEach((file,i) => {

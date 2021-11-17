@@ -2,7 +2,7 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT']."/../vendor/autoload.php");
 error_reporting(E_ALL & ~E_NOTICE);
-$filename = 'C:\Users\maxva\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
+$filename = 'C:\Users\max\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
 // $content = file_get_contents($filename);
 $config = yaml_parse_file($filename);
 // die($content);

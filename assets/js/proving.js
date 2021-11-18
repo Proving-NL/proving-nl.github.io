@@ -50,6 +50,14 @@ $().on('load', async e => {
   }
   let factuurData;
   let facturenElem;
+  const transportOptions = [
+    { title: 'Niet ingevuld', style: 'background-color:red;color:yellow;', },
+    { title: 'Post', style: 'background-color:orange;', },
+    { title: 'Visser', style: 'background-color:lightblue;', },
+    { title: 'Route', style: 'background-color:lightgreen;', },
+    { title: 'Afhalen', style: 'background-color:#ccc;', },
+    { title: 'Brengen', style: 'background-color:green;color:white;', },
+  ];
   function num(value, dig = 2){
     return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
   }
@@ -77,7 +85,9 @@ $().on('load', async e => {
             $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
             $('td').text(salesorder.nr),
             $('td').text(salesorder.ref),
-            $('td').text(['Niet ingevuld', 'Post', 'Visser', 'Route', 'Afhalen', 'Brengen'][salesorder.routeNr] || 'Onbekend'),
+            $('td')
+            .text(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend')
+            .style(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].style : null),
             $('td').text(salesorder.weight),
           ),
         ),
@@ -182,25 +192,10 @@ $().on('load', async e => {
 
     rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     const mailtext = ''; // Exta tekst op mail naar klant
-
-    // let sum = rows.reduce((s,row) => s + row.quant * row.netto, 0);
-
-
-    // sum = 100;
-    // salesorder.clientKortingContant = 1;
-    // salesorder.clientVrachtkosten = 10;
-
     salesorder.clientKortingContant = isNaN(salesorder.clientKortingContant) ? 0 : Number(salesorder.clientKortingContant);
-
     const els = {};
     let totaal = 0;
     let betaald = 0;
-
-    // const elem = $('iframe').printbody().append(
-    //   $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
-    // ).append(
-
-
     const elem = $('div').append(
       $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
       $('div').briefkop(salesorder, 'FACTUUR '+factuurNr).append(
@@ -224,9 +219,9 @@ $().on('load', async e => {
           $('thead').append(
             $('tr').append(
               $('th').align('left').text('Code'),
+              $('th').align('right').text('Aantal'),
               $('th').align('left').text('Verpakking'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
-              $('th').align('right').text('Aantal'),
               $('th').align('right').text('Prijs'),
               $('th').align('right').text('Excl'),
             ),
@@ -236,17 +231,17 @@ $().on('load', async e => {
               $('tr').append(
                 $('th'),
                 $('th'),
-                $('th').align('left').text(`Order: ${salesorder.nr}`, salesorder.ref ? `ref: ${salesorder.ref}`: ''),
                 $('th'),
+                $('th').align('left').text(`Order: ${salesorder.nr}`, salesorder.ref ? `ref: ${salesorder.ref}`: ''),
                 $('th'),
                 $('th'),
               )
             ].concat(
               rows.filter(row => row.orderNr === salesorder.nr).map(row => $('tr').append(
                 $('td').text(row.artNr),
+                $('td').align('right').text(row.quant),
                 $('td').text(row.unit),
                 $('td').style('white-space:normal;').text(row.title),
-                $('td').align('right').text(row.quant),
                 $('td').align('right').text(!row.netto ? '' : cur(row.netto)),
                 $('td').align('right').text(row.quant && row.netto ? cur(row.totnetto = row.quant * row.netto, totaal += row.totnetto) : ''),
               )),
@@ -292,18 +287,13 @@ $().on('load', async e => {
         ),
       ),
     )
-
     console.log(invoice);
-
     els.trh.append($('th').align('right').text(`Excl`));
     els.trb.append($('td').align('right').text(cur(totaal)));
-
     els.trh.append($('th').align('right').text(`Btw ${invoice.btw}%`));
     els.trb.append($('td').align('right').text(cur(invoice.btwbedrag = totaal * invoice.btw/100, totaal += invoice.btwbedrag)));
-
     els.trh.append($('th').align('right').text(`Incl`));
     els.trb.append($('td').align('right').text(cur(totaal)));
-
     if (betaald) {
       els.trh.append($('th').align('right').text(`Voldaan`));
       els.trb.append($('td').align('right').text(cur(betaald)));
@@ -312,25 +302,23 @@ $().on('load', async e => {
     }
     return elem;
   }
-  async function factuurSend(data, html) {
-    const [clientOrders,rows] = data;
-    const [salesorder] = clientOrders;
-    const invoiceNr = salesorder.invoiceNr || salesorder.invoiceNrAbis;
-    const from = `invoice@${salesorder.accountCompanyName.toLowerCase()}.nl`;
-    await $().url('https://aliconnect.nl/api/abis/data').query({
-      request_type: 'sendfactuur',
-    }).input({
+  async function sendInvoice(elem, factuurData) {
+    const [clientInvoices,clientOrders,rows] = factuurData;
+    const [invoice] = clientInvoices;
+    const invoiceNr = invoice.nr;
+    const from = `invoice@${invoice.accountCompanyName.toLowerCase()}.nl`;
+    const maildata = {
       from: from,
       bcc: from,
-      to: salesorder.clientOtherMailAddress,
       to: 'max.van.kampen@alicon.nl',
+      to: invoice.clientOtherMailAddress,
       invoiceNr: invoiceNr,
-      chapters: [
-        {
-          title: `${salesorder.accountCompanyName} factuur ${invoiceNr} voor ${salesorder.clientCompanyName}`,
-          content: aim.markdown().render(`Geachte heer / mevrouw,
+      chapters: [{
+        title: `${invoice.accountCompanyName} factuur ${invoiceNr} voor ${invoice.clientCompanyName}`,
+        content: aim.markdown().render(`
+          Geachte heer / mevrouw,
 
-          Hierbij ontvangt ${salesorder.clientCompanyName} een factuur aangaande de door ${salesorder.accountCompanyName} geleverde goederen.
+          Hierbij ontvangt ${invoice.clientCompanyName} een factuur aangaande de door ${invoice.accountCompanyName} geleverde goederen.
 
           Voor automatische verwerking van uw digitale facturen is uw factuur bijgevoegd als bijlage.
           Wij willen u graag erop attenderen dat digitale factuurbestanden gedurende zeven jaar bewaard dienen te worden.
@@ -338,42 +326,47 @@ $().on('load', async e => {
           Het bewaren van (alleen) een afdruk van de digitaal ontvangen facturen op papier is niet voldoende,
           U dient uw digitale factuur ook digitaal te bewaren.
 
-          Voor eventuele vragen kunt u zich richten tot onze financiële administratie
-          via e-mail: [invoice@${salesorder.accountCompanyName}.nl](mailto:invoice@${salesorder.accountCompanyName}.nl?SUBJECT=Vraag over factuur ${invoiceNr}&BODY=Beste administratie,%0A%0AIk heb een vraag aangaande factuur ${invoiceNr}%0A%0AMijn vraag is )
-          of telefonisch: ${salesorder.accountPhone}
+          Voor eventuele vragen over de factuur kunt u zich richten tot onze financiële administratie
+          via e-mail: [administratie@${invoice.accountCompanyName}.nl](mailto:administratie@${invoice.accountCompanyName}.nl?SUBJECT=Vraag over factuur ${invoiceNr}&BODY=Beste administratie,%0A%0ANamens ${invoice.clientCompanyName} heb ik een vraag aangaande factuur ${invoiceNr}: ... ?%0A%0AMet vriendelijke groet,%0A${invoice.clientCompanyName})
+          of telefonisch: ${invoice.accountPhone}
 
-          Met vriendelijke groet,  \nAdministratie  \n${salesorder.accountCompanyName}`),
-        },
-      ],
-      attachements: [
-        {
-          content: html,
-          name: `${salesorder.accountCompanyName}-factuur-${invoiceNr}-${salesorder.clientName}.pdf`.toLowerCase(),
-        }
-      ]
-    }).post().then(e => {
-      console.log(e.body);
-    })
+          Indien U vragen heeft over de geleverde artikelen kunt u contact opnemen
+          via e-mail: [verkoop@${invoice.accountCompanyName}.nl](mailto:verkoop@${invoice.accountCompanyName}.nl?SUBJECT=Inhoudelijke vragen over factuur ${invoiceNr}&BODY=Beste administratie,%0A%0ANamens ${invoice.clientCompanyName} heb ik een vraag aangaande factuur ${invoiceNr}: ... ?%0A%0AMet vriendelijke groet,%0A${invoice.clientCompanyName})
+
+          Met vriendelijke groet,  \nAdministratie  \n${invoice.accountCompanyName}
+          `
+        ),
+      }],
+      attachements: [{
+        content: elem.elem.innerHTML,
+        name: `${invoice.accountCompanyName}-factuur-${invoiceNr}-${invoice.clientName}.pdf`.toLowerCase()
+      }]
+    };
+    console.log(maildata);
+    await $().url('https://aliconnect.nl/api/abis/data').query({
+      request_type: 'sendInvoice',
+    }).input(maildata).post().then(e => console.log(e.body));
+    // elem.remove();
   }
   async function factureren(salesorder, id){
     const data = await $().url('https://aliconnect.nl/api/abis/data').post({
-      request_type: 'newfactuur',
+      request_type: 'createInvoice',
       accountCompanyName: salesorder.accountCompanyName,
       ordernummers: id,
     }).then(e => e.body);
     // console.log(data);
-    const accountCompany = data.shift().shift();
+    const [bedrijven] = data;
+    const [accountCompany] = bedrijven;
     const invoiceNr = accountCompany.invoiceNr;
     const factuurElem = await factuur(invoiceNr);
-    const [clientOrders,rows] = factuurData;
-    [salesorder] = clientOrders;
-    // console.log(salesorder);
+
+    const [clientInvoices,clientOrders,rows] = factuurData;
+    const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
-    if (salesorder.clientOtherMailAddress) {
-      await factuurSend(factuurData, factuurElem.elem.innerHTML);
-      factuurElem.remove();
+    if (invoice.clientOtherMailAddress) {
+      await sendInvoice(factuurElem, factuurData);
     } else {
-      facturenElem.append(factuurElem.style('page-break-before:always;'))
+      facturenElem.append(factuurElem.style('page-break-after:always;'))
     }
     const pageId = new URLSearchParams(document.location.search).get('id');
     document.location.href = '#?id=';
@@ -430,14 +423,13 @@ $().on('load', async e => {
       ]),
     ).print();
   }
-  async function lijstFactureren() {
-    const orders = aim.listRows;
+  async function lijstFactureren(orders) {
     for (let clientName of orders.map(row => row.clientName).unique()) {
       const clientOrders = orders.filter(row => row.clientName === clientName);
       const [salesorder] = clientOrders;
       await factureren(salesorder, clientOrders.map(o => o.nr).join(','));
     }
-    if (facturenElem.elem.children) {
+    if (facturenElem.elem.innerText) {
       facturenElem.printpdf();
     }
     facturenElem = null;
@@ -488,9 +480,13 @@ $().on('load', async e => {
 
         Mocht dit schrijven uw betaling kruisen dan kunt u deze herinnering als niet verzonden beschouwen.
 
+        Deze mail is verstuurd door een geautomatiseerd proces. U kunt niet op deze mail reageren.
+        Heeft u vragen dan kunt u een email sturen naar
+        [administratie@${invoice.accountCompanyName}.nl](mailto:administratie@${invoice.accountCompanyName}.nl?SUBJECT=Vraag over betalingsherinnering&BODY=Beste administratie,%0A%0ANamens ${invoice.clientCompanyName} heb ik een vraag aangaande de betalingsherinnering: ... ?%0A%0AMet vriendelijke groet,%0A${invoice.clientCompanyName}).
+
         Met vriendelijke groet,
 
-        ${invoice.accountCompanyName}  \nBoekhouding  \nTel: ${invoice.accountPhone} Email: [invoice@${invoice.accountCompanyName}.nl](mailto:invoice@${invoice.accountCompanyName}.nl?SUBJECT=Vraag over betalingsherinnerig&BODY=Beste administratie,%0A%0AIk heb een vraag over de betalinsherinnering.%0A%0A)
+        ${invoice.accountCompanyName}  \nBoekhouding  \nTel: ${invoice.accountPhone}
         `
       );
       // $('.pv').text('').html(content);
@@ -501,8 +497,8 @@ $().on('load', async e => {
       }).input({
         from: from,
         bcc: from,
-        to: invoice.clientOtherMailAddress,
         to: 'max.van.kampen@alicon.nl',
+        to: invoice.clientOtherMailAddress,
         chapters: [{
           title: `Betalingsherinnering voor ${invoice.clientCompanyName}`,
           content: content,
@@ -531,31 +527,14 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.salesorder.app = {
     nav: row => [
-      $('button').class('abtn print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
+      $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
       $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr)).print()),
-
-      row.invoiceNrAbis || row.invoiceNr
-      ? $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNrAbis || row.invoiceNr)).printpdf())
-      : $('button').text('Factureren').on('click', async e => {
-        await factureren(row, row.nr);
-        // console.log(facturenElem);
-        if (facturenElem.elem.children) {
-          facturenElem.print();
-        }
-        facturenElem = null;
-      }),
-
-      (row.invoiceNr = row.invoiceNrAbis || row.invoiceNr) && row.clientOtherMailAddress
-      ? $('button').class('abtn mail-send').title('Factuur verzenden').on('click', async e => {
-        const factuurElem = await factuur(row.invoiceNr);
-        const [clientOrders,rows] = factuurData;
-        [salesorder] = clientOrders;
-        if (salesorder.clientOtherMailAddress) {
-          await factuurSend(factuurData, factuurElem.elem.innerHTML);
-          factuurElem.remove();
-        }
-      })
-      : null,
+      row.invoiceNr ? [
+        $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNr)).printpdf()),
+        !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.invoiceNr), factuurData)),
+      ] : [
+        $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
+      ],
     ],
     navList: () => [
       $('button').text('Bonnen').append(
@@ -576,7 +555,7 @@ $().on('load', async e => {
             id: aim.listRows.map(row => row.nr).join(','),
             set: 'deliverDateTime = GETDATE()'
           })),
-          $('button').text('Factureren').on('click', lijstFactureren),
+          $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
         ),
       ),
     ]
@@ -584,6 +563,7 @@ $().on('load', async e => {
   aim.config.components.schemas.invoice.app = {
     nav: row => [
       $('button').class('abtn print').title('Print').on('click', async e => (await factuur(row.nr)).printpdf()),
+      !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
     ],
     navList: () => [
       $('button').text('Facturen').append(
@@ -675,32 +655,34 @@ $().on('load', async e => {
       },
     }]
   })
+  function clienttable(rows, cols, options = {}){
+    // console.log(cols);
+    return $('table').style('width:100%;').append(
+      $('thead').append(
+        $('tr').append(
+          Object.keys(cols).map(title => $('th').text(title))
+        )
+      ),
+      $('tbody').append(
+        rows.map(row => $('tr').style(options.style ? options.style(row) : null).append(
+          Object.values(cols).map(fn => fn(row)),
+          // cols.map(col => $('td').text((col.calc || String)(row[col.name])).style(col.style||'')),
+        ))
+      )
+    );
+  }
   async function analyseBedrijf (naam) {
     const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-company&name=' + naam).then(res => res.json());
     var [clients] = data;
     clients.forEach(row => {
-      row.verschil = (row.lastYear||0) - (row.beforeLastYear||0);
-      row.groei = row.beforeLastYear ? ((row.lastYear||0)-row.beforeLastYear||0)/row.beforeLastYear*100 : 100;
+      row.verschil = row.lastYear - row.beforeLastYear;
+      row.groei = row.beforeLastYear ? (row.lastYear-row.beforeLastYear)/row.beforeLastYear*100 : 100;
+      row.marge = row.lastYear - row.totInkoop;
+      row.winst = row.lastYear && row.marge ? row.marge / row.lastYear * 100 : 0;
     })
-    clients = clients.filter(row => row.lastYear || row.beforeLastYear);
+    // clients = clients.filter(row => row.lastYear || row.beforeLastYear);
     function val(value, dig = 0){
       return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
-    }
-    function clienttable(rows, cols, options = {}){
-      // console.log(cols);
-      return $('table').style('width:100%;').append(
-        $('thead').append(
-          $('tr').append(
-            Object.keys(cols).map(title => $('th').text(title))
-          )
-        ),
-        $('tbody').append(
-          rows.map(row => $('tr').style(options.style ? options.style(row) : null).append(
-            Object.values(cols).map(fn => fn(row)),
-            // cols.map(col => $('td').text((col.calc || String)(row[col.name])).style(col.style||'')),
-          ))
-        )
-      );
     }
     const styleValCol = 'width:2cm;text-align:right;';
     const cols = {
@@ -708,12 +690,24 @@ $().on('load', async e => {
       AM: row => $('td').text(row.clientManager),
       'Afgelopen periode': row => $('td').text(val(row.lastYear)).style(styleValCol),
       'Periode daarvoor': row => $('td').text(val(row.beforeLastYear)).style(styleValCol),
-      'Verschil': row => $('td').text(val(row.verschil)).style(styleValCol+`color:${row.verschil<0 ? 'orange' : 'inherit'};`),
-      'Groei': row => $('td').text(val(row.groei)).style(styleValCol+`color:${row.groei<0 ? 'orange' : 'inherit'};`),
+      // 'Verschil': row => $('td').text(val(row.verschil)).style(styleValCol+`color:${row.verschil<0 ? 'orange' : 'inherit'};`),
+      'Groei': row => $('td').text(val(row.verschil)).style(styleValCol+`color:${row.groei<0 ? 'orange' : 'inherit'};`),
+      '%': row => $('td').text(val(row.groei)).style(`text-align:right;`),
+
+      'Marge': row => $('td').text(val(row.marge)).style(styleValCol+`color:${row.marge<0 ? 'orange' : 'inherit'};`),
+      'Winst': row => $('td').text(val(row.winst)).style(`text-align:right;color:${
+        row.winst<15 ? 'red'
+        : row.winst<30 ? 'orange'
+        : row.winst>50 ? 'lightgreen'
+        : 'inherit'
+      };`),
+
+      // 'Inkoop': row => $('td').text(val(row.totInkoop)).style(styleValCol),
+      // 'Marge': row => $('td').text(val(row.marge)).style(styleValCol),
+      'Saldo': row => $('td').text(val(row.saldo)).style(styleValCol),
       'Dagen': row => $('td').text(val(row.dagen)).style(styleValCol+`color:${row.dagen>30 ? 'orange' : 'inherit'};`),
     };
     const clientManagers = clients.map(row => row.clientManager).unique().sort();
-
     const elem = $('div').parent(
       $('div').parent(
         $('.lv').text('').append(
@@ -724,20 +718,25 @@ $().on('load', async e => {
         )
       )
     );
-
     [
       [naam, clients],
     ]
     .concat(clientManagers.map(cm => [cm, clients.filter(row => row.clientManager === cm)]))
     .forEach(([cm,clients])=>{
-      const omzet1 = clients.map(row => row.lastYear).reduce((s,v) => s + v);
-      const omzet2 = clients.map(row => row.beforeLastYear).reduce((s,v) => s + v);
+      const omzet1 = clients.map(row => Number(row.lastYear||0)).reduce((s,v) => s + v);
+      const omzet2 = clients.map(row => Number(row.beforeLastYear||0)).reduce((s,v) => s + v);
+      const saldo = clients.map(row => Number(row.saldo||0)).reduce((s,v) => s + v);
+      const inkoop = clients.map(row => Number(row.totInkoop||0)).reduce((s,v) => s + v);
+      const marge = clients.map(row => Number(row.marge||0)).reduce((s,v) => s + v);
       elem.append(
         $('h1').text('Analyse', naam, 'Client Manager:', cm),
         $('ul').append(
           $('li').text( `Omzet afgelopen 365 dagen: ${val(omzet1)}`),
           $('li').text( `Omzet jaar ervoor: ${val(omzet2)}`),
           $('li').text( `Groei: ${num((omzet1-omzet2)/omzet2*100)}%`),
+          $('li').text( `Inkoop: ${val(inkoop)}`),
+          $('li').text( `Marge: ${val(marge)}`),
+          $('li').text( `Saldo: ${val(saldo)}`),
         ),
         $('details').append(
           $('summary').text('Top Klanten omzet'),
@@ -792,11 +791,36 @@ $().on('load', async e => {
       Analyse: {
         Airo: () => analyseBedrijf('Airo'),
         Proving: () => analyseBedrijf('Proving'),
-        Voorraad() {
-          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/voorraad').toString())}`;
+        async Voorraad() {
+          const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-voorraad').then(res => res.json());
+          const [arts] = data;
+          function magcode(code){
+            var a = (code||'').split('');
+            a[0] = ('00' + '-IJKLMNOP--ABCDEFGH'.split('').indexOf(a[0])).slice(-2);
+            a[1] = ('00' + '-ABCDEFGHIJKLMNOP'.split('').indexOf(a[1])).slice(-2);
+            a[2] = ('00' + a[2]).slice(-2);
+            return a.join('.');
+          }
+          const elem = $('div').parent(
+            $('div').parent(
+              $('.lv').text('').append(
+                $('nav').append(
+                  $('span'),
+                  $('button').class('icn-print').on('click', e => elem.print()),
+                ),
+              )
+            )
+          );
+          elem.append(
+            clienttable(arts, {
+              Omschrijving: row => $('td').text(row.Omschrijving),
+              MagLokatie: row => $('td').style('font-family:consolas;').text(row.MagLokatie, magcode(row.MagLokatie)),
+              Voorraad: row => $('td').text(row.Voorraad),
+            }),
+          )
         },
-        Verloop() {
-          document.location.hash = `#?l=${aim.urlToId($().url('https://proving.aliconnect.nl/report/verkoop_verloop').toString())}`;
+        async Verloop() {
+          const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-verkoop-verloop').then(res => res.json());
         },
       }
     },
@@ -841,10 +865,141 @@ $().on('load', async e => {
         'Import'() {
           $('input').type('file').multiple(false).accept('.xlsx').on('change', e => {
             importFiles(e.target.files);
+            alert('Import gereed');
           }).click().remove()
         },
       },
       // Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
+    },
+    Magazijn: {
+      Opslag() {
+        const elems = {
+          locatie: $('div'),
+          ean: $('div'),
+          artcode: $('div'),
+          art: $('div'),
+        }
+        $('.pv').text('').append(
+          $('input').on('keyup', e => {
+            if (e.code === 'Enter') {
+              if (e.target.value.length===8) {
+                elems.locatie.text(e.target.value);
+              } else {
+                elems.ean.text(e.target.value);
+              }
+              e.target.value = '';
+            }
+          }),
+          elems.locatie,
+          elems.ean,
+          elems.artcode,
+          elems.art,
+        );
+        return;
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storage',
+        }).get().then(e => {
+          const [arts] = e.body;
+          // const storageLocations = arts.map(a=>a.storageLocation).unique();
+          // console.log(storageLocations);
+          // art.length=100;
+          arts.forEach(a=>a.storageLocation = a.storageLocation || a.prodStorageLocation || 'xxx');
+          arts.sort((a,b)=>a.storageLocation.localeCompare(b.storageLocation));
+          // console.log(arts);
+          $(document.documentElement).class('');
+          // var k='';
+          // var to;
+          // return;
+          $(document.body).text('').style('overflow:auto;').append(
+            $('table').style('font-family:consolas;').append(
+              arts.map(a => $('tr').append(
+                // $('td').append($('input').value(a.storageLocation.substr(0,3))),
+                $('td').text(a.storageLocation.substr(0,3)),
+                $('td').text([
+                  (a.prodBrand||'xxx').substr(0,3).toUpperCase(),
+                  a.artNr||a.prodArtNr||a.orderCode,
+                  a.quantity,
+                  // (a.supplier||'xxx').substr(0,3).toUpperCase(),
+                ].join('-').toLowerCase().replace(/\s/g,'')),
+                $('td').append($('input').value(a.ean)),
+                // $('td').text(a.ean),
+                $('td').append($('input').value(a.stockStart).on('keyup', e => {
+                  if (e.code === 'Enter') {
+                    alert(e.target.value);
+                  }
+                  // k=k+'['+e.code+']';
+                  // k=k+e.key;
+                  // clearTimeout(to);
+                  // to = setTimeout(e => alert(k), 500);
+                })),
+                // $('td').text(a.stockStart),
+                // $('td').text(a.unit),
+                $('td').text(
+                  a.prodBrand,
+                  a.prodTitle,
+                  a.prodInhoud ? a.prodInhoud + (a.prodInhoudEenheid || 'st') : null,
+                  a.quantity>1 ? '(' + a.unit + ')' : '',
+                  a.quantity>1 ? a.quantity + 'st': '',
+                ),
+              ))
+            )
+          )
+          return;
+
+          const store = { art: [], children:{} };
+          for (art of arts) {
+            var a = (art.storageLocation||'?').substring(0,3).toUpperCase().split('');
+            // console.log(art.storageLocation);
+            var s = store;
+            for (c1 of a) {
+              s = s.children[c1] = s.children[c1] || { name: c1, art: [], children:{} };
+            }
+            s.art.push(art);
+          }
+          console.log(store);
+          const elem = $('.lv').text('');
+          function artrows(rows){
+            return $('table').style('font-family:consolas;').append(
+              rows.map(a => $('tr').append(
+                $('td').text(a.storageLocation || a.prodStorageLocation),
+                $('td').text(a.stockStart),
+                $('td').text([
+                  (a.prodBrand||'xxx').substr(0,3).toUpperCase(),
+                  a.artNr||a.prodArtNr||a.orderCode,
+                  a.quantity,
+                  (a.supplier||'xxx').substr(0,3).toUpperCase()
+                ].join('-').toLowerCase()),
+                $('td').text(a.unit),
+                $('td').text(
+                  a.prodBrand,
+                  a.prodTitle,
+                  a.prodInhoud ? a.prodInhoud + (a.prodInhoudEenheid || 'st') : null,
+                  a.quantity>1 ? a.quantity + 'st': '',
+                ),
+                $('td').text(a.ean),
+              ))
+            )
+          }
+          for (let [s1,o1] of Object.entries(store.children)) {
+            let e1 = $('details').parent(elem).open(1).append(
+              $('summary').text(s1),
+              artrows(o1.art),
+            )
+            for (let [s2,o2] of Object.entries(o1.children)) {
+              let e2 = $('details').parent(e1).open(1).append(
+                $('summary').text(s1,s2),
+                artrows(o2.art),
+              )
+              for (let [s3,o3] of Object.entries(o2.children)) {
+                let e3 = $('details').parent(e2).open(1).append(
+                  $('summary').text(s1,s2,s3),
+                  artrows(o3.art),
+                )
+              }
+            }
+          }
+        });
+      },
     },
     Abis: {
       Klanten() {
@@ -873,6 +1028,30 @@ $().on('load', async e => {
       },
     },
   });
+
+
+
+  //
+  // const store = [];
+  // aim.config.storage.old.forEach(c => {
+  //   var a = String(c.name).substring(0,3).toUpperCase().split('');
+  //   var s = store;
+  //   for (c1 of a) {
+  //     console.log(c1);
+  //     if (!s.find(r=>r.name==c1)) s.push({ name: c1, nr: Number(c1), art: [], children: []});
+  //     s = s.find(r=>r.name==c1).children;
+  //   }
+  // })
+  // console.log(
+  //   JSON.stringify(store, null, 2)
+  //   .replace(/"children": \[\]\n/gs,'')
+  //   .replace(/"/gs,'')
+  //   // .replace(/\},\n|\}\n|\{\n|\[\n|\],\n|\]\n/gs,'')
+  //   .replace(/\},(?=\n)|\}(?=\n)|\{(?=\n)|\],(?=\n)|\](?=\n)|\[(?=\n)|,/gs,'')
+  //   .replace(/\s\sname:/gs,'- name:')
+  //   .split(/\n/).filter(s => s.trim()).join('\n')
+  // );
+
 })
 function importFiles(files){
   Array.from(files).forEach((file,i) => {

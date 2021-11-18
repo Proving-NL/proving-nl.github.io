@@ -71,6 +71,7 @@
 - **Eenheid/Unit (InhoudEenheid)**, `inhoudEenheid`: .
 - **Bedrijf (Bedrijf)**, `bedrijf`: .
 - **lokatie (maglokatie)**, `stockLocation`: .
+- **lokatie (maglokatie)**, `storageLocation`: .
 - **VOS (VOC)**, `vos`: .
 # Artikelen-Onder
 - schema: `art`
@@ -88,6 +89,7 @@
 - **Marge (marge)**, `marge`: .
 - **Verkoop (verkoop)**, `salePrice`: .
 - **Verkoop aangepast (datum)**, `salePriceLastModifiedDateTime`: .
+- **Artikel locatie (artLocatie)**, `storageLocation`: .
 - **ArtNr (ArtNr)**, `prodArtNr`: .
 - **Merk/Brand (Merk)**, `prodBrand`: .
 - **Code (Code)**, `prodCode`: .
@@ -96,6 +98,7 @@
 - **Eenheid/Unit (InhoudEenheid)**, `prodInhoudEenheid`: .
 - **Bedrijf (Bedrijf)**, `prodBedrijf`: .
 - **lokatie (maglokatie)**, `prodStockLocation`: .
+- **lokatie (maglokatie)**, `prodStorageLocation`: .
 - **VOS (VOC)**, `prodVos`: .
 - **Unit (Eenheid)**, `artUnit`: .
 - **Verpak aantal (AantalStuks)**, `artQuantity`: .

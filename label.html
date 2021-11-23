@@ -4,6 +4,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link href="https://aliconnect.nl/sdk/src/css/web.css" rel="stylesheet" />
+  <script src="https://aliconnect.nl/sdk/src/js/aim.js" client_id="cac652da-dcdc-455a-a0de-e32bac08ea06"></script>
+  <script src="https://aliconnect.nl/sdk/src/js/web.js"></script>
   <style>
   @media print {
     @page {
@@ -24,27 +26,138 @@
   table{width:78mm;height:28mm;border-collapse:collapse;page-break-after:always;}
   td{border:solid 1px white;}
   td{text-align:center;padding-top:2mm;}
-  .bc{font-family:barcode;font-size:34pt;display:block;height:10mm;overflow:hidden;}
+  .bc{font-family:barcode;font-size:10mm;display:inline-block;height:8mm;overflow:hidden;}
+  .nr{display:inline-block;line-height:9mm;vertical-align:text-bottom;font-size: 8mm;margin-left:10px;width:30mm;}
 </style>
 </head>
-<body style="">
-  <div class=label>
-  </div>
-  <table>
+<body style="font-family:consolas;">
+  <script>
+  const rijen = [
+    {
+      nr: 12,
+      racks: [
+        { nr: 1, shelfs: 5 },
+        { nr: 2, shelfs: 5 },
+        { nr: 3, shelfs: 5 },
+        { nr: 4, shelfs: 5 },
+        { nr: 5, shelfs: 5 },
+        { nr: 6, shelfs: 5 },
+        { nr: 7, shelfs: 5 },
+        { nr: 8, shelfs: 5 },
+        { nr: 9, shelfs: 5 },
+        { nr: 10, shelfs: 5 },
+        { nr: 11, shelfs: 5 },
+        { nr: 12, shelfs: 5 },
+        { nr: 13, shelfs: 5 },
+        { nr: 14, shelfs: 5 },
+        { nr: 15, shelfs: 5 },
+      ]
+    },
+    {
+      nr: 13,
+      racks: [
+        { nr: 1, shelfs: 3 },
+        { nr: 2, shelfs: 3 },
+      ]
+    },
+    {
+      nr: 14,
+      racks: [
+        { nr: 1, shelfs: 3 },
+      ]
+    },
+    {
+      nr: 15,
+      racks: [
+        { nr: 1, shelfs: 5 },
+        { nr: 2, shelfs: 5 },
+        { nr: 3, shelfs: 5 },
+        { nr: 4, shelfs: 5 },
+        { nr: 5, shelfs: 5 },
+        { nr: 6, shelfs: 5 },
+        { nr: 7, shelfs: 5 },
+        { nr: 8, shelfs: 5 },
+        { nr: 9, shelfs: 5 },
+        { nr: 10, shelfs: 5 },
+      ]
+    },
+    {
+      nr: 17,
+      racks: [
+        { nr: 1, shelfs: 6 },
+        { nr: 2, shelfs: 6 },
+        { nr: 3, shelfs: 6 },
+        { nr: 4, shelfs: 6 },
+        { nr: 5, shelfs: 6 },
+        { nr: 6, shelfs: 6 },
+        { nr: 7, shelfs: 6 },
+        { nr: 8, shelfs: 6 },
+        { nr: 9, shelfs: 6 },
+        { nr: 10, shelfs: 6 },
+        { nr: 11, shelfs: 6 },
+        { nr: 12, shelfs: 6 },
+        { nr: 13, shelfs: 6 },
+        { nr: 14, shelfs: 6 },
+      ]
+    },
+  ];
+  // locs = [
+  //   [ [1], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  //   [ [2], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  //   [ [3], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  //   [ [4], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  //   [ [5], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  //   [ [6], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  //   [ [6], [1,2,3,4,5,6,7,8,9,10,11,12,13,14], [1,2,3,4,5,6] ],
+  // ]
+  //
+  // {
+  //   1: {
+  //     1: [1,2,3,4,5,6],
+  //     2: [1,2,3,4,5,6],
+  //     3: [1,2,3,4,5,6],
+  //     4: [1,2,3,4,5,6],
+  //     5: [1,2,3,4,5,6],
+  //   }
+  // }
+  // [
+  //   [1]
+  // ]
+  rijen.forEach(rij => {
+    rij.racks.forEach(rack => {
+      Array(rack.shelfs).fill(null).forEach((shelf,shelfnr) => {
+        const code = `*00${("00"+rij.nr).slice(-2)}${("00"+rack.nr).slice(-2)}${("00"+(shelfnr+1)).slice(-2)}*`;
+        console.log(code);
+        $(document.body).append(
+          $('table').append(
+            $('tr').append(
+              $('td').append(
+                $('span').class('bc').text(code),
+                $('span').class('nr').text(`${rij.nr}.${rack.nr}.${(shelfnr+1)} ` + (shelfnr===0 ? `⇩` : ``)),
+              )
+            )
+          )
+        )
+      })
+    })
+  })
+  </script>
+  <!-- <table>
     <tr>
-      <td>
-        <div><span class=bc>*01010102*</span></div>
-        <div style="font-size:26pt;">01.01.01.02</div>
+      <td style="font-family:consolas;">
+        <div><span class=bc>*00010102*</span></div>
+        <div style="font-size:26pt;">1.1.1</div>
       </td>
     </tr>
   </table>
   <table>
     <tr>
-      <td>
+      <td style="font-family:consolas;">
         <div><span class=bc>*8711347070428*</span></div>
-        <div style="font-size:9pt;">Motip spuitbus RAL 9010 400ml (doos) 6st</div>
+        <div style="font-size:10pt;">kim-8294-160 - 8711347070428</div>
+        <div style="font-size:8pt;">Kimberly-Clark Wypall X80 poetsdoek 1-laags 160st (doos) 160st</div>
       </td>
     </tr>
-  </table>
+  </table> -->
 </body>
 </html>

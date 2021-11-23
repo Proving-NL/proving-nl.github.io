@@ -83,11 +83,9 @@
 - **EAN (EAN barcode)**, `ean`: .
 - **Gewicht/weight (gewicht)**, `weight`: .
 - **Bruto (bruto)**, `bruto`: .
-- **Korting (kort.)**, `discount`: .
+- **Korting (kort.)**, `purchaseDiscount`: .
 - **Net (netto)**, `net`: .
 - **Net gewijzigd (datum)**, `netLastModifiedDateTime`: .
-- **Marge (marge)**, `marge`: .
-- **Verkoop (verkoop)**, `salePrice`: .
 - **Verkoop aangepast (datum)**, `salePriceLastModifiedDateTime`: .
 - **Artikel locatie (artLocatie)**, `storageLocation`: .
 - **ArtNr (ArtNr)**, `prodArtNr`: .
@@ -100,5 +98,16 @@
 - **lokatie (maglokatie)**, `prodStockLocation`: .
 - **lokatie (maglokatie)**, `prodStorageLocation`: .
 - **VOS (VOC)**, `prodVos`: .
+- **ArtNr (ArtNr)**, `artNr`: .
+- **Unit (Eenheid)**, `unit`: .
+- **Verpak aantal (AantalStuks)**, `quantity`: .
+- **Leverancier/supplier (Leverancier)**, `supplier`: .
+- **Bestelcode (bestelcode)**, `orderCode`: .
+- **EAN (EAN barcode)**, `ean`: .
+- **Gewicht/weight (gewicht)**, `weight`: .
+- **Titel/Title (Tekst/Omschrijving)**, `prodTitle`: .
+- **Datum besteld (besteld)**, `orderDateTime`: Datum van opdracht door klant tot levering.
+- **Aanbieding (Aanbieding)**, `isQuote`: Order is aanbieding.
+- **In opdracht (Verwerkt)**, `isOrder`: Order in opdracht voor levering.
 - **Unit (Eenheid)**, `artUnit`: .
 - **Verpak aantal (AantalStuks)**, `artQuantity`: .

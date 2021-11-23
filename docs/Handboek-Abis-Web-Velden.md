@@ -4,6 +4,7 @@
 # invoice
 # prod
 # art
+# clientart
 # salesorderrow
 # supplierproduct
 # article

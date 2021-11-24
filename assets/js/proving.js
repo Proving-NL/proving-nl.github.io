@@ -480,7 +480,7 @@ aim.libraries.init = () => {
       const quantity = row.artQuantity || row.quantity;
       return [
         row.prodBrand,
-        (row.title || row.prodTitle).replace(row.prodBrand, '').trim(),
+        (row.title || row.prodTitle || '').replace(row.prodBrand, '').trim(),
         row.prodInhoud ? row.prodInhoud + (row.prodInhoudEenheid || 'st') : null,
         quantity>1 ? '(' + row.unit + ')' : '',
         quantity>1 ? quantity + 'st': '',
@@ -502,7 +502,7 @@ aim.libraries.init = () => {
       const [salesorder] = salesorders;
       console.log(salesorder,rows);
       // rows = rows.filter(row => row.orderNr === salesorder.nr);
-      rows.forEach(row => row.storageLocation = row.newStorageLocation ? row.newStorageLocation.match(/../g).splice(1).map(Number).join('-') : row.prodStockLocation.substr(0,3));
+      rows.forEach(row => row.storageLocation = row.newStorageLocation ? row.newStorageLocation.match(/../g).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
       rows = rows.filter(row => row.orderNr === salesorder.nr);
       rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
 
@@ -599,40 +599,40 @@ aim.libraries.init = () => {
               $('tr').append(
                 $('th').align('left').text('Artikelcode'),
                 $('th').align('left').text('Omschrijving'),
-                $('th').align('right').text('Prijs'),
+                // $('th').align('right').text('Prijs'),
                 $('th').align('right').text('Aantal'),
-                $('th').align('right').text('Totaal'),
+                // $('th').align('right').text('Totaal'),
               ),
             ),
             $('tbody').append(
               rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
                 $('td').text(rowCode(row)).style('font-family:monospace;font-size:0.9em;'),
                 $('td').text(rowTitle(row)).style('white-space:normal;'),
-                $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
+                // $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
                 $('td').align('right').text(row.quant),
-                $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
+                // $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
               )),
-              $('tr').style('border-top:solid 1px;').append(
-                $('td'),
-                $('td').align('right').text('SUBTOTAAL'),
-                $('td'),
-                $('td'),
-                $('td').align('right').text(num(rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
-              ),
-              $('tr').append(
-                $('td'),
-                $('td').align('right').text('BTW specificatie 21.0%'),
-                $('td'),
-                $('td'),
-                $('td').align('right').text(num(0.21 * rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
-              ),
-              $('tr').append(
-                $('td'),
-                $('td').align('right').text('TOTAAL (incl. BTW)'),
-                $('td'),
-                $('td'),
-                $('td').style('border-top:solid 1px;').align('right').text(num(1.21 * rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
-              ),
+              // $('tr').style('border-top:solid 1px;').append(
+              //   $('td'),
+              //   $('td').align('right').text('SUBTOTAAL'),
+              //   $('td'),
+              //   $('td'),
+              //   $('td').align('right').text(num(rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
+              // ),
+              // $('tr').append(
+              //   $('td'),
+              //   $('td').align('right').text('BTW specificatie 21.0%'),
+              //   $('td'),
+              //   $('td'),
+              //   $('td').align('right').text(num(0.21 * rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
+              // ),
+              // $('tr').append(
+              //   $('td'),
+              //   $('td').align('right').text('TOTAAL (incl. BTW)'),
+              //   $('td'),
+              //   $('td'),
+              //   $('td').style('border-top:solid 1px;').align('right').text(num(1.21 * rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
+              // ),
             ),
           ),
         ).style('page-break-before:always;'),

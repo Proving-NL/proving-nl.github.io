@@ -1,10 +1,12 @@
 # account
+# company
 # client
 # salesorder
 # invoice
 # prod
 # art
-# clientart
+# lev
+# levart
 # salesorderrow
 # supplierproduct
 # article

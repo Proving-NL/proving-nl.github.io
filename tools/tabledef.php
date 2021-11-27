@@ -1,14 +1,17 @@
-<style>textarea{width:100%;height:500px;}</style>
 <?php
+// <style>textarea{width:100%;height:500px;}</style>
 require_once($_SERVER['DOCUMENT_ROOT']."/../vendor/autoload.php");
 error_reporting(E_ALL & ~E_NOTICE);
 $filename = 'C:\Users\maxva\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
+$filename = 'C:\Users\max\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
 // $content = file_get_contents($filename);
 $config = yaml_parse_file($filename);
 // die($content);
 // $config = yaml_parse_file('tabledef.yaml');
 $s1=$s2=$s3='';
-$sql = "USE [abisingen]\nGO\n";
+
+aim()->sql_query("USE [abisingen]");
+// $sql = "USE [abisingen]\nGO\n";
 // aim()->sql_query("USE abisingen");
 $abis_web_doc = "";
 foreach ($config['components']['schemas'] as $schemaName => $schema) {
@@ -17,10 +20,11 @@ foreach ($config['components']['schemas'] as $schemaName => $schema) {
     $abis_pc_doc.="# ".$schema['abisPC'].PHP_EOL;
     $abis_pc_doc.="- schema: `$schemaName`".PHP_EOL;
   }
-  if (isset($schema['srcTablename'])) {
-    $sql_schema = "DROP VIEW api.$schemaName\nGO\nCREATE VIEW api.$schemaName AS
+  if (isset($schema['srcTablename']) && $schema['properties']) {
+    $sql_schema = "CREATE VIEW [api].[$schemaName] AS
     SELECT
       '$schemaName' AS schemaName".PHP_EOL;
+      // echo "$schemaName";
     foreach ($schema['properties'] as $propertyName => $property) {
       if (preg_match('/\(/', $property['title'])) {
         $abis_pc_doc .= "- **".get_item($property,'title')."**, `$propertyName`: ";
@@ -44,18 +48,17 @@ foreach ($config['components']['schemas'] as $schemaName => $schema) {
         $sql_schema.="LEFT OUTER JOIN $join[tableName] ON $join[tableName].$join[columnName] = $schemaName.$join[srcName]".PHP_EOL;
       }
     }
-    $sql_schema.=PHP_EOL."GO".PHP_EOL;
-    // aim()->sql_query($sql_schema);
-    // die($sql_schema);
-    $sql.=$sql_schema;
+    sqlsrv_query( aim()->conn, "DROP VIEW api.$schemaName");
+    sqlsrv_query( aim()->conn, $sql_schema);
   }
 }
 
-
-file_put_contents('c:/aliconnect/webroot/aliconnect/aliconnect.sql/abis/apigen.sql', $sql);
+// file_put_contents('c:/aliconnect/webroot/aliconnect/aliconnect.sql/abis/apigen.sql', $sql);
 file_put_contents('../docs/Handboek-Abis-PC-Velden.md', $abis_pc_doc);
 file_put_contents('../docs/Handboek-Abis-Web-Velden.md', $abis_web_doc);
-
+// aim()->sql_query("USE abisingen");
+die();
+// aim()->sql_query($sql);
 
 die("<pre>$sql</pre>");
 

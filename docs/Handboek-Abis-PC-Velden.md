@@ -1,4 +1,6 @@
 # Klanten
+- schema: `company`
+# Klanten
 - schema: `client`
 - **Naam (KlantID)**, `name`: Zoeknaam / Afkorting organisatie naam.
 - **Bedrijfsnaam (Firma)**, `companyName`: Organisatie naam.
@@ -76,6 +78,8 @@
 # Artikelen-Onder
 - schema: `art`
 - **ArtNr (ArtNr)**, `artNr`: .
+- **Merk/Brand (Merk)**, `prodBrand`: .
+- **Titel/Title (Tekst/Omschrijving)**, `prodTitle`: .
 - **Unit (Eenheid)**, `unit`: .
 - **Verpak aantal (AantalStuks)**, `quantity`: .
 - **Leverancier/supplier (Leverancier)**, `supplier`: .
@@ -89,9 +93,7 @@
 - **Verkoop aangepast (datum)**, `salePriceLastModifiedDateTime`: .
 - **Artikel locatie (artLocatie)**, `storageLocation`: .
 - **ArtNr (ArtNr)**, `prodArtNr`: .
-- **Merk/Brand (Merk)**, `prodBrand`: .
 - **Code (Code)**, `prodCode`: .
-- **Titel/Title (Tekst/Omschrijving)**, `prodTitle`: .
 - **Inhoud (Inhoud)**, `prodInhoud`: .
 - **Eenheid/Unit (InhoudEenheid)**, `prodInhoudEenheid`: .
 - **Bedrijf (Bedrijf)**, `prodBedrijf`: .

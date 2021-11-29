@@ -561,28 +561,21 @@ $().on('load', async e => {
   function cur(value){
     return value ? '€ ' + Number(value).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : '';
   }
-  async function order(orderNr) {
-    const data = await $().url('https://aliconnect.nl/api/abis/data').post({
-      request_type: 'paklijst',
-      id: orderNr,
-      set: 'printDateTime = GETDATE()'
-    }).then(e => e.body);
-    var [salesorders,rows] = data;
-    const [salesorder] = salesorders;
-    console.log(salesorder,rows);
-    // rows = rows.filter(row => row.orderNr === salesorder.nr);
+  function orderPage(salesorder, rows) {
     rows.forEach(row => row.storageLocation = row.newStorageLocation ? row.newStorageLocation.match(/../g).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
     rows = rows.filter(row => row.orderNr === salesorder.nr);
     rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
-
-    // const artnummerFormat = new Intl.NumberFormat('nl-NL', { minimumSignificantDigits: 9 });
+    console.log(salesorder, rows);
     return $('div').append(
       $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
+      $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
       $('div').briefkop(salesorder, 'Pakbon (alleen voor intern gebruik)').append(
         salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+        // $('div').class('barcode').text('*2345234*'),
         $('table').class('grid').style('table-layout:fixed;').append(
           $('thead').append(
             $('tr').append(
+              // $('th').align('left').text('ID'),
               $('th').align('left').text('Aangemaakt'),
               $('th').align('left').text('Gepakt'),
               $('th').align('left').text('Verzonden'),
@@ -592,6 +585,7 @@ $().on('load', async e => {
           ),
           $('tbody').append(
             $('tr').style('height:30px;').append(
+              // $('td').append($('span').class('bc').text(2345234)),
               $('td').text(salesorder.userName),
               $('td'),
               $('td'),
@@ -639,7 +633,9 @@ $().on('load', async e => {
             ),
           ),
           $('tbody').append(
-            rows.sort((a,b) => a.storageLocation.localeCompare(b.storageLocation)).map(row => $('tr').append(
+            rows
+            // .sort((a,b) => a.storageLocation.localeCompare(b.storageLocation))
+            .map(row => $('tr').append(
               $('td').text(row.storageLocation),
               // $('td').text(Number(row.artId).pad(9)),
               $('td').text(rowCode(row)),//.style('font-family:monospace;font-size:0.9em;'),
@@ -712,6 +708,35 @@ $().on('load', async e => {
         ),
       ).style('page-break-before:always;'),
     );
+  }
+  async function order(orderNr) {
+    const data = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'paklijst',
+      id: orderNr,
+      set: 'printDateTime = GETDATE()'
+    }).then(e => e.body);
+    var [salesorders,rows] = data;
+    const [salesorder] = salesorders;
+    if (!rows.length) alert('Order bevat geen regels');
+    // console.log(1, salesorder,rows);
+    // rows = rows.filter(row => row.orderNr === salesorder.nr);
+
+    // const artnummerFormat = new Intl.NumberFormat('nl-NL', { minimumSignificantDigits: 9 });
+    return orderPage(salesorder,rows);
+  }
+  async function order1(orderNr) {
+    return $('div').append(
+      $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
+      $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
+      $('div').text(1231213),
+    );
+    // return $('table').append(
+    //   $('tr').append(
+    //     $('td').append(
+    //       $('span').class('bc').text(1231213),
+    //     )
+    //   )
+    // )
   }
   async function offertebon(orderNr) {
     const data = await $().url('https://aliconnect.nl/api/abis/data').post({
@@ -965,15 +990,16 @@ $().on('load', async e => {
           )),
         ),
       ),
-      ...salesorders.map(salesorder => [
-        orderPage(salesorder, rows, {
-          title: 'PAKBON INTERN',
-          remark: salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
-        }).style('page-break-before:always;'),
-        orderPage(salesorder, rows, {
-          title: 'PAKBON',
-        }).style('page-break-before:always;'),
-      ]),
+      // ...salesorders.map(salesorder => [
+      //   orderPage(salesorder, rows, {
+      //     title: 'PAKBON INTERN',
+      //     remark: salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+      //   }).style('page-break-before:always;'),
+      //   orderPage(salesorder, rows, {
+      //     title: 'PAKBON',
+      //   }).style('page-break-before:always;'),
+      // ]),
+      ...salesorders.map(salesorder => orderPage(salesorder, rows)),
     ).print();
   }
   async function lijstFactureren(orders) {
@@ -1121,6 +1147,7 @@ $().on('load', async e => {
   aim.config.components.schemas.salesorder.app = {
     nav: row => [
       $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
+      // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr)).print()),
       row.invoiceNr ? [
         $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNr)).printpdf()),
@@ -1133,21 +1160,30 @@ $().on('load', async e => {
       $('button').text('Bonnen').append(
         $('div').append(
           $('button').text('Paklijst').on('click', lijstPakken),
-          $('button').text('Gepakt').on('click', e => $().url('https://aliconnect.nl/api/abis/data').post({
-            request_type: 'paklijst',
-            id: aim.listRows.map(row => row.nr).join(','),
-            set: 'pickDateTime = GETDATE()'
-          })),
-          $('button').text('Verzonden').on('click', e => $().url('https://aliconnect.nl/api/abis/data').post({
-            request_type: 'paklijst',
-            id: aim.listRows.map(row => row.nr).join(','),
-            set: 'sendDateTime = GETDATE()'
-          })),
-          $('button').text('Geleverd').on('click', e => $().url('https://aliconnect.nl/api/abis/data').post({
-            request_type: 'paklijst',
-            id: aim.listRows.map(row => row.nr).join(','),
-            set: 'deliverDateTime = GETDATE()'
-          })),
+          $('button').text('Gepakt').on('click', async e => {
+            await $().url('https://aliconnect.nl/api/abis/data').post({
+              request_type: 'paklijst',
+              id: aim.listRows.map(row => row.nr).join(','),
+              set: 'pickDateTime = GETDATE()'
+            });
+            alert('Status gepakt');
+          }),
+          $('button').text('Verzonden').on('click', async e => {
+            await $().url('https://aliconnect.nl/api/abis/data').post({
+              request_type: 'paklijst',
+              id: aim.listRows.map(row => row.nr).join(','),
+              set: 'sendDateTime = GETDATE()'
+            });
+            alert('Status verzonden');
+          }),
+          $('button').text('Geleverd').on('click', async e => {
+            await $().url('https://aliconnect.nl/api/abis/data').post({
+              request_type: 'paklijst',
+              id: aim.listRows.map(row => row.nr).join(','),
+              set: 'deliverDateTime = GETDATE()'
+            });
+            alert('Status geleverd');
+          }),
           $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
         ),
       ),
@@ -1263,6 +1299,8 @@ $().on('load', async e => {
     { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Keel- en oorbescherming', exp: /\b(Keel- en oorbescherming)\b/i, },
     { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Stofmasker', exp: /\b(Stofmasker)\b/i, },
 
+
+
     { toepassing: 'Schuren', name: 'Schuurblok', exp: /\b(Schuurblok|Schuurblokje)\b/i },
     { toepassing: 'Schuren', name: 'Schuurschijf', exp: /\b(schuursch\.|schuurschijf|schuurschijven)\b/i },
     { toepassing: 'Schuren', name: 'Schuurrol', exp: /\b(Schuurrol)\b/i },
@@ -1345,6 +1383,7 @@ $().on('load', async e => {
 
     { toepassing: 'Slijpen', name: 'Netschijf', exp: /\b(Netschijf|Netschijven)\b/i },
     { toepassing: 'Slijpen', name: 'Netstrook', exp: /\b(Netstrook|Netstroken)\b/i },
+
     { toepassing: 'Slijpen', name: 'Doorslijpschijf', exp: /\b(Doorslijpschijf|Doorslijpschijven)\b/i },
 
     { toepassing: 'Maskeren', name: 'Maskeerpapier', exp: /\b(Maskeerpapier)\b/i, },
@@ -1354,6 +1393,7 @@ $().on('load', async e => {
 
     { toepassing: 'Maskeren', name: 'Montagetape', exp: /\b(Montagetape)\b/i, },
 
+    { toepassing: 'Tapen', name: 'Afplaktape', exp: /\b(Afplaktape)\b/i },
     { toepassing: 'Tapen', name: 'Afdichtingstape', exp: /\b(Afdichtingstape)\b/i, },
     { toepassing: 'Tapen', name: 'Dozensluittape', exp: /\b(Dozensluittape)\b/i, },
     { toepassing: 'Tapen', name: 'Isolatietape', exp: /\b(isolatietape)\b/i, },
@@ -1787,25 +1827,53 @@ $().on('load', async e => {
     },
     Orders: {
       Mandje: e => aim.list('salesorder',{
-        $filter: `isOrder NE 1 && isQuote NE 1`,
+        $filter: `isQuote NE 1 && isOrder NE 1`,
         $order: `nr DESC`,
         $search: '*',
       }),
       Nieuw: e => aim.list('salesorder',{
-        $filter: `isOrder EQ 1 && printDateTime EQ NULL`,
+        $filter: `isQuote NE 1 && isOrder EQ 1 && printDateTime EQ NULL`,
         $order: `nr DESC`,
         $search: '*',
       }),
+
       Actief: e => aim.list('salesorder',{
-        $filter: `printDateTime NE NULL && ISNULL(invoiceNrAbis,0) EQ 0 && ISNULL(invoiceNr,0) EQ 0 && payDateTime EQ NULL`,
+        $filter: `isQuote NE 1 && printDateTime NE NULL && pickDateTime EQ NULL`,
         $order: `nr DESC`,
         $search: '*',
       }),
-      Overig: e => aim.list('salesorder',{
-        $filter: `ISNULL(invoiceNr,0) GT 0`,
+
+      Verzendgereed: e => aim.list('salesorder',{
+        $filter: `isQuote NE 1 && pickDateTime NE NULL && sendDateTime EQ NULL`,
         $order: `nr DESC`,
-        $search: ``,
+        $search: '*',
       }),
+
+      Optransport: e => aim.list('salesorder',{
+        $filter: `isQuote NE 1 && sendDateTime NE NULL && deliverDateTime EQ NULL`,
+        $order: `nr DESC`,
+        $search: '*',
+      }),
+
+      Geleverd: e => aim.list('salesorder',{
+        $filter: `isQuote NE 1 && deliverDateTime NE NULL && invoiceNr EQ 0`,
+        $order: `nr DESC`,
+        $search: '*',
+      }),
+
+      OnHold: e => aim.list('salesorder',{
+        $filter: `isQuote NE 1 && onHold EQ 1`,
+        $order: `nr DESC`,
+        $search: '*',
+      }),
+
+
+      // Overig: e => aim.list('salesorder',{
+      //   $filter: `ISNULL(invoiceNr,0) GT 0`,
+      //   $order: `nr DESC`,
+      //   $search: ``,
+      // }),
+
       Alles: e => aim.list('salesorder',{
         $order: `nr DESC`,
         $top: 100,
@@ -1886,6 +1954,216 @@ $().on('load', async e => {
                     artlist.map((a,i) => [
                       $('div').text(a.artNr, rowCode(a), a.id),
                       // $('div').text(rowTitle(a)),
+                      $('div').append(
+                        a.eanElem = $('input').value(a.ean)
+                        .type('number')
+                        .placeholder('ean')
+                        .step(1)
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'ean',
+                            value: a.ean = e.target.value,
+                          });
+                          a.newStorageLocationElem.select().focus();
+                        }),
+                        a.newStorageLocationElem = $('input')
+                        .style('width: 120px;')
+                        .value(a.newStorageLocation)
+                        .type('number')
+                        .step(1)
+                        .placeholder('locatie')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'newStorageLocation',
+                            value: a.newStorageLocation = e.target.value,
+                          });
+                          a.stockElem.select().focus();
+                        }),
+                        a.stockElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.stock)
+                        .type('number')
+                        .placeholder('aantal')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'stock',
+                            value: a.stock = e.target.value,
+                          });
+                          artlist[i+1].eanElem.select().focus();
+                        }),
+                        a.prodInhoudElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.prodInhoud)
+                        .type('number')
+                        .placeholder('inhoud')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'prodInhoud',
+                            value: a.prodInhoud = e.target.value,
+                          })
+                        }),
+                      )
+                    ]),
+                  )
+                }
+              }),
+              elems.locatie,
+              elems.ean,
+              elems.artcode,
+              elems.art,
+            )
+          );
+          return;
+          return;
+          $(document.body).text('').style('overflow:auto;').append(
+            $('table').style('font-family:consolas;').append(
+              arts.map(a => $('tr').append(
+                // $('td').append($('input').value(a.storageLocation.substr(0,3))),
+                $('td').text(a.storageLocation),
+                $('td').text(locCode(a.storageLocation)),
+                $('td').text(rowCode(a)),
+                $('td').text(a.orderCode),
+                $('td').append($('input').value(a.ean)),
+                // $('td').text(a.ean),
+                $('td').append($('input').value(a.stockStart).on('keyup', e => {
+                  if (e.code === 'Enter') {
+                    alert(e.target.value);
+                  }
+                  // k=k+'['+e.code+']';
+                  // k=k+e.key;
+                  // clearTimeout(to);
+                  // to = setTimeout(e => alert(k), 500);
+                })),
+                // $('td').text(a.stockStart),
+                // $('td').text(a.unit),
+                $('td').text(rowTitle(a)),
+              ))
+            )
+          )
+          return;
+
+          const store = { art: [], children:{} };
+          for (art of arts) {
+            var a = (art.storageLocation||'?').substring(0,3).toUpperCase().split('');
+            // console.log(art.storageLocation);
+            var s = store;
+            for (c1 of a) {
+              s = s.children[c1] = s.children[c1] || { name: c1, art: [], children:{} };
+            }
+            s.art.push(art);
+          }
+          console.log(store);
+          const elem = $('.lv').text('');
+          function artrows(rows){
+            return $('table').style('font-family:consolas;').append(
+              rows.map(a => $('tr').append(
+                $('td').text(a.storageLocation || a.prodStorageLocation),
+                $('td').text(a.stockStart),
+                $('td').text([
+                  (a.prodBrand||'xxx').substr(0,3).toUpperCase(),
+                  a.artNr||a.prodArtNr||a.orderCode,
+                  a.quantity,
+                  (a.supplier||'xxx').substr(0,3).toUpperCase()
+                ].join('-').toLowerCase()),
+                $('td').text(a.unit),
+                $('td').text(
+                  a.prodBrand,
+                  a.prodTitle,
+                  a.prodInhoud ? a.prodInhoud + (a.prodInhoudEenheid || 'st') : null,
+                  a.quantity>1 ? a.quantity + 'st': '',
+                ),
+                $('td').text(a.ean),
+              ))
+            )
+          }
+          for (let [s1,o1] of Object.entries(store.children)) {
+            let e1 = $('details').parent(elem).open(1).append(
+              $('summary').text(s1),
+              artrows(o1.art),
+            )
+            for (let [s2,o2] of Object.entries(o1.children)) {
+              let e2 = $('details').parent(e1).open(1).append(
+                $('summary').text(s1,s2),
+                artrows(o2.art),
+              )
+              for (let [s3,o3] of Object.entries(o2.children)) {
+                let e3 = $('details').parent(e2).open(1).append(
+                  $('summary').text(s1,s2,s3),
+                  artrows(o3.art),
+                )
+              }
+            }
+          }
+        });
+      },
+      Opslag() {
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storage',
+        }).get().then(e => {
+          const [arts] = e.body;
+          arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
+          arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
+          arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
+          arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
+          $(document.documentElement).class('');
+          var k='';
+          var to;
+          const elems = {
+            locatie: $('div'),
+            ean: $('div'),
+            artcode: $('div'),
+            art: $('div').style('font-family:monospace;'),
+          }
+          $(document.body).text('').append(
+            $('style').text('input{text-align:right;font:inherit;}'),
+            $('div').style('font-size:20px;').append(
+              $('input').style('font-size:20px;').on('keyup', e => {
+                if (e.code === 'Enter') {
+                  const value = e.target.value;
+                  // e.target.value = '';
+                  // if (value[0]==='0' && value[1]==='0') {
+                  //   console.log(value);
+                  //   const loc = value.slice(-6).match(/../g).map(Number).join('.');
+                  //   elems.locatie.text(loc);
+                  //   var artlist = arts.filter(a => a.locCode === loc);
+                  // } else {
+                  //   elems.ean.text(value);
+                  //   var artlist = arts.filter(a => a.ean == value);
+                  // }
+                  console.log(arts);
+                  const avalue = value.split(' ');
+                  var artlist = arts.filter(a => avalue.every(value => [
+                    a.ean,
+                    a.locCode,
+                    a.prodStorageLocation,
+                    a.newStorageLocation,
+                    a.prodTitle,
+                    a.prodArtNr,
+                    a.prodBrand,
+                    a.artNr,
+                    a.orderCode,
+                    a.supplier
+                  ]
+                    .some(v => v && v.toLowerCase().includes(value))
+                  ));
+                  console.log(artlist);
+                  elems.art.text('').append(
+                    artlist.map((a,i) => [
+                      $('div').text(a.artNr, rowCode(a), a.id),
+                      $('div').text(a.prodTitle),
+                      $('div').text(rowTitle(a)),
                       $('div').append(
                         a.eanElem = $('input').value(a.ean)
                         .type('number')

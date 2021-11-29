@@ -14,6 +14,14 @@
 1.
 
 
+
+# Status orders
+
+1. **Mandje**: Orders in de maak, vinkje is niet actief
+1. **Nieuw**: Orders mandje gereed, vinkje actief
+
+
+
 # Afspraken
 
 - Klant vervallen => opmerking = `vervallen` of in ABIS WEB archived date time = `datum van vandaag`

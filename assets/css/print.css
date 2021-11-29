@@ -38,12 +38,12 @@ table {
     background: #eee;
   }
 } */
-@font-face {
+/* @font-face {
   font-family: barcode;
   src: url('fonts/Code39Azalea.eot') format('embedded-opentype'), url('fonts/Code39Azalea.woff') format('woff'), url('fonts/Code39Azalea.ttf') format('truetype'), url('fonts/Code39Azalea.svg#Code39Azalea') format('svg');
   font-weight: normal;
   font-style: normal;
-}
+} */
 * {
   position: relative;
 }
@@ -91,3 +91,4 @@ div.header {
   top: 0;
   width: 100%;
 }
+.barcode{font-family:barcode;font-size:10mm;display:inline-block;height:8mm;overflow:hidden;}

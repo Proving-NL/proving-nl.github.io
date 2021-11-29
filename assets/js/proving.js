@@ -568,7 +568,7 @@ $().on('load', async e => {
     console.log(salesorder, rows);
     return $('div').append(
       $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
-      $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
+      // $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
       $('div').briefkop(salesorder, 'Pakbon (alleen voor intern gebruik)').append(
         salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
         // $('div').class('barcode').text('*2345234*'),

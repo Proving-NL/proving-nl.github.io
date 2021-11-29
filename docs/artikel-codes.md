@@ -278,7 +278,7 @@ verpakking / unit
                   industrieel
               Wash Primers              
         **Poetsen**
-            Poetsmidellen
+            Poetsmiddellen
             Foampads
             Poetsdoeken
             Spot Repair
@@ -299,6 +299,12 @@ verpakking / unit
           2-K
         Pre-fill
         Overig
+
+    **Werkplaatsinrichting**
+        Spuitcabine
+          Plafondfilters
+          Paintstop
+        Schragen  
 
 
 # Merk

@@ -24,3 +24,7 @@ body>header>article {
 .cards.cols>div span.supplier::before {
   content: '\A';
 }
+body.lv td {
+  border: solid 1px var(--trans5);
+  font-family: consolas;
+}

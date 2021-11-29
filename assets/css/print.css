@@ -66,8 +66,8 @@ table.grid th {
   /* background: #eee; */
 }
 table.grid td,table.grid th {
-  /* border: solid 1px #eee; */
-  padding: 2px 5px 2px 0;
+  border: solid 1px #ccc;
+  padding: 2px 5px;
 }
 
 table.grid td {

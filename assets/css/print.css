@@ -15,6 +15,7 @@ table {
   font-size: 10pt;
   margin: auto;
   background: white;
+  /* table-layout: fixed; */
 }
 .herinner {
   background: #DF554A;
@@ -61,12 +62,12 @@ table.grid {
 }
 table.grid th {
   font-size: 0.9em;
-  border-top: solid 1px;
-  border-bottom: solid 1px;
+  /* border-top: solid 1px; */
+  /* border-bottom: solid 1px; */
   /* background: #eee; */
 }
-table.grid td,table.grid th {
-  border: solid 1px #ccc;
+table.grid td, table.grid th {
+  border: solid 1px black;
   padding: 2px 5px;
 }
 
@@ -91,4 +92,31 @@ div.header {
   top: 0;
   width: 100%;
 }
-.barcode{font-family:barcode;font-size:10mm;display:inline-block;height:8mm;overflow:hidden;}
+@font-face {
+  font-family: barcode;
+  src:
+  url('https://aliconnect.nl/sdk/src/font/Code39Azalea.eot') format('embedded-opentype'),
+  url('https://aliconnect.nl/sdk/src/font/Code39Azalea.woff') format('woff'),
+  url('https://aliconnect.nl/sdk/src/font/Code39Azalea.ttf') format('truetype'),
+  url('https://aliconnect.nl/sdk/src/font/Code39Azalea.svg#Code39Azalea') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.bc{
+  font-family:barcode;
+  font-size:10mm;
+  /* font-size:30mm; */
+  display:inline-block;
+  height:8mm;
+  overflow:hidden;
+}
+
+.datum,.facnr,.nr,.debnr {
+  width: 26mm;
+}
+th{
+  background-color: #eee;
+  font-weight: normal;
+  /* font-size: 0.9em; */
+}

@@ -40,6 +40,21 @@ $().on('load', async e => {
   .append(
     $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
   )
+  // supplierproduct = await fetch('product.json').then( response => response.json() );
+  // // supplierproduct = supplierproduct.filter(row => row.catalogPrice)
+  // supplierproduct.forEach(row => {
+  //   row.description = row.description || row.title;
+  //   if (row.catalogPrice) {
+  //     row.saleDiscount = row.saleDiscount || Math.floor((row.purchaseDiscount || 0) * 0.3);
+  //   }
+  //   if (row.description.match(/tape/i)) row.brand = '3M';
+  //   if (row.description.match(/folie/i)) row.brand = '3MB';
+  //   // row.afmeting = (row.description.replace(/\s/g,'').match(/((\d+|\.|,?)(mm|m?)x(\d+|\.|,?)(mm|m))|((\d+|\.|,?)(mm|m))/)||[])[1] || '';
+  //   row.afmeting = (( row.description.match(/((([\d|\.|,]+?)\s*?(mm|cm|m)\s*?x\s*|)?(([\d|\.|,]+?)\s*?(mm|cm|m)\s*?x\s*|)?([\d|\.|,]+?)\s*?(mm|cm|m))/i) || [] )[1] || '').replace(/\s/g,'').toLowerCase();
+  //   row.gaten = (( row.description.match(/(\d+)\s*?(?=gaten)/i) || [] )[1] || '');
+  //   row.korrel = (( row.description.match(/\b(P\d+)\b/i) || [] )[1] || '');
+  // })
+
   function locCode(loc){
     return loc
     .replace(/^I/, '1.')
@@ -464,6 +479,40 @@ $().on('load', async e => {
       });
     });
   });
+
+  //
+  // function artrows(rows){
+  //   rows.forEach(row => {
+  //     const locatie =
+  //     row.storageLocation =
+  //   })
+  // }
+  //
+  // console.log(locaties);
+  //
+  //
+  //
+  // function getLocatie(row){
+  //   if (!row) return '';
+  //   if (typeof row === 'string') {
+  //     row = row.toLowerCase();
+  //     if (row.match(/\.|-/)) {
+  //       row = '00'+row.split(/\.|-/).map(c => ('00'+c).slice(-2)).join('');
+  //     }
+  //     return locaties.find(loc => loc.locatieNr,loc.locatieCodeString,loc.locatieCode,loc.locatieCode2].includes(row))
+  //   }
+  //   return
+  //   locaties.find(loc => loc.locatieNr === row.newStorageLocation)
+  //   locaties.find(l => l.locatieCodeString === row.prodStorageLocation) ||
+  //   locaties.find(l => l.locatieCodeString === row.storageLocation)
+  // }
+  //
+  //
+  // console.log(getLocatie('1.1.1'));
+  // console.log(getLocatie('00020202'));
+  // console.log(getLocatie('ia1'));
+  // console.log(getLocatie('IA1'));
+
   function rowCode(row){
     const quantity = row.artQuantity || row.quantity;
     return [
@@ -753,7 +802,7 @@ $().on('load', async e => {
       factuurNr: factuurNr,
     }).then(e => e.body);
     console.log(factuurNr,factuurData);
-    const [clientInvoices, clientOrders, rows] = factuurData;
+    const [clientInvoices,clientOrders,rows] = factuurData;
     const [invoice] = clientInvoices;
     const [salesorder] = clientOrders;
     if (!salesorder) return alert('FACTUUR HEEFT GEEN PAKBONNEN');
@@ -835,10 +884,10 @@ $().on('load', async e => {
             //   $('td').align('right').text(`${salesorder.clientKortingContant || 0}%`),$('td').align('right').text(cur(salesorder.kortingContant = salesorder.clientKortingContant ? totaal * salesorder.clientKortingContant / 100 : 0, totaal -= salesorder.kortingContant)),
             // ),
 
-            // !invoice.kortContantProc ? null : $('tr').append(
-            //   $('td'),$('td'),$('td').text(`Korting contant over ${cur(totaal)}`),
-            //   $('td').align('right').text(`${invoice.kortContantProc}%`),$('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)),
-            // ),
+            !invoice.kortContantProc ? null : $('tr').append(
+              $('td'),$('td'),$('td').text(`Korting contant over ${cur(totaal)}`),
+              $('td').align('right').text(`${invoice.kortContantProc}%`),$('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)),
+            ),
 
           ),
         ),
@@ -855,16 +904,8 @@ $().on('load', async e => {
       ),
     )
     console.log(invoice);
-
-    if (invoice.kortContantProc) {
-      els.trh.append($('th').align('right').text(`Subtotaal`));
-      els.trb.append($('td').align('right').text(cur(totaal)));
-      els.trh.append($('th').align('right').text(`Korting ${invoice.kortContantProc}%`));
-      els.trb.append($('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)));
-    }
     els.trh.append($('th').align('right').text(`Excl`));
     els.trb.append($('td').align('right').text(cur(totaal)));
-
     els.trh.append($('th').align('right').text(`Btw ${invoice.btw}%`));
     els.trb.append($('td').align('right').text(cur(invoice.btwbedrag = totaal * invoice.btw/100, totaal += invoice.btwbedrag)));
     els.trh.append($('th').align('right').text(`Incl`));
@@ -2920,6 +2961,30 @@ $().on('load', async e => {
       },
     },
   });
+
+  // console.log('010101'.match(/../g));
+
+  //
+  // const store = [];
+  // aim.config.storage.old.forEach(c => {
+  //   var a = String(c.name).substring(0,3).toUpperCase().split('');
+  //   var s = store;
+  //   for (c1 of a) {
+  //     console.log(c1);
+  //     if (!s.find(r=>r.name==c1)) s.push({ name: c1, nr: Number(c1), art: [], children: []});
+  //     s = s.find(r=>r.name==c1).children;
+  //   }
+  // })
+  // console.log(
+  //   JSON.stringify(store, null, 2)
+  //   .replace(/"children": \[\]\n/gs,'')
+  //   .replace(/"/gs,'')
+  //   // .replace(/\},\n|\}\n|\{\n|\[\n|\],\n|\]\n/gs,'')
+  //   .replace(/\},(?=\n)|\}(?=\n)|\{(?=\n)|\],(?=\n)|\](?=\n)|\[(?=\n)|,/gs,'')
+  //   .replace(/\s\sname:/gs,'- name:')
+  //   .split(/\n/).filter(s => s.trim()).join('\n')
+  // );
+
   function readBinary(file){
     return new Promise((resolve,fail) => {
       const reader = new FileReader();

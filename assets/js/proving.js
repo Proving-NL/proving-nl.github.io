@@ -519,7 +519,7 @@ $().on('load', async e => {
     );
   }
   function orderPage(salesorder, rows) {
-    rows.forEach(row => row.storageLocation = row.newStorageLocation ? row.newStorageLocation.match(/../g).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
+    rows.forEach(row => row.storageLocation = row.newStorageLocation ? (row.newStorageLocation.match(/../g)||[]).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
     rows = rows.filter(row => row.orderNr === salesorder.nr);
     rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     console.log(salesorder, rows);

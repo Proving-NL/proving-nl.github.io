@@ -4,16 +4,10 @@
 - schema: `client`
 - **Naam (KlantID)**, `name`: Zoeknaam / Afkorting organisatie naam.
 - **Bedrijfsnaam (Firma)**, `companyName`: Organisatie naam.
-- **Telefoon (Tel)**, `companyPhone`: Algemeen organisatie telefoon nummer.
-- **Mobiel (Mobiel)**, `contactMobile`: Contact persoon mobiel nummer.
-- **Fax (Fax)**, `companyFax`: Algemeen organisatie fax nummer.
 - **Omschrijving (Omschrijving)**, `description`: Toelichting op bedrijf.
-- **Leverdag (Leverdag)**, `leverdag`: Dag van levering 0=Zondag, ..., 6= Zaterdag.
-- **Wijze van levering (RouteNr)**, `routeNr`: Standaard wijze van levering.. Opties: **0**=Niet ingevuld; **1**=Post; **2**=Visser; **3**=Route; **4**=Afhalen; **5**=Brengen(geen route); 
-- **Wijze van opdracht (VolgNr)**, `volgNr`: Standaard wijze van opdracht verkoop order.. Opties: **1**=Telefonisch; **2**=Whatsapp; **3**=Email-order; **4**=Email-tekst; **5**=Balie; 
-- **Opmerking (Opmerking)**, `opmerking`: Standaard opmerking op pakbon intern.
-- **Contactpersoon (Afleveradres Aanhef)**, `businessContactName`: Contactpersoon naam.
 - **Contact email (Afleveradres extra)**, `businessMailAddress`: Contactpersoon mail adres.
+- **Telefoon (Tel)**, `companyPhone`: Algemeen organisatie telefoon nummer.
+- **Fax (Fax)**, `companyFax`: Algemeen organisatie fax nummer.
 - **Straat (Afleveradres Straat)**, `businessAddressStreet`: Organisatie bezoek adres straat.
 - **Postcode (Afleveradres postcode)**, `businessAddressPostalCode`: Organisatie bezoek adres postcode.
 - **Plaats (Afleveradres Plaats)**, `businessAddressCity`: Organisatie bezoek adres plaats.
@@ -21,18 +15,21 @@
 - **Factuur email (Factuuradres extra)**, `otherMailAddress`: Organisatie post/factuur mail adres.
 - **Postbus en Straat (Factuuradres Straat)**, `otherAddressStreet`: Organisatie post/factuur postbus of straat.
 - **Plaats (Factuuradres Plaats)**, `otherAddressCity`: Organisatie post/factuur postcode en plaats.
-- **Netto omzet (Totaal netto)**, `netTotal`: Netto omzet afgelopen 365 dagen.
-- **VOS totaal (Totaal VOS)**, `vosTotal`: Vervallen.
-- **VOS start (VOSlijst van)**, `vosStart`: VOS lijst start datum.
-- **VOS end (VOSlijst tot)**, `vosEnd`: VOS lijst eind datum.
-- **Debiteur nummer (Deb.nr.)**, `debNr`: AFAS Debiteur nummer.
+- **Contactpersoon (Afleveradres Aanhef)**, `businessContactName`: Contactpersoon naam.
+- **Mobiel (Mobiel)**, `contactMobile`: Contact persoon mobiel nummer.
+- **Opmerking (Opmerking)**, `opmerking`: Standaard opmerking op pakbon intern.
+- **Korting contant (tekenbon)**, `kortingContant`: Standaard betalings korting over factuur.
+- **Wijze van levering (RouteNr)**, `routeNr`: Standaard wijze van levering.. Opties: **0**=Niet ingevuld; **1**=Post; **2**=Visser; **3**=Route; **4**=Afhalen; **5**=Brengen(geen route); 
+- **Wijze van opdracht (VolgNr)**, `volgNr`: Standaard wijze van opdracht verkoop order.. Opties: **1**=Telefonisch; **2**=Whatsapp; **3**=Email-order; **4**=Email-tekst; **5**=Balie; 
+- **Leverdag (Leverdag)**, `leverdag`: Dag van levering 0=Zondag, ..., 6= Zaterdag.
 - **Vracht kosten (Vracht kosten)**, `vrachtkosten`: Klant BTW nummer.
+- **Regio (regio)**, `regio`: Verkoop regio, tekst onbekend, account manager.
+- **Netto omzet (Totaal netto)**, `netTotal`: Netto omzet afgelopen 365 dagen.
+- **Debiteur nummer (Deb.nr.)**, `debNr`: AFAS Debiteur nummer.
 - **BTW tarief (btw)**, `btw`: Facturatie BTW tarief in %.
 - **BTW nummer (nummer)**, `btwNr`: Klant BTW nummer.
-- **Regio (regio)**, `regio`: Verkoop regio, tekst onbekend, account manager.
-- **Bedrijf (bedrijf)**, `accountName`: Bedrijf waar klant toe behoort. Opties: **airo**=Airo; **proving**=Proving; **broersen**=Broersen; 
-- **Korting contant (tekenbon)**, `kortingContant`: Standaard betalings korting over factuur.
 - **Nog te ontvangen (openstaand)**, `openstaand`: _readonly_ Totaal openstaand facturatie bedrag.
+- **Bedrijf (bedrijf)**, `accountName`: Bedrijf waar klant toe behoort. Opties: **airo**=Airo; **proving**=Proving; 
 # Pakbonnen
 - schema: `salesorder`
 - **Nr (PakBonId/bonnr)**, `nr`: _readonly_ Order nummer.

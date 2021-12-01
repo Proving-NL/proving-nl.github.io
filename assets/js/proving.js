@@ -1830,44 +1830,36 @@ $().on('load', async e => {
         $order: `nr DESC`,
         $search: '*',
       }),
-
       Actief: e => aim.list('salesorder',{
         $filter: `isQuote NE 1 && printDateTime NE NULL && pickDateTime EQ NULL`,
         $order: `nr DESC`,
         $search: '*',
       }),
-
       Verzendgereed: e => aim.list('salesorder',{
         $filter: `isQuote NE 1 && pickDateTime NE NULL && sendDateTime EQ NULL`,
         $order: `nr DESC`,
         $search: '*',
       }),
-
       Optransport: e => aim.list('salesorder',{
         $filter: `isQuote NE 1 && sendDateTime NE NULL && deliverDateTime EQ NULL`,
         $order: `nr DESC`,
         $search: '*',
       }),
-
       Geleverd: e => aim.list('salesorder',{
         $filter: `isQuote NE 1 && deliverDateTime NE NULL && invoiceNr EQ 0`,
         $order: `nr DESC`,
         $search: '*',
       }),
-
       OnHold: e => aim.list('salesorder',{
         $filter: `isQuote NE 1 && onHold EQ 1`,
         $order: `nr DESC`,
         $search: '*',
       }),
-
-
       // Overig: e => aim.list('salesorder',{
       //   $filter: `ISNULL(invoiceNr,0) GT 0`,
       //   $order: `nr DESC`,
       //   $search: ``,
       // }),
-
       Alles: e => aim.list('salesorder',{
         $order: `nr DESC`,
         $top: 100,

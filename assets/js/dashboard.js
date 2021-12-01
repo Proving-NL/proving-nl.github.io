@@ -11,11 +11,11 @@ $().on('load', e => {
       request_type: 'dashboard',
     }).then(e => e.body);
     set();
-    to = setTimeout(e => load(), 3000);
+    to = setTimeout(e => load(), 5000);
   })()
   function set(value) {
     setorderdate = value || setorderdate;
-    const names = ['Mandje','Nieuw','Geprint','Gereed','Verzonden','Geleverd'];
+    const names = ['Mandje','Nieuw','Geprint','Gereed','Verzonden','Geleverd','ReadyMix'];
     const datetext = {
       pick: 'Gereed voor verzending',
       send: 'Verzonden',
@@ -23,7 +23,7 @@ $().on('load', e => {
     }
     table.text('').append(
       $('tr').append(
-        $('td').text(new Date().toLocaleTimeString()),
+        $('td').text(new Date().toLocaleTimeString().substr(0,5)),
         $('td').text('Tijd'),
       ),
       $('tr').append(

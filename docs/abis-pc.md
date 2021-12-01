@@ -1,0 +1,46 @@
+# Database abisingen
+
+- Objecten in gebruik door applicatie
+    - tables abis
+        - `dbo.abis_rechten`
+        - `dbo.abis_gebruiker`
+        - `dbo.dtCommand`
+    - tables
+        - `dbo.bedrijven`
+        - table `dbo.klanten1`
+        - view `dbo.klanten`
+        - `dbo.fabrikanten`
+        - `dbo.leveranciers`
+        - `dbo.producten`
+        - `dbo.artikelen`
+        - `dbo.klantArtikelen`
+        - table `dbo.bonnen1`
+        - view `dbo.bonnen`
+        - table `dbo.fakturen1`
+        - view `dbo.fakturen`
+        - `dbo.orderRegels`
+        - `dbo.inkOrd`
+        - `dbo.inkOrdRegel`
+    - views
+        - `dbo.dvLevArt`
+        - `dbo.dvKlArt`
+        - `svFakturatieBedrijfPerPeriode2019`, nodig voor `doorfacturatie`
+    - procedures
+        - `dbo.spBonArtAddKlantArt`
+
+- Abis web requiered
+    - tables
+        - `dbo.lev`
+        - `dbo.levart`
+    - handmatig
+        -  `api.getAfasFactuurExport`, export naar afas
+        -  `api.calculate_totals`, bereken totalen van een factuur. Vindt plaats bij `createInvoice` en `factuur`
+        - `api.facturenOpenstaand`
+
+    - config generated
+        - `api.client`
+        - `api.salesorder`
+        - `api.salesorderrow`
+        - `api.invoice`
+        - `api.art`
+        - `api.invoice`

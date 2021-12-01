@@ -1618,22 +1618,8 @@ $().on('load', async e => {
   aim.config.import.forEach(imp => {
     for (let tab of imp.tabs) {
       tab.callback = async row => {
-        await $().url('https://aliconnect.nl/api/abis/data').input({
-          partNr: row.partNr,
-          companyName: row.companyName,
-          orderCode: row.orderCode,
-          packUnit: row.packUnit,
-          contentUnit: row.contentUnit,
-          contentQuantity: row.contentQuantity,
-          ean: row.ean,
-          description: row.description,
-          title: row.title,
-          listPrice: row.listPrice,
-          discount: row.discount,
-          price: row.price,
-          code: row.code,
-          data: JSON.stringify(row),
-        }).query({request_type: 'art'}).post().then(e => console.log(e.body));
+        await $().url('https://aliconnect.nl/api/abis/data').input(row).query({request_type: 'levart',
+        }).post();//.then(e => console.log(e.body));
       }
     }
   });
@@ -2958,11 +2944,9 @@ $().on('load', async e => {
       for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename))) {
         const result = await readBinary(file);
         const workbook = XLSX.read(result, { type: 'binary' });
-        // console.log(workbook);
+        console.log(workbook);
         for (let tab of fileConfig.tabs) {
-          // console.log(tab);
-
-          // return;
+          console.log(tab);
           const data = {
             rows: [],
           };
@@ -2970,7 +2954,7 @@ $().on('load', async e => {
           tab.colRow = tab.colRow || 1;
           const sheet = workbook.Sheets[tab.tabname];
           const toprow = [];
-          // console.log(sheet);
+          console.log(sheet);
           let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
           colEnd = XLSX.utils.decode_col(colEnd);
           function rowvalue(r,c){
@@ -2980,19 +2964,22 @@ $().on('load', async e => {
           for (var c=0; c<=colEnd; c++) {
             toprow[c] = rowvalue(tab.colRow,c);
           }
-          // console.log(toprow);
+          console.log(toprow);
+          // const cols = [];
+          // for (var name in tab.cols) {
+          //   if (Array.isArray(tab.cols[name])) {
+          //     tab.cols[name].forEach(c => cols[XLSX.utils.decode_col(c)] = name);
+          //   } else {
+          //     cols[toprow.indexOf(tab.cols[name])] = name;
+          //   }
+          // }
+          // console.log(tab.cols,cols);
+          // return;
           const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
           const infoElem = $('footer>.main');
           const rowStart = tab.colRow;
-
-          for (var name in tab.cols) {
-            if (String(tab.cols[name]).match(/return /)) {
-              tab.cols[name] = new Function('row', tab.cols[name]);
-            }
-          }
-          console.log(tab.cols);
-
-
+          // tab.colRow=700;
+          // rowEnd=715;
           for (var r = tab.colRow+1; r<=rowEnd; r++) {
             progressElem.value(r);
             let row;
@@ -3000,25 +2987,46 @@ $().on('load', async e => {
               var value;
               if (Array.isArray(tab.cols[name])) {
                 value = tab.cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
-              } else if (typeof tab.cols[name] === 'function') {
-                value = tab.cols[name](row) || '';
-              } else if (toprow.includes(name)) {
-                value = rowvalue(r, toprow.indexOf(name));
-              } else if (toprow.includes(tab.cols[name])) {
-                value = rowvalue(r, toprow.indexOf(tab.cols[name]));
               } else {
-                value = tab.cols[name];
+                // console.log();
+                value = rowvalue(r, toprow.includes(name) ? toprow.indexOf(name) : toprow.indexOf(tab.cols[name]));
               }
               if (value !== undefined) {
-                (row = row || {})[name] = value;
+                row = row || Object.assign({},tab.data);
+                row[name] = value;
               }
             }
             if (row) {
-              // return;
+              // console.log(row)
               data.rows.push(row);
               allrows.push([row, tab.callback]);
+              // row.keyname = row.keyname || row.orderCode;
+              // if (row.keyname && (row.catalogPrice || row.purchasePrice || row.partPrice)) {
+              //   // if (row && row.orderCode && row.description && row.catalogPrice) {
+              //   row.keyname = (tab.keyname || '') + row.keyname;
+              //   row.orderCode = (tab.orderCode || '') + row.orderCode;
+              //   if (tab.calc) {
+              //     tab.calc.forEach(c => row[c.name] *= c.faktor)
+              //   }
+              //   data.rows.push(row);
+              // }
             }
           };
+          // console.log(data);
+          // if (tab.callback) {
+          //   await tab.callback(data.rows);
+          // }
+          // return;
+          // const res = await fetch("https://proving.aliconnect.nl/import.php?data=purchaseproduct", {
+          //   method: 'POST', // *GET, POST, PUT, DELETE, etc.
+          //   mode: 'cors', // no-cors, *cors, same-origin
+          //   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+          //   credentials: 'same-origin', // include, *same-origin, omit
+          //   redirect: 'follow', // manual, *follow, error
+          //   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+          //   body: JSON.stringify(data) // body data type must match "Content-Type" header
+          // }).then(res => res.text())
+          // console.log(res);
         }
       }
     }
@@ -3026,12 +3034,9 @@ $().on('load', async e => {
     var i = 0;
     const progressElem = $('footer>progress').max(max).value(i);
     for (var [row,callback] of allrows) {
-      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', row.code);
       await callback(row);
-      // return;
       progressElem.value(++i);
     }
-    $('span.main').text('');
     progressElem.value(null);
     alert('Import gereed');
   }

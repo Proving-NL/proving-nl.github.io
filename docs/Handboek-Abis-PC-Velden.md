@@ -1,35 +1,18 @@
 # Klanten
 - schema: `company`
-# Klanten
-- schema: `client`
-- **Naam (KlantID)**, `name`: Zoeknaam / Afkorting organisatie naam.
-- **Bedrijfsnaam (Firma)**, `companyName`: Organisatie naam.
-- **Omschrijving (Omschrijving)**, `description`: Toelichting op bedrijf.
-- **Contact email (Afleveradres extra)**, `businessMailAddress`: Contactpersoon mail adres.
-- **Telefoon (Tel)**, `companyPhone`: Algemeen organisatie telefoon nummer.
-- **Fax (Fax)**, `companyFax`: Algemeen organisatie fax nummer.
-- **Straat (Afleveradres Straat)**, `businessAddressStreet`: Organisatie bezoek adres straat.
-- **Postcode (Afleveradres postcode)**, `businessAddressPostalCode`: Organisatie bezoek adres postcode.
-- **Plaats (Afleveradres Plaats)**, `businessAddressCity`: Organisatie bezoek adres plaats.
-- **Factuur contactpersoon (Factuuradres Aanhef)**, `otherContactName`: Organisatie post adres contactpersoon.
-- **Factuur email (Factuuradres extra)**, `otherMailAddress`: Organisatie post/factuur mail adres.
-- **Postbus en Straat (Factuuradres Straat)**, `otherAddressStreet`: Organisatie post/factuur postbus of straat.
-- **Plaats (Factuuradres Plaats)**, `otherAddressCity`: Organisatie post/factuur postcode en plaats.
-- **Contactpersoon (Afleveradres Aanhef)**, `businessContactName`: Contactpersoon naam.
-- **Mobiel (Mobiel)**, `contactMobile`: Contact persoon mobiel nummer.
-- **Opmerking (Opmerking)**, `opmerking`: Standaard opmerking op pakbon intern.
-- **Korting contant (tekenbon)**, `kortingContant`: Standaard betalings korting over factuur.
-- **Wijze van levering (RouteNr)**, `routeNr`: Standaard wijze van levering.. Opties: **0**=Niet ingevuld; **1**=Post; **2**=Visser; **3**=Route; **4**=Afhalen; **5**=Brengen(geen route); 
-- **Wijze van opdracht (VolgNr)**, `volgNr`: Standaard wijze van opdracht verkoop order.. Opties: **1**=Telefonisch; **2**=Whatsapp; **3**=Email-order; **4**=Email-tekst; **5**=Balie; 
-- **Leverdag (Leverdag)**, `leverdag`: Dag van levering 0=Zondag, ..., 6= Zaterdag.
-- **Vracht kosten (Vracht kosten)**, `vrachtkosten`: Klant BTW nummer.
-- **Regio (regio)**, `regio`: Verkoop regio, tekst onbekend, account manager.
-- **Netto omzet (Totaal netto)**, `netTotal`: Netto omzet afgelopen 365 dagen.
-- **Debiteur nummer (Deb.nr.)**, `debNr`: AFAS Debiteur nummer.
-- **BTW tarief (btw)**, `btw`: Facturatie BTW tarief in %.
-- **BTW nummer (nummer)**, `btwNr`: Klant BTW nummer.
-- **Nog te ontvangen (openstaand)**, `openstaand`: _readonly_ Totaal openstaand facturatie bedrag.
-- **Bedrijf (bedrijf)**, `accountName`: Bedrijf waar klant toe behoort. Opties: **airo**=Airo; **proving**=Proving; 
+# Fakturen
+- schema: `invoice`
+- **Naam (KlantID)**, `clientName`: .
+- **Contactpersoon (Aanhef)**, `clientBusinessContactName`: .
+- **Contact email (extra)**, `clientBusinessMailAddress`: .
+- **Straat (Straat)**, `clientBusinessAddressStreet`: .
+- **Postcode (postcode)**, `clientBusinessAddressPostalCode`: .
+- **Plaats (Plaats)**, `clientBusinessAddressCity`: .
+- **Factuur contactpersoon (Aanhef)**, `clientOtherContactName`: .
+- **Factuur email (extra)**, `clientOtherMailAddress`: .
+- **Postbus en Straat (Straat)**, `clientOtherAddressCity`: .
+- **Korting contant (tekenbon)**, `clientKortingContant`: .
+- **(Vracht kosten)**, `clientVrachtkosten`: .
 # Pakbonnen
 - schema: `salesorder`
 - **Nr (PakBonId/bonnr)**, `nr`: _readonly_ Order nummer.
@@ -47,66 +30,5 @@
 - **Netto (verkoop)**, `nettoverk`: Omzet order verkoop.
 - **Netto (inkoop)**, `nettoink`: Kosten inkoop.
 - **Netto (opbrengst)**, `nettowinst`: Netto winst / resultaat verkoop order.
-# Fakturen
-- schema: `invoice`
-- **Naam (KlantID)**, `clientName`: .
-- **Contactpersoon (Aanhef)**, `clientBusinessContactName`: .
-- **Contact email (extra)**, `clientBusinessMailAddress`: .
-- **Straat (Straat)**, `clientBusinessAddressStreet`: .
-- **Postcode (postcode)**, `clientBusinessAddressPostalCode`: .
-- **Plaats (Plaats)**, `clientBusinessAddressCity`: .
-- **Factuur contactpersoon (Aanhef)**, `clientOtherContactName`: .
-- **Factuur email (extra)**, `clientOtherMailAddress`: .
-- **Postbus en Straat (Straat)**, `clientOtherAddressCity`: .
-- **Korting contant (tekenbon)**, `clientKortingContant`: .
-- **(Vracht kosten)**, `clientVrachtkosten`: .
-# Artikelen-Boven
-- schema: `prod`
-- **ArtNr (ArtNr)**, `artNr`: .
-- **Merk/Brand (Merk)**, `brand`: .
-- **Code (Code)**, `code`: .
-- **Titel/Title (Tekst/Omschrijving)**, `title`: .
-- **Inhoud (Inhoud)**, `inhoud`: .
-- **Eenheid/Unit (InhoudEenheid)**, `inhoudEenheid`: .
-- **Bedrijf (Bedrijf)**, `bedrijf`: .
-- **lokatie (maglokatie)**, `stockLocation`: .
-- **lokatie (maglokatie)**, `storageLocation`: .
-- **VOS (VOC)**, `vos`: .
 # Artikelen-Onder
 - schema: `art`
-- **ArtNr (ArtNr)**, `artNr`: .
-- **Merk/Brand (Merk)**, `prodBrand`: .
-- **Titel/Title (Tekst/Omschrijving)**, `prodTitle`: .
-- **Unit (Eenheid)**, `unit`: .
-- **Verpak aantal (AantalStuks)**, `quantity`: .
-- **Leverancier/supplier (Leverancier)**, `supplier`: .
-- **Bestelcode (bestelcode)**, `orderCode`: .
-- **EAN (EAN barcode)**, `ean`: .
-- **Gewicht/weight (gewicht)**, `weight`: .
-- **Bruto (bruto)**, `bruto`: .
-- **Korting (kort.)**, `purchaseDiscount`: .
-- **Net (netto)**, `net`: .
-- **Net gewijzigd (datum)**, `netLastModifiedDateTime`: .
-- **Verkoop aangepast (datum)**, `salePriceLastModifiedDateTime`: .
-- **Artikel locatie (artLocatie)**, `storageLocation`: .
-- **ArtNr (ArtNr)**, `prodArtNr`: .
-- **Code (Code)**, `prodCode`: .
-- **Inhoud (Inhoud)**, `prodInhoud`: .
-- **Eenheid/Unit (InhoudEenheid)**, `prodInhoudEenheid`: .
-- **Bedrijf (Bedrijf)**, `prodBedrijf`: .
-- **lokatie (maglokatie)**, `prodStockLocation`: .
-- **lokatie (maglokatie)**, `prodStorageLocation`: .
-- **VOS (VOC)**, `prodVos`: .
-- **ArtNr (ArtNr)**, `artNr`: .
-- **Unit (Eenheid)**, `unit`: .
-- **Verpak aantal (AantalStuks)**, `quantity`: .
-- **Leverancier/supplier (Leverancier)**, `supplier`: .
-- **Bestelcode (bestelcode)**, `orderCode`: .
-- **EAN (EAN barcode)**, `ean`: .
-- **Gewicht/weight (gewicht)**, `weight`: .
-- **Titel/Title (Tekst/Omschrijving)**, `prodTitle`: .
-- **Datum besteld (besteld)**, `orderDateTime`: Datum van opdracht door klant tot levering.
-- **Aanbieding (Aanbieding)**, `isQuote`: Order is aanbieding.
-- **In opdracht (Verwerkt)**, `isOrder`: Order in opdracht voor levering.
-- **Unit (Eenheid)**, `artUnit`: .
-- **Verpak aantal (AantalStuks)**, `artQuantity`: .

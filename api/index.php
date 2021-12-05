@@ -2,7 +2,19 @@
 $client_id = 'cac652da-dcdc-455a-a0de-e32bac08ea06';
 require_once($_SERVER['DOCUMENT_ROOT']."/../vendor/autoload.php");
 aim()->api();
-debug($aim);
+// debug(1);
+foreach (aim()->config['import'] as $import) {
+  foreach ($import['tabs'] as $tab) {
+    $filename = "$import[filename]-$tab[tabname]";
+    $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT']."/../public/data/$filename.json"), true);
+    foreach ($data as $row) {
+
+    }
+  }
+}
+http_response(200, 1);
+
+// debug($aim->config['import']);
 // $path = str_replace('/api','',$_SERVER['REQUEST_URI']);
 // $paths = [
 //   "/inkoop/order"=> "WITH

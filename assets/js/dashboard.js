@@ -1,47 +1,58 @@
 $().on('load', e => {
   let keybuffer = null;
-  let setorderdate;
+  let setstatus;
   let to;
   let ordernr = '';
-  let data = [];
-  const table = $('table').parent($(document.body));
-  (async function load(){
+  let data = [[]];
+  const elem = $('div').parent($(document.body));
+  async function load(){
     clearTimeout(to);
     data = await $().url('https://aliconnect.nl/api/abis/data').post({
       request_type: 'dashboard',
     }).then(e => e.body);
+    // Object.keys(names).forEach(name=>names[name]=0);
+    // data[0].forEach(r=>names[r.status] = r.aantal)
     set();
     to = setTimeout(e => load(), 5000);
-  })()
+  }
+  load();
+  function valcells(name){
+    const row = data[0].find(r=>r.status===name) || {};
+    // console.log(name,row);
+    //
+    return [
+      $('th').text(name),
+      $('td').text(row.aantal||''),
+    ]
+  }
   function set(value) {
-    setorderdate = value || setorderdate;
-    const names = ['Mandje','Nieuw','Geprint','Gereed','Verzonden','Geleverd','ReadyMix'];
-    const datetext = {
-      pick: 'Gereed voor verzending',
-      send: 'Verzonden',
-      deliver: 'Geleverd',
-    }
-    table.text('').append(
-      $('tr').append(
-        $('td').text(new Date().toLocaleTimeString().substr(0,5)),
-        $('td').text('Tijd'),
+    elem.text('').append(
+      $('div').text(new Date().toLocaleTimeString().substr(0,5), setstatus = value || setstatus, ordernr),
+      $('table').append(
+        $('tr').append(
+          valcells('Opdracht'),
+          valcells('Ingepland'),
+        ),
+        $('tr').append(
+          valcells('Geprint'),
+          valcells('Gepakt'),
+        ),
+        $('tr').append(
+          valcells('Verzonden'),
+          valcells('On Hold'),
+        ),
+        $('tr').append(
+          valcells('Geleverd'),
+          valcells('Verzonden>2d'),
+        ),
+        $('tr').append(
+          valcells('ReadyMix'),
+        ),
       ),
-      $('tr').append(
-        $('td').text(datetext[setorderdate]),
-        $('td').text('Scanner'),
-      ),
-      $('tr').append(
-        $('td').text(ordernr),
-        $('td').text('Order'),
-      ),
-      names.map((name,i) => $('tr').append(
-        $('td').text(data[i] ? data[i][0].aantal : null),
-        $('td').text(name),
-      )),
     )
   };
-  set('pick');
-
+  set('Gepakt');
+  let query = 'pickDateTime = GETDATE(), onholdDateTime = NULL';
   $(window).on('keyup', e => {
     if (keybuffer === null) {
       if (e.key === 'CapsLock') {
@@ -58,23 +69,26 @@ $().on('load', e => {
       e.preventDefault();
       if (e.key === 'Enter') {
         if (keybuffer === '0901') {
-          set('pick');
-          // console.log('Order gereed voor transport');
+          set('Gepakt');
+          query = 'pickDateTime = GETDATE(), sendDateTime = NULL, deliverDateTime = NULL, onholdDateTime = NULL';
         } else if (keybuffer === '0902') {
-          set('send');
-          // console.log('Order op transport');
+          set('Verzonden');
+          query = 'sendDateTime = GETDATE(), deliverDateTime = NULL, onholdDateTime = NULL';
         } else if (keybuffer === '0903') {
-          set('deliver');
-          // console.log('Order geleverd');
+          set('Geleverd');
+          query = 'deliverDateTime = GETDATE(), onholdDateTime = NULL';
+        } else if (keybuffer === '0904') {
+          set('On Hold');
+          query = 'onholdDateTime = GETDATE(), sendDateTime = NULL, deliverDateTime = NULL';
+        } else if (keybuffer === '0905') {
         } else {
-          console.log('PAKBON', keybuffer, setorderdate);
+          // console.log('PAKBON', keybuffer, setorderdate);
           ordernr = keybuffer;
-          set();
-          // $().url('https://aliconnect.nl/api/abis/data').post({
-          //   request_type: 'paklijst',
-          //   id: ordernr,
-          //   set: setorderdate + 'DateTime = GETDATE()'
-          // }).then(e => e.body);
+          $().url('https://aliconnect.nl/api/abis/data').post({
+            request_type: 'paklijst',
+            id: ordernr,
+            set: query,
+          }).then(e => load());
         }
         keybuffer = null;
       } else {

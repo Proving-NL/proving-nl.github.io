@@ -2,8 +2,8 @@
 // <style>textarea{width:100%;height:500px;}</style>
 require_once($_SERVER['DOCUMENT_ROOT']."/../vendor/autoload.php");
 error_reporting(E_ALL & ~E_NOTICE);
-$filename = 'C:\Users\maxva\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
 $filename = 'C:\Users\max\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
+$filename = 'C:\Users\maxva\Alicon\Proving BD - Documenten\aliconnect\proving-nl.config\yaml\proving-nl.config.js.yaml';
 // $content = file_get_contents($filename);
 $config = yaml_parse_file($filename);
 // die($content);
@@ -45,11 +45,15 @@ foreach ($config['components']['schemas'] as $schemaName => $schema) {
     $sql_schema.="FROM $schema[srcTablename] AS $schemaName".PHP_EOL;
     if (isset($schema['join'])) {
       foreach ($schema['join'] as $join) {
-        $sql_schema.="LEFT OUTER JOIN $join[tableName] ON $join[tableName].$join[columnName] = $schemaName.$join[srcName]".PHP_EOL;
+        $as = $join['as'] ?: $join['tableName'];
+        $sql_schema.="LEFT OUTER JOIN $join[tableName] AS $as ON $as.$join[columnName] = $schemaName.$join[srcName]".PHP_EOL;
       }
     }
     sqlsrv_query( aim()->conn, "DROP VIEW api.$schemaName");
-    sqlsrv_query( aim()->conn, $sql_schema);
+    // error_log($sql_schema."\n", 3, "\aliconnect\logs\sql.log");
+    if (!sqlsrv_query( aim()->conn, $sql_schema)) {
+      die($sql_schema);
+    }
   }
 }
 

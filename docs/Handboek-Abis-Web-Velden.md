@@ -1,13 +1,5 @@
-# account
 # company
-# client
-# salesorder
 # invoice
-# prod
+# salesorder
 # art
-# lev
-# levart
 # salesorderrow
-# supplierproduct
-# article
-# aimproduct

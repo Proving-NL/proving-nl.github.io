@@ -1,12 +1,13 @@
 $().on('load', async e => {
-  // console.log('JA');
+  console.log('JA', aim.config);
+
   let clientart = [];
   let clientName = [];
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
     $('button.account>span').text(clientName);
     [clientart] = await fetch('https://aliconnect.nl/api/abis/data?request_type=clientArt&clientName=' + clientName).then(res => res.json());
-    console.log('JA', clientart);
+    // console.log('JA', clientart);
 
   }
 
@@ -470,7 +471,7 @@ $().on('load', async e => {
       (row.artNr||row.prodArtNr||row.orderCode||'').replace(/,/g, '.').replace(/-(\d+)$/g, '/$1'),
       Number(quantity) > 1 ? quantity : null,
       // (a.supplier||'xxx').substr(0,3).toUpperCase(),
-    ].filter(Boolean).join('-').toLowerCase().replace(/\s/g,'')
+    ].filter(Boolean).join('-').toUpperCase().replace(/\s/g,'')
   }
   function rowTitle(row){
     const quantity = row.artQuantity || row.quantity;
@@ -495,9 +496,10 @@ $().on('load', async e => {
     );
   }
   function briefElem(row, title, bc = ''){
+    console.log(1, row.accountName);
     return $('div').class('brief').append(
       $('div').append(
-        $('img').src(`https://${row.accountCompanyName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${row.accountCompanyName.toLowerCase()}.png`
+        $('img').src(`https://${row.accountName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${row.accountName.toLowerCase()}.png`
         ),
       ),
       $('table').style('margin-bottom:10mm;width:100%;').append(
@@ -640,7 +642,7 @@ $().on('load', async e => {
             rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
               $('td').align('right').text(row.quant),
               $('td').text(row.unit),
-              $('td').text(rowCode(row)).style('font-family:monospace;font-size:0.9em;'),
+              $('td').text(rowCode(row)),
               $('td').text(rowTitle(row)).style('white-space:normal;'),
               // $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
               // $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
@@ -1122,7 +1124,7 @@ $().on('load', async e => {
     );
     return elem;
   }
-  aim.config.components.schemas.client.app = {
+  aim.config.components.schemas.company.app = {
     nav: row => [
       $('button').class('abtn print').title('Printen').on('click', e => {
         const elem = $('article').parent('.lv').class('cover').append(
@@ -1561,11 +1563,14 @@ $().on('load', async e => {
     // row.title = row.product + Object.entries(options).map(entry => entry.join(':')).join(', ');
     row.title = [row.product, row.title].concat(Object.values(row.options)).filter(Boolean).join(', ');
   }
-
-  aim.config.components.schemas.levart.app = {
-    precompile: artrow,
-    header: artHeader,
+  function description(s){
+    if (s && s !== 'NB') return s.replace(/™|®/g,'').replace(/  /g,' ').trim();
   }
+
+  // aim.config.components.schemas.levart.app = {
+  //   precompile: artrow,
+  //   header: artHeader,
+  // }
 
   aim.cols = {
     catalogPrice(row, div) {
@@ -1618,22 +1623,39 @@ $().on('load', async e => {
   aim.config.import.forEach(imp => {
     for (let tab of imp.tabs) {
       tab.callback = async row => {
-        await $().url('https://aliconnect.nl/api/abis/data').input({
-          partNr: row.partNr,
-          companyName: row.companyName,
-          orderCode: row.orderCode,
-          packUnit: row.packUnit,
-          contentUnit: row.contentUnit,
-          contentQuantity: row.contentQuantity,
-          ean: row.ean,
-          description: row.description,
-          title: row.title,
-          listPrice: row.listPrice,
-          discount: row.discount,
-          price: row.price,
-          code: row.code,
-          data: JSON.stringify(row),
-        }).query({request_type: 'art'}).post().then(e => console.log(e.body));
+        await $().url('https://aliconnect.nl/api/abis/data')
+        .input(row)
+        // .input({
+        //   code: row.code,
+        //   partNr: row.partNr,
+        //   companyName: row.companyName,
+        //   orderCode: row.orderCode,
+        //   unit: (row.unit||'').toLowerCase(),
+        //   partCode: row.partCode,
+        //   contentQuantity: row.contentQuantity,
+        //   contentUnit: (row.contentUnit||'').toLowerCase(),
+        //   ean: row.ean,
+        //   description: description(row.description),
+        //   description_nl: description(row.description_nl),
+        //   description_en: description(row.description_en),
+        //   description_de: description(row.description_de),
+        //   description_fr: description(row.description_fr),
+        //   partPrice: row.partPrice,
+        //   packPrice: row.packPrice,
+        //   discount: row.discount,
+        //   productGroep: row.productGroep,
+        //   weight: row.weight !== 'NB' ? row.weight : null,
+        //   width: row.width !== 'NB' ? row.width : null,
+        //   length: row.length !== 'NB' ? row.length : null,
+        //   height: row.height !== 'NB' ? row.height : null,
+        //   countryOrigin: row.countryOrigin,
+        //   shelfLife: row.shelfLife,
+        //   remark: row.remark,
+        //   discountCode: row.discountCode,
+        //   data: row,
+        // })
+        .query({request_type: 'art'}).post()
+        .then(e => e.body ? console.error(e.body) : null);
       }
     }
   });
@@ -1788,87 +1810,97 @@ $().on('load', async e => {
     })
   }
   aim.om.treeview({
-    Sales: {
-      Klanten: e => aim.list('client',{
+    CRM: {
+      Organisaties: e => aim.list('company',{
         $filter: `archivedDateTime EQ NULL`,
         $search: ``,
       }),
-      Archief: e => aim.list('client',{
+      Archief: e => aim.list('company',{
         $filter: `archivedDateTime NE NULL`,
         $search: ``,
       }),
-      Analyse: {
-        Airo: () => analyseBedrijf('Airo'),
-        Proving: () => analyseBedrijf('Proving'),
-        async Voorraad() {
-          const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-voorraad').then(res => res.json());
-          const [arts] = data;
-          function magcode(code){
-            var a = (code||'').split('');
-            a[0] = ('00' + '-IJKLMNOP--ABCDEFGH'.split('').indexOf(a[0])).slice(-2);
-            a[1] = ('00' + '-ABCDEFGHIJKLMNOP'.split('').indexOf(a[1])).slice(-2);
-            a[2] = ('00' + a[2]).slice(-2);
-            return a.join('.');
-          }
-          const elem = $('div').parent(
-            $('div').parent(
-              $('.lv').text('').append(
-                $('nav').append(
-                  $('span'),
-                  $('button').class('icn-print').on('click', e => elem.print()),
-                ),
-              )
-            )
-          );
-          elem.append(
-            clienttable(arts, {
-              Omschrijving: row => $('td').text(row.Omschrijving),
-              MagLokatie: row => $('td').style('font-family:consolas;').text(row.MagLokatie, magcode(row.MagLokatie)),
-              Voorraad: row => $('td').text(row.Voorraad),
-            }),
-          )
-        },
-        async Verloop() {
-          const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-verkoop-verloop').then(res => res.json());
-        },
-      }
+      // Analyse: {
+      //   Airo: () => analyseBedrijf('Airo'),
+      //   Proving: () => analyseBedrijf('Proving'),
+      //   async Voorraad() {
+      //     const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-voorraad').then(res => res.json());
+      //     const [arts] = data;
+      //     function magcode(code){
+      //       var a = (code||'').split('');
+      //       a[0] = ('00' + '-IJKLMNOP--ABCDEFGH'.split('').indexOf(a[0])).slice(-2);
+      //       a[1] = ('00' + '-ABCDEFGHIJKLMNOP'.split('').indexOf(a[1])).slice(-2);
+      //       a[2] = ('00' + a[2]).slice(-2);
+      //       return a.join('.');
+      //     }
+      //     const elem = $('div').parent(
+      //       $('div').parent(
+      //         $('.lv').text('').append(
+      //           $('nav').append(
+      //             $('span'),
+      //             $('button').class('icn-print').on('click', e => elem.print()),
+      //           ),
+      //         )
+      //       )
+      //     );
+      //     elem.append(
+      //       clienttable(arts, {
+      //         Omschrijving: row => $('td').text(row.Omschrijving),
+      //         MagLokatie: row => $('td').style('font-family:consolas;').text(row.MagLokatie, magcode(row.MagLokatie)),
+      //         Voorraad: row => $('td').text(row.Voorraad),
+      //       }),
+      //     )
+      //   },
+      //   async Verloop() {
+      //     const data = await fetch('https://aliconnect.nl/api/abis/data?request_type=report-verkoop-verloop').then(res => res.json());
+      //   },
+      // }
     },
     Orders: {
-      Mandje: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && isOrder NE 1`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
-      Nieuw: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && isOrder EQ 1 && printDateTime EQ NULL`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
       Actief: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && printDateTime NE NULL && pickDateTime EQ NULL`,
+        $filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
         $order: `nr DESC`,
         $search: '*',
       }),
-      Verzendgereed: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && pickDateTime NE NULL && sendDateTime EQ NULL`,
+      Mandje: e => aim.list('salesorder',{
+        $filter: `isOrder NE 1`,
         $order: `nr DESC`,
         $search: '*',
       }),
-      Optransport: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && sendDateTime NE NULL && deliverDateTime EQ NULL`,
+      Aanbieding: e => aim.list('salesorder',{
+        $filter: `isQuote NE 0`,
         $order: `nr DESC`,
         $search: '*',
       }),
-      Geleverd: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && deliverDateTime NE NULL && invoiceNr EQ 0`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
-      OnHold: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && onHold EQ 1`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
+      // Nieuw: e => aim.list('salesorder',{
+      //   $filter: `isQuote NE 1 && isOrder EQ 1 && printDateTime EQ NULL`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
+      // Actief: e => aim.list('salesorder',{
+      //   $filter: `isQuote NE 1 && printDateTime NE NULL && pickDateTime EQ NULL`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
+      // Verzendgereed: e => aim.list('salesorder',{
+      //   $filter: `isQuote NE 1 && pickDateTime NE NULL && sendDateTime EQ NULL`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
+      // Optransport: e => aim.list('salesorder',{
+      //   $filter: `isQuote NE 1 && sendDateTime NE NULL && deliverDateTime EQ NULL`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
+      // Geleverd: e => aim.list('salesorder',{
+      //   $filter: `isQuote NE 1 && deliverDateTime NE NULL && invoiceNr EQ 0`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
+      // OnHold: e => aim.list('salesorder',{
+      //   $filter: `isQuote NE 1 && onHold EQ 1`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
       // Overig: e => aim.list('salesorder',{
       //   $filter: `ISNULL(invoiceNr,0) GT 0`,
       //   $order: `nr DESC`,
@@ -1878,7 +1910,6 @@ $().on('load', async e => {
         $order: `nr DESC`,
         $top: 100,
         $search: '',
-
       }),
       ReadyMix: e => aim.list('salesorderrow',{
         $filter: `prodStockLocation EQ 'k-m' && sendDateTime EQ NULL && isQuote <> 1 && isOrder = 1`,
@@ -2925,19 +2956,17 @@ $().on('load', async e => {
     Overig: {
       MagazijnScannerKaart() {
         printElem().append(
-          $('table').style('font-size:3em;').append(
-            $('tr').append(
-              $('td').text('Order gereed voor transport').style('height:50mm;'),
-              $('td').class('bc').text('*0901*').style('font-size:30mm;'),
-            ),
-            $('tr').append(
-              $('td').text('Order op transport').style('height:50mm;'),
-              $('td').class('bc').text('*0902*').style('font-size:30mm;'),
-            ),
-            $('tr').append(
-              $('td').text('Order geleverd').style('height:50mm;'),
-              $('td').class('bc').text('*0903*').style('font-size:30mm;'),
-            ),
+          $('div').style('font-size:3em;text-align:center;').append(
+            $('div').text('Gepakt'),
+            $('div').class('bc').text('*0901*').style('font-size:30mm;height:3cm;'),
+            $('div').text('Verzonden'),
+            $('div').class('bc').text('*0902*').style('font-size:30mm;height:3cm;'),
+            $('div').text('On Hold'),
+            $('div').class('bc').text('*0904*').style('font-size:30mm;height:3cm;'),
+            $('div').text('Geleverd'),
+            $('div').class('bc').text('*0903*').style('font-size:30mm;height:3cm;'),
+            $('div').text('Factureren'),
+            $('div').class('bc').text('*0905*').style('font-size:30mm;height:3cm;'),
           ),
         ).print()
       },
@@ -2947,20 +2976,75 @@ $().on('load', async e => {
     return new Promise((resolve,fail) => {
       const reader = new FileReader();
       reader.readAsBinaryString(file);
+      // reader.onprogress = e => console.log(e);
       reader.onload = e => resolve(e.target.result);
     })
   }
-  async function importFiles(files){
-    const allrows = [];
+  async function importFiles1(files){
+    let allrows = [];
     files = Array.from(files);
     for (var file of files) {
-      console.log(file.name);
-      for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename))) {
+      $('span.main').text('import:', file.name);
+      if (file.name.match(/\.xls/)) {
         const result = await readBinary(file);
         const workbook = XLSX.read(result, { type: 'binary' });
-        // console.log(workbook);
+        for (let sheetname of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetname];
+          if (sheet['!ref']) {
+            let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
+            // console.log(sheet['!ref'], colEnd,rowEnd);
+            colEnd = XLSX.utils.decode_col(colEnd);
+            let maxCol = 0;
+            const rows = [];
+            for (var r = 1; r<=rowEnd; r++) {
+              const row = [];
+              for (var c=0; c<=colEnd; c++) {
+                var sheetcell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
+                var cell = null;
+                if (sheetcell) {
+                  maxCol = Math.max(maxCol,c);
+                  if (sheetcell.l) {
+                    cell = {
+                      v: sheetcell.l.display,
+                      href: sheetcell.l.Target,
+                    }
+                  } else {
+                    cell = {
+                      v: sheetcell.v,
+                    }
+                  }
+                }
+                row.push(cell);
+              }
+              rows.push(row);
+            }
+            rows.forEach(row => row.length = maxCol + 1);
+            // console.log(file.name, sheetname, maxCol, rows);
+            $('span.main').text('upload:', file.name, sheetname);
+            await $().url('https://aliconnect.nl/api/abis/data')
+            .input(rows)
+            .query({
+              request_type: 'importdata',
+              filename: file.name + '-' + sheetname,
+            })
+            .post()
+            .then(console.log)
+          }
+        }
+      }
+      $('span.main').text('import done');
+    }
+  }
+  async function importFiles(files){
+    let allrows = [];
+    files = Array.from(files);
+    for (var file of files) {
+      $('span.main').text('import:', file.name);
+      for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename.toLowerCase()))) {
+        const result = await readBinary(file);
+        const workbook = XLSX.read(result, { type: 'binary' });
         for (let tab of fileConfig.tabs) {
-          // console.log(tab);
+          $('span.main').text('import:', file.name, tab.tabname);
 
           // return;
           const data = {
@@ -2975,7 +3059,13 @@ $().on('load', async e => {
           colEnd = XLSX.utils.decode_col(colEnd);
           function rowvalue(r,c){
             var cell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
-            if (cell) return cell.v;
+            if (cell) {
+              if (cell.l) {
+                return `(${cell.l.display})[${cell.l.Target}]`;
+              }
+              // console.log(c,r,cell)
+              return cell.v;
+            }
           }
           for (var c=0; c<=colEnd; c++) {
             toprow[c] = rowvalue(tab.colRow,c);
@@ -2990,7 +3080,7 @@ $().on('load', async e => {
               tab.cols[name] = new Function('row', tab.cols[name]);
             }
           }
-          console.log(tab.cols);
+          // console.log(tab.cols);
 
 
           for (var r = tab.colRow+1; r<=rowEnd; r++) {
@@ -3000,8 +3090,13 @@ $().on('load', async e => {
               var value;
               if (Array.isArray(tab.cols[name])) {
                 value = tab.cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+                // console.log(name, tab.cols[name]);
               } else if (typeof tab.cols[name] === 'function') {
-                value = tab.cols[name](row) || '';
+                try {
+                  value = tab.cols[name](row) || '';
+                } catch(err) {
+
+                }
               } else if (toprow.includes(name)) {
                 value = rowvalue(r, toprow.indexOf(name));
               } else if (toprow.includes(tab.cols[name])) {
@@ -3014,26 +3109,33 @@ $().on('load', async e => {
               }
             }
             if (row) {
+              // console.log(row);
               // return;
               data.rows.push(row);
-              allrows.push([row, tab.callback]);
+              allrows.push([row, tab]);
             }
           };
         }
       }
     }
+    // return;
+    // allrows = allrows.filter(entry => entry[0].partCode);
+    // console.log(allrows);
     var max = allrows.length;
     var i = 0;
     const progressElem = $('footer>progress').max(max).value(i);
-    for (var [row,callback] of allrows) {
-      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', row.code);
-      await callback(row);
+    for (var [row,tab] of allrows) {
+      // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
+      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code);
+      try {
+        await tab.callback(row);
+      } catch (err) {}
       // return;
       progressElem.value(++i);
     }
-    $('span.main').text('');
+    $('span.main').text('import done');
     progressElem.value(null);
-    alert('Import gereed');
+    // alert('Import gereed');
   }
   $(window).on('popstate', async e => {
     const documentSearchParams = new URLSearchParams(document.location.search);

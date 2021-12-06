@@ -14,11 +14,10 @@ $().on('load', async e => {
   // let clientName = localStorage.getItem('clientName');
   aim.om.treeview({
     'Shop': {
-      Producten(){
-        aim.list('art', {
-          $search: '',
-        });
-      },
+      Producten: e => aim.list('product',{
+        $filter: `CompanyId EQ 6133 || CompanyId EQ NULL`,
+        $search: ``,
+      }),
       Boodschappenlijst() {
         aim.list('art',{
           $filter: `id IN (SELECT artId FROM abisingen.dbo.klantartikelen WHERE klantid = '${clientName}')`,
@@ -658,6 +657,7 @@ $().on('load', async e => {
       id: orderNr,
       set: 'printDateTime = GETDATE()'
     }).then(e => e.body);
+    console.log(data);
     var [salesorders,rows] = data;
     const [salesorder] = salesorders;
     if (!rows.length) alert('Order bevat geen regels');
@@ -925,10 +925,10 @@ $().on('load', async e => {
   async function factureren(salesorder, id){
     const data = await $().url('https://aliconnect.nl/api/abis/data').post({
       request_type: 'createInvoice',
-      accountCompanyName: salesorder.accountCompanyName,
+      accountName: salesorder.accountName,
       ordernummers: id,
     }).then(e => e.body);
-    // console.log(data);
+    console.log(data);
     const [bedrijven] = data;
     const [accountCompany] = bedrijven;
     const invoiceNr = accountCompany.invoiceNr;
@@ -1623,7 +1623,10 @@ $().on('load', async e => {
   aim.config.import.forEach(imp => {
     for (let tab of imp.tabs) {
       tab.callback = async row => {
+        // console.log(row);
+        // return;
         await $().url('https://aliconnect.nl/api/abis/data')
+        .query({request_type: 'art'})
         .input(row)
         // .input({
         //   code: row.code,
@@ -1654,7 +1657,7 @@ $().on('load', async e => {
         //   discountCode: row.discountCode,
         //   data: row,
         // })
-        .query({request_type: 'art'}).post()
+        .post()
         .then(e => e.body ? console.error(e.body) : null);
       }
     }
@@ -1926,10 +1929,16 @@ $().on('load', async e => {
       'Facturen Actueel': e => aim.list('invoice',{
         $filter: `isbetaald EQ 0`,
         $order: `nr DESC`,
+        $search: '*',
       }),
       'Facturen Betaald': e => aim.list('invoice',{
         $filter: `isbetaald EQ 1`,
         $order: `nr DESC`,
+        $search: '',
+      }),
+      'Facturen Alles': e => aim.list('invoice',{
+        $order: `nr DESC`,
+        $search: '',
       }),
       Afas: {
         'Export Facturen Airo': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
@@ -2928,30 +2937,30 @@ $().on('load', async e => {
       },
     },
     Abis: {
-      Klanten() {
-        aim.list('client');
-      },
-      Pakbonnen() {
-        aim.list('salesorder');
-      },
-      Pakbon_regels() {
-        aim.list('salesorderrow');
-      },
-      Fakturen() {
-        aim.list('invoice');
-      },
       Producten() {
         aim.list('prod');
       },
-      Artikelen() {
-        aim.list('art');
-      },
-      Klant_artikelen() {
-        aim.list('clientart');
-      },
-      Bedrijven() {
-        aim.list('account');
-      },
+      // Klanten() {
+      //   aim.list('client');
+      // },
+      // Pakbonnen() {
+      //   aim.list('salesorder');
+      // },
+      // Pakbon_regels() {
+      //   aim.list('salesorderrow');
+      // },
+      // Fakturen() {
+      //   aim.list('invoice');
+      // },
+      // Artikelen() {
+      //   aim.list('art');
+      // },
+      // Klant_artikelen() {
+      //   aim.list('clientart');
+      // },
+      // Bedrijven() {
+      //   aim.list('account');
+      // },
     },
     Overig: {
       MagazijnScannerKaart() {
@@ -3076,7 +3085,7 @@ $().on('load', async e => {
           const rowStart = tab.colRow;
 
           for (var name in tab.cols) {
-            if (String(tab.cols[name]).match(/return /)) {
+            if (typeof tab.cols[name] !== 'function' && String(tab.cols[name]).match(/return /)) {
               tab.cols[name] = new Function('row', tab.cols[name]);
             }
           }

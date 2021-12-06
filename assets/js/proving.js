@@ -880,7 +880,7 @@ $().on('load', async e => {
     const [clientInvoices,clientOrders,rows] = factuurData;
     const [invoice] = clientInvoices;
     const invoiceNr = invoice.nr;
-    const from = `invoice@${invoice.accountCompanyName.toLowerCase()}.nl`;
+    const from = `invoice@${invoice.accountName.toLowerCase()}.nl`;
     const maildata = {
       from: from,
       bcc: from,
@@ -1266,6 +1266,101 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.art.app = {
     header: artHeader,
+  }
+  aim.config.components.schemas.product.app = {
+    header(row){
+      const elem = $('div').class('price');
+
+      elem.append(
+        $('div').text(
+          row.content,
+          row.contentUnit,
+        ),
+        $('div').text(
+          row.listPrice,
+          row.discount,
+        ),
+      );
+
+      console.log(row);
+      if (row.artId) {
+        elem.append(
+          $('div').text(
+            row.artUnit,
+            row.artSt,
+            row.artInh,
+            row.arteenh,
+            row.artBrand,
+          ),
+          $('div').text(
+            row.artBruto,
+            row.artInk,
+            row.artInkKort,
+            row.artInkNet,
+          ),
+          $('div').text(
+            row.artStockStart,
+            row.artStock,
+            row.artLoc1,
+            row.artLoc,
+          ),
+          $('div').text(
+            row.artProdGroup,
+            row.artBedrijf,
+          ),
+        );
+      }
+      if (row.purchaseId) {
+        elem.append(
+          $('div').text(
+            row.supplier,
+            row.supPackPrice,
+            row.supPartPrice,
+            row.supDiscount,
+          ),
+        );
+      }
+
+      return elem;
+
+
+
+      const myart = clientart.find(a => a.artId === row.id);
+      if (myart) {
+        row.discount = myart.clientDiscount;
+      }
+      row.listPrice = Number(row.listPrice);
+      row.purchaseDiscount = Number(row.purchaseDiscount);
+      if (row.purchaseDiscount = Number(row.purchaseDiscount)) {
+        row.purchasePrice = row.listPrice * (100 - row.purchaseDiscount) / 100;
+      } else if (row.purchasePrice = Number(row.purchasePrice)) {
+        row.purchaseDiscount = row.purchasePrice / row.listPrice * 100;
+      }
+      row.price = row.listPrice * (100 - row.discount) / 100;
+      // console.log(row);
+      // const elem = $('div').class('price');
+      if (row.discount) {
+        elem.class('price discount', myart ? 'client' : '').append(
+          $('span').attr('listprice', num(row.listPrice)),
+          $('span').attr('discount', num(-row.discount,0)),
+        );
+      }
+      elem.append(
+        $('span').attr('price', num(row.price)),
+        $('span').attr('fatprice', num(row.price * 1.21)),
+        row.purchasePrice ? $('span').attr('purchaseprice', num(row.purchasePrice)) : null,
+        row.purchaseDiscount ? $('span').attr('purchasediscount', num(row.purchaseDiscount)) : null,
+
+        $('span'),
+        elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
+          row.quant = Number(e.target.value);
+          console.log(row.quant);
+        }).on('click', e => {
+          e.stopPropagation();
+        }),
+      );
+      return elem;
+    },
   }
 
   const productlist = [

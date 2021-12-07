@@ -15,7 +15,7 @@ $().on('load', async e => {
   aim.om.treeview({
     'Shop': {
       Producten: e => aim.list('product',{
-        $filter: `CompanyId EQ 6133 || CompanyId EQ NULL`,
+        $filter: `keyGroup EQ 'Proving' && clientName='Heuvel'`,
         $search: ``,
       }),
       Boodschappenlijst() {
@@ -1317,6 +1317,13 @@ $().on('load', async e => {
             row.supPackPrice,
             row.supPartPrice,
             row.supDiscount,
+          ),
+        );
+      }
+      if (row.clientDiscount) {
+        elem.append(
+          $('div').text(
+            row.clientDiscount,
           ),
         );
       }
@@ -3223,7 +3230,7 @@ $().on('load', async e => {
       }
     }
     // return;
-    // allrows = allrows.filter(entry => entry[0].partCode);
+    allrows = allrows.filter(entry => entry[0].keyGroup && entry[0].keyName);
     // console.log(allrows);
     var max = allrows.length;
     var i = 0;
@@ -3232,6 +3239,7 @@ $().on('load', async e => {
       // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
       $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code);
       try {
+        console.log(row);
         await tab.callback(row);
       } catch (err) {}
       // return;

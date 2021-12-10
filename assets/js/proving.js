@@ -1,13 +1,21 @@
+function gettext(selector){
+  return (selector.match(/\\w+/)||[]).shift();
+}
+function getnumber(selector){
+  return (selector.match(/\\d+/)||[]).shift()
+}
+
 $().on('load', async e => {
   console.log('JA', aim.config);
-
   let clientart = [];
   let clientName = [];
+
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
     $('button.account>span').text(clientName);
     [clientart] = await fetch('https://aliconnect.nl/api/abis/data?request_type=clientArt&clientName=' + clientName).then(res => res.json());
-    // console.log('JA', clientart);
+    aim.idfilter = `clientName EQ '${clientName}'`;
+    // console.log('JA', clientname);
 
   }
 
@@ -15,7 +23,7 @@ $().on('load', async e => {
   aim.om.treeview({
     'Shop': {
       Producten: e => aim.list('product',{
-        $filter: `keyGroup EQ 'Proving' && clientName='Heuvel'`,
+        $filter: `clientName='${clientName}' && discount NE NULL`,
         $search: ``,
       }),
       Boodschappenlijst() {
@@ -32,8 +40,9 @@ $().on('load', async e => {
       // },
     },
   });
+
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
-  selectClient(localStorage.getItem('clientName'));
+  await selectClient(localStorage.getItem('clientName'));
   // $('button.account>span').text(clientName);
   $('.abtn.menu>ul')
   .on('click', e => e.stopPropagation())
@@ -1270,67 +1279,76 @@ $().on('load', async e => {
   aim.config.components.schemas.product.app = {
     header(row){
       const elem = $('div').class('price');
+      var price;
 
+      row.orderContent = row.orderContent == 1 ? row.partContent || 1 : row.orderContent;
+
+      row.orderPackPrice = row.orderPackPrice || row.orderPartPrice * row.orderContent;
+      row.orderDiscount = row.artikelInkKorting;
+      if (!row.orderDiscount) {
+        row.orderPackPrice *= 1.5;
+        row.orderDiscount = 50;
+      }
+
+      row.orderPartPrice = row.orderPackPrice / row.orderContent;
+      if (row.supplier) {
+        var discount = row.orderDiscount;
+        var style = 'color:lightgreen;font-size:1.2em';
+        elem.append(
+          $('div').append(
+            $('span').text('€ ' + num(row.orderPackPrice)).style('text-decoration:line-through;'),
+            ' (-' + num(discount).replace(/,00$|0$/g,'') + '%) € ',
+            $('span').text(num(price = row.orderPackPrice*(100-discount)/100)).style(style),
+            ' ',
+            row.orderContent == 1 ? null : ' € ' + num(row.orderPartPrice*(100-discount)/100) + '/' + row.orderContentUnit,
+            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+            row.supplier,
+          ),
+        );
+      }
+      var discount = row.orderDiscount * 0.4;
+      var style = 'color:lightblue;font-size:1.2em';
       elem.append(
-        $('div').text(
-          row.content,
-          row.contentUnit,
-        ),
-        $('div').text(
-          row.listPrice,
-          row.discount,
+        $('div').append(
+          $('span').text('€ ' + num(row.orderPackPrice)).style('text-decoration:line-through;'),
+          ' (-' + num(discount).replace(/,00$|0$/g,'') + '%) € ',
+          $('span').text(num(price = row.orderPackPrice*(100-discount)/100)).style(style),
+          ' ',
+          row.orderContent == 1 ? null : ' € ' + num(row.orderPartPrice*(100-discount)/100) + '/' + row.orderContentUnit,
+          ' (€ ' + num(price * 1.21) + ' incl. btw) ',
         ),
       );
-
-      console.log(row);
-      if (row.artId) {
-        elem.append(
-          $('div').text(
-            row.artUnit,
-            row.artSt,
-            row.artInh,
-            row.arteenh,
-            row.artBrand,
-          ),
-          $('div').text(
-            row.artBruto,
-            row.artInk,
-            row.artInkKort,
-            row.artInkNet,
-          ),
-          $('div').text(
-            row.artStockStart,
-            row.artStock,
-            row.artLoc1,
-            row.artLoc,
-          ),
-          $('div').text(
-            row.artProdGroup,
-            row.artBedrijf,
-          ),
-        );
-      }
-      if (row.purchaseId) {
-        elem.append(
-          $('div').text(
-            row.supplier,
-            row.supPackPrice,
-            row.supPartPrice,
-            row.supDiscount,
-          ),
-        );
-      }
       if (row.clientDiscount) {
+        var discount = row.clientDiscount;
+        var style = 'color:orange;font-size:1.2em';
+
         elem.append(
-          $('div').text(
-            row.clientDiscount,
+          $('div').append(
+            $('span').text('€ ' + num(row.orderPackPrice)).style('text-decoration:line-through;'),
+            ' (-' + num(discount).replace(/,00$|0$/g,'') + '%) € ',
+            $('span').text(num(price = row.orderPackPrice*(100-discount)/100)).style(style),
+            ' ',
+            row.orderContent == 1 ? null : ' € ' + num(row.orderPartPrice*(100-discount)/100) + '/' + row.orderContentUnit,
+            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+            row.clientName,
           ),
         );
       }
+      elem.append(
+        $('div').append(
+          'Verzending in: ',
+          $('b').text(row.verzending).style('color:green;'),
+          elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
+            row.quant = Number(e.target.value);
+            console.log(row.quant);
+          }).on('click', e => {
+            e.stopPropagation();
+          }),
+        )
+      );
+
 
       return elem;
-
-
 
       const myart = clientart.find(a => a.artId === row.id);
       if (myart) {
@@ -1366,6 +1384,115 @@ $().on('load', async e => {
           e.stopPropagation();
         }),
       );
+      return elem;
+    },
+    header(row){
+      const elem = $('div').class('price');
+      var price;
+      var listPrice = row.inkPackPrice || row.purchaseListPrice || row.listPrice;
+
+      if (row.purchaseListPrice && row.purchaseListPrice != listPrice) {
+        elem.append(
+          $('div').append(
+            'inkoop bruto gewijzigd ',
+            $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
+            ' € ',
+            $('span').text(num(price = listPrice)).style('color:red;font-size:1.2em'),
+          ),
+        );
+      }
+      row.purchaseDiscount = Math.round( row.purchaseDiscount * 10) / 10;
+
+      var style = 'color:lightgreen;';
+      elem.append(
+        $('div').style('font-size:0.8em;').append(
+          'Inkoop € ',
+          $('span').text(num(price = listPrice*(100-row.purchaseDiscount)/100)).style(style),
+          ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+          // $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
+          ' korting ',
+          $('span').style('color:green;').text(num(row.purchaseDiscount).replace(/,00$|0$/g,'') + '%'),
+          row.inkPackPrice ? '' : ' (niet gekoppeld)',
+        ),
+      );
+
+      discount = Math.floor( ( row.discount || row.purchaseDiscount * 0.4) * 10 ) / 10;
+      if (!row.purchaseDiscount) {
+        listPrice *= 2;
+        discount = 20;
+      }
+
+
+      var style = 'color:orange;';
+      if (row.clientArtDiscount) {
+        discount = row.clientArtDiscount;
+        elem.append(
+          $('div').append(
+            $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
+            ' € ',
+            $('span').text(num(price = listPrice*(100-discount)/100)).style(style+'font-size:1.2em;'),
+            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+            ' korting ',
+            $('span').style(style).text(num(discount).replace(/,00$|0$/g,'') + '%')
+            ,' (alleen voor jou)',
+          ),
+        );
+      } else {
+        var style = 'color:lightblue;';
+        elem.append(
+          $('div').append(
+            $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
+            ' € ',
+            $('span').text(num(price = listPrice*(100-discount)/100)).style(style+'font-size:1.2em;'),
+            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+            ' korting ',
+            $('span').style(style).text(num(discount).replace(/,00$|0$/g,'') + '%')
+          ),
+        );
+      }
+
+
+      var meerpack = 12;
+      discount = Math.floor(discount * 1.8 * 10) / 10;
+      listPrice *= meerpack;
+      // var style = 'color:blue;';
+      elem.append(
+        $('div').style('font-size:0.8em;').append(
+          meerpack, ' stuks ',
+          $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
+          ', € ',
+          $('span').text(num(price = listPrice*(100-discount)/100)).style(style),
+          ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+          ' korting ',
+          $('span').style(style).text(num(discount).replace(/,00$|0$/g,'') + '%')
+        ),
+      );
+      // } else if (listPrice) {
+      //   elem.append(
+      //     $('div').append(
+      //       '€ ',
+      //       $('span').text(num(price = listPrice)).style('color:lightblue;font-size:1.2em'),
+      //       ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+      //     ),
+      //   );
+      // }
+
+
+      elem.append(
+        $('div').append(
+          $('span').style('font-size:0.8em;').append(
+            'Verzending in: ',
+            $('b').text(row.verzending).style('color:green;'),
+          ),
+          elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
+            row.quant = Number(e.target.value);
+            console.log(row.quant);
+          }).on('click', e => {
+            e.stopPropagation();
+          }),
+        )
+      );
+
       return elem;
     },
   }
@@ -1669,6 +1796,7 @@ $().on('load', async e => {
     if (s && s !== 'NB') return s.replace(/™|®/g,'').replace(/  /g,' ').trim();
   }
 
+
   // aim.config.components.schemas.levart.app = {
   //   precompile: artrow,
   //   header: artHeader,
@@ -1915,6 +2043,12 @@ $().on('load', async e => {
     })
   }
   aim.om.treeview({
+    Inkoop: {
+      Producten: e => aim.list('product',{
+        $filter: `clientName='${clientName}'`,
+        $search: ``,
+      }),
+    },
     CRM: {
       Organisaties: e => aim.list('company',{
         $filter: `archivedDateTime EQ NULL`,
@@ -2020,11 +2154,6 @@ $().on('load', async e => {
         $filter: `prodStockLocation EQ 'k-m' && sendDateTime EQ NULL && isQuote <> 1 && isOrder = 1`,
         // $order: `nr DESC`,
         $top: `100`,
-      }),
-    },
-    Inkoop: {
-      Artikelen: e => aim.list('levart',{
-        $search: ``,
       }),
     },
     Administratie: {
@@ -3155,6 +3284,7 @@ $().on('load', async e => {
         const result = await readBinary(file);
         const workbook = XLSX.read(result, { type: 'binary' });
         for (let tab of fileConfig.tabs) {
+          if (tab.disabled || !workbook.Sheets[tab.tabname]) continue;
           $('span.main').text('import:', file.name, tab.tabname);
 
           // return;
@@ -3182,66 +3312,66 @@ $().on('load', async e => {
             toprow[c] = rowvalue(tab.colRow,c);
           }
           // console.log(toprow);
-          const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
-          const infoElem = $('footer>.main');
+          // const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
+          // const infoElem = $('footer>.main');
           const rowStart = tab.colRow;
-
-          for (var name in tab.cols) {
-            if (typeof tab.cols[name] !== 'function' && String(tab.cols[name]).match(/return /)) {
-              tab.cols[name] = new Function('row', tab.cols[name]);
+          for (let cols of tab.cols) {
+            for (var name in cols) {
+              if (typeof cols[name] !== 'function' && String(cols[name]).match(/return /)) {
+                cols[name] = new Function('row', cols[name]);
+              }
             }
-          }
           // console.log(tab.cols);
+            for (var r = tab.colRow+1; r<=rowEnd; r++) {
+              let row;
+              for (var name in cols) {
+                var value;
+                if (Array.isArray(cols[name])) {
+                  value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+                  // console.log(name, tab.cols[name]);
+                } else if (typeof cols[name] === 'function') {
+                  try {
+                    value = cols[name](row) || '';
+                  } catch(err) {
 
-
-          for (var r = tab.colRow+1; r<=rowEnd; r++) {
-            progressElem.value(r);
-            let row;
-            for (var name in tab.cols) {
-              var value;
-              if (Array.isArray(tab.cols[name])) {
-                value = tab.cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
-                // console.log(name, tab.cols[name]);
-              } else if (typeof tab.cols[name] === 'function') {
-                try {
-                  value = tab.cols[name](row) || '';
-                } catch(err) {
-
+                  }
+                } else if (toprow.includes(name)) {
+                  value = rowvalue(r, toprow.indexOf(name));
+                } else if (toprow.includes(cols[name])) {
+                  value = rowvalue(r, toprow.indexOf(cols[name]));
+                } else {
+                  value = cols[name];
                 }
-              } else if (toprow.includes(name)) {
-                value = rowvalue(r, toprow.indexOf(name));
-              } else if (toprow.includes(tab.cols[name])) {
-                value = rowvalue(r, toprow.indexOf(tab.cols[name]));
-              } else {
-                value = tab.cols[name];
+                if (value !== undefined) {
+                  (row = row || {})[name] = value;
+                }
               }
-              if (value !== undefined) {
-                (row = row || {})[name] = value;
+              if (row) {
+                // console.log(row);
+                // return;
+                data.rows.push(row);
+                allrows.push([row, tab]);
               }
-            }
-            if (row) {
-              // console.log(row);
-              // return;
-              data.rows.push(row);
-              allrows.push([row, tab]);
-            }
-          };
+            };
+          }
         }
       }
     }
     // return;
-    allrows = allrows.filter(entry => entry[0].keyGroup && entry[0].keyName);
+    allrows = allrows.filter(entry => entry[0].packKeyGroup && entry[0].packKeyName && (entry[0].packPrice || entry[0].partPrice));
     // console.log(allrows);
     var max = allrows.length;
     var i = 0;
     const progressElem = $('footer>progress').max(max).value(i);
     for (var [row,tab] of allrows) {
       // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
-      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code);
+      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.packKeyGroup, row.packKeyName, row.partKeyGroup, row.partKeyName);
       try {
-        console.log(row);
+        // console.log(row);
         await tab.callback(row);
-      } catch (err) {}
+      } catch (err) {
+        console.error(row);
+      }
       // return;
       progressElem.value(++i);
     }

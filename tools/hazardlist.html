@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link href="https://aliconnect.nl/sdk/src/css/web.css" rel="stylesheet" />
+  <script src="https://aliconnect.nl/sdk/src/js/aim.js" client_id="cac652da-dcdc-455a-a0de-e32bac08ea06"></script>
+  <script src="https://aliconnect.nl/sdk/src/js/web.js"></script>
+  <script>
+    function num(value, dig = 2){
+      return new Intl.NumberFormat('nl-NL', { minimumFractionDigits: dig, maximumFractionDigits: dig }).format(value);
+    }
+    $().on('load', async e => {
+      const [rows] = await $().url('https://aliconnect.nl/api/abis/data').query({
+        request_type: 'hazardlist',
+      }).get().then(e => e.body);
+      rows.forEach(row => {
+        row.SafeLocation = String(row.StorageLocation.match(/../g).map(v => Number(v)).slice(1).shift());
+      });
+      rows.sort((a,b) => a.SafeLocation.localeCompare(b.SafeLocation) || a.Title.localeCompare(b.Title))
+      console.log(rows);
+      var tot=0;
+      $(document.body).append(
+        $('table').append(
+        $('thead').append(
+        $('tr').append(
+        $('th').text('Locatie'),
+        $('th').text('Aantal'),
+        $('th').text('Titel'),
+        // $('th').text('Inh'),
+        // $('th').text('Eenh'),
+        // $('th').text('Aantal'),
+        // $('th').text('Verpakking Eenheid'),
+
+        // $('th').text('Kg/Eenh'),
+        $('th').text('VOS(gr/l)'),
+        $('th').text('VOS(kg)'),
+        // $('th').text('VOS Waarde'),
+        // $('th').text('VOS Tekst'),
+        $('th').text('SDS'),
+        )
+        ),
+        $('tbody').append(
+          rows.map(row => $('tr').append(
+          $('td').align('right').text(row.SafeLocation),
+          $('td').align('right').text(row.Stock),
+          $('td').text(row.Title.replace(/\r|\n/g,'')),
+          // $('td').text(row.PartContent),
+          // $('td').text(row.PartContentUnit),
+          // $('td').text(row.Content),
+          // $('td').text(row.Unit),
+
+          // $('td').align('right').text(row.PartWeight),
+          $('td').align('right').append(
+            row.PartVosPerEenh ? num(row.PartVosPerEenh,0) : ''
+          ),
+          $('td').align('right').append(
+            row.PartVosPerEenh ? num(row.tot = row.PartVosPerEenh * row.Stock * (row.PartContent || 1) / 1000,1,tot+=row.tot) : ''
+          ),
+          // $('td').text(row.PartVos),
+          // $('td').text(row.PartVosTekst),
+          $('td').append(!row.InkSds ? null : $('a').text('SDS').target('spec').href(row.InkSds)),
+          )),
+          $('tr').append(
+          $('td'),
+          $('td'),
+          $('td'),
+          $('td'),
+          $('td'),
+          $('td').align('right').text(num(tot,1)),
+          $('td').text('kg'),
+          )
+        ),
+      ),
+      )
+    });
+  </script>
+</head>
+<body>
+</body>
+</html>

@@ -1484,7 +1484,9 @@ $().on('load', async e => {
             'Verzending in: ',
             $('b').text(row.verzending).style('color:green;'),
           ),
-          elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
+          elem.input = $('input')
+          .tabindex(-1)
+          .type('number').step(1).min(0).value(row.quant).on('change', e => {
             row.quant = Number(e.target.value);
             console.log(row.quant);
           }).on('click', e => {
@@ -1747,20 +1749,10 @@ $().on('load', async e => {
     match('Dichtheid', /(\d+\s*?(g\/m²))/i);
     match('Hittebestendig', /(\d+°)/);
     match('Schroefdraad', /(M\d+\s*?x[\d|,]+)/i);
-
-    // match('Afmeting', /(\d+?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m|)?\s*x\s*M\d+)/i);
-    // match('Afmeting', /((\d[\d|\.|,\/]*)?(mm|)?([\s|x]*|)?([\d|\.|,\/]+|)?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m))/i);
     match('Dikte', /(\d+\s*?(µm|mµ|µ))/i);
     match('Diameter', /Ø((\s|)(\d[\d|\.|,]+)(\s|)(mm|))/i);
     match('Afmeting', /[^-]\b(\d+(\.\d+|,\d+|[\/|\d]+)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m|)(\s|)(x|)(\s|)([\d|\.|,|\/]+|)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m|)(\s|)(x|)(\s|)([\d|\.|,|\/]+|)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m)\b)/i);
-
-    // match('Afmeting', /(([\d|\.|,|\/]+?)(\s*)?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m|)(|)\s*?(x|-|\/)\s*|)?(([\d|\.|,]+?)\s*?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m|)\s*?(x|-|\/)\s*|)?([\d|\.|,]+?)\s*?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m))/i);
-
-    // match('Afmeting', /(([\d|\.|,|\/]+?)\s*?(?:x|mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m))\b/i);
-    // match('Afmeting', /([\d]+\sx\s[\d]+)/i);
-
     match('Gaten', /(\d+)\s*?(gaten\s\d+mm|gaten|gat|gaat)/i);
-    // match('maat', /(\b(M|L|S|XL|XXL|Large|Medium|Small|XLarge|XXLarge)\b\s*?[\d|-]+)/);
     match('Maat', /\b(M|L|S|XL|XXL|Large|Medium|Small|XLarge|XXLarge)\b/);
     match('Grofte', /(P\d+)/i);
     match('Grofte', /((grofte|korrel)\s*?\d+)/i, /grofte|korrel|\s/);
@@ -1772,6 +1764,16 @@ $().on('load', async e => {
         options[name] = row[name] = row[name].toLowerCase().replace(/([\d|\.|\/]+)/, ' $1 ').replace(/x/, ' x ').replace(/\s\s/, ' ').replace(/µm|mµ|µ/, 'µm')
       }
     })
+
+    // match('Afmeting', /(\d+?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m|)?\s*x\s*M\d+)/i);
+    // match('Afmeting', /((\d[\d|\.|,\/]*)?(mm|)?([\s|x]*|)?([\d|\.|,\/]+|)?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m))/i);
+
+    // match('Afmeting', /(([\d|\.|,|\/]+?)(\s*)?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m|)(|)\s*?(x|-|\/)\s*|)?(([\d|\.|,]+?)\s*?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m|)\s*?(x|-|\/)\s*|)?([\d|\.|,]+?)\s*?(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m))/i);
+
+    // match('Afmeting', /(([\d|\.|,|\/]+?)\s*?(?:x|mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|m))\b/i);
+    // match('Afmeting', /([\d]+\sx\s[\d]+)/i);
+
+    // match('maat', /(\b(M|L|S|XL|XXL|Large|Medium|Small|XLarge|XXLarge)\b\s*?[\d|-]+)/);
 
 
     // if (match = row.title.match(/([\d|\.|,]+\s*x\s*[\d|\.|,]+)/i)) {
@@ -2042,6 +2044,637 @@ $().on('load', async e => {
       )
     })
   }
+  function readBinary(file){
+    return new Promise((resolve,fail) => {
+      const reader = new FileReader();
+      reader.readAsBinaryString(file);
+      // reader.onprogress = e => console.log(e);
+      reader.onload = e => resolve(e.target.result);
+    })
+  }
+  async function importFiles1(files){
+    let allrows = [];
+    files = Array.from(files);
+    for (var file of files) {
+      $('span.main').text('import:', file.name);
+      if (file.name.match(/\.xls/)) {
+        const result = await readBinary(file);
+        const workbook = XLSX.read(result, { type: 'binary' });
+        for (let sheetname of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetname];
+          if (sheet['!ref']) {
+            let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
+            // console.log(sheet['!ref'], colEnd,rowEnd);
+            colEnd = XLSX.utils.decode_col(colEnd);
+            let maxCol = 0;
+            const rows = [];
+            for (var r = 1; r<=rowEnd; r++) {
+              const row = [];
+              for (var c=0; c<=colEnd; c++) {
+                var sheetcell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
+                var cell = null;
+                if (sheetcell) {
+                  maxCol = Math.max(maxCol,c);
+                  if (sheetcell.l) {
+                    cell = {
+                      v: sheetcell.l.display,
+                      href: sheetcell.l.Target,
+                    }
+                  } else {
+                    cell = {
+                      v: sheetcell.v,
+                    }
+                  }
+                }
+                row.push(cell);
+              }
+              rows.push(row);
+            }
+            rows.forEach(row => row.length = maxCol + 1);
+            // console.log(file.name, sheetname, maxCol, rows);
+            $('span.main').text('upload:', file.name, sheetname);
+            await $().url('https://aliconnect.nl/api/abis/data')
+            .input(rows)
+            .query({
+              request_type: 'importdata',
+              filename: file.name + '-' + sheetname,
+            })
+            .post()
+            .then(console.log)
+          }
+        }
+      }
+      $('span.main').text('import done');
+    }
+  }
+  async function importFiles(files){
+    let allrows = [];
+    files = Array.from(files);
+    for (var file of files) {
+      $('span.main').text('import:', file.name);
+      console.log(file.name, aim.config.import);
+      for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename.toLowerCase()))) {
+        const result = await readBinary(file);
+        const workbook = XLSX.read(result, { type: 'binary' });
+        for (let tab of fileConfig.tabs) {
+          if (tab.disabled || !workbook.Sheets[tab.tabname]) continue;
+          $('span.main').text('import:', file.name, tab.tabname);
+          console.log(tab);
+          // return;
+          const data = {
+            rows: [],
+          };
+          const prefixArtcode = tab.artcode || '';
+          tab.colRow = tab.colRow || 1;
+          const sheet = workbook.Sheets[tab.tabname];
+          const toprow = [];
+          // console.log(sheet);
+          let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
+          colEnd = XLSX.utils.decode_col(colEnd);
+          function rowvalue(r,c){
+            var cell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
+            if (cell) {
+              if (cell.l) {
+                return `(${cell.l.display})[${cell.l.Target}]`;
+              }
+              // console.log(c,r,cell)
+              return cell.v;
+            }
+          }
+          for (var c=0; c<=colEnd; c++) {
+            toprow[c] = rowvalue(tab.colRow,c);
+          }
+          // console.log(toprow);
+          // const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
+          // const infoElem = $('footer>.main');
+          const rowStart = tab.colRow;
+          for (let cols of tab.cols) {
+            for (var name in cols) {
+              if (typeof cols[name] !== 'function' && String(cols[name]).match(/return /)) {
+                cols[name] = new Function('row', cols[name]);
+              }
+            }
+          // console.log(tab.cols);
+            for (var r = tab.colRow+1; r<=rowEnd; r++) {
+              let row;
+              for (var name in cols) {
+                var value;
+                if (Array.isArray(cols[name])) {
+                  value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+                  // console.log(name, tab.cols[name]);
+                } else if (typeof cols[name] === 'function') {
+                  try {
+                    value = cols[name](row) || '';
+                  } catch(err) {
+
+                  }
+                } else if (toprow.includes(name)) {
+                  value = rowvalue(r, toprow.indexOf(name));
+                } else if (toprow.includes(cols[name])) {
+                  value = rowvalue(r, toprow.indexOf(cols[name]));
+                } else {
+                  value = cols[name];
+                }
+                if (value !== undefined) {
+                  (row = row || {})[name] = value;
+                }
+              }
+              if (row) {
+                // console.log(row);
+                // return;
+                data.rows.push(row);
+                allrows.push([row, tab]);
+              }
+            };
+          }
+        }
+      }
+    }
+    // return;
+    console.log(allrows);
+    allrows = allrows.filter(entry => entry[0].packKeyGroup && entry[0].packKeyName && (entry[0].packPrice || entry[0].partPrice));
+    console.log(allrows);
+    var max = allrows.length;
+    var i = 0;
+    const progressElem = $('footer>progress').max(max).value(i);
+    for (var [row,tab] of allrows) {
+      // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
+      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.packKeyGroup, row.packKeyName, row.partKeyGroup, row.partKeyName);
+      try {
+        // console.log(row);
+        await tab.callback(row);
+      } catch (err) {
+        console.error(row);
+      }
+      // return;
+      progressElem.value(++i);
+    }
+    $('span.main').text('import done');
+    progressElem.value(null);
+    // alert('Import gereed');
+  }
+  $(window).on('popstate', async e => {
+    const documentSearchParams = new URLSearchParams(document.location.search);
+    const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
+    if (!documentSearchParams.get('l') && !searchParams.get('l') && searchParams.get('$search')) {
+      aim.search(searchParams.get('$search'));
+
+      // aim.api('/abis/data').query({request_type: 'article',$search: searchParams.get('$search')}).get().then(response => response.json().then(data => aim.listview(data.rows)));
+    }
+  })
+  $(window).on('dragover', e => e.preventDefault())
+  $(window).on('drop', async e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const data = e.dataTransfer || e.clipboardData;
+    if (data.types.includes('Files')) {
+      importFiles(data.files);
+      // const config = await fetch('https://aliconnect.nl/yaml.php', {
+      //   method: 'POST',
+      //   body: await fetch('config/import.yaml').then(res => res.text()),
+      // }).then(res => res.json());
+      // console.log(1, config, files);
+    }
+  });
+  function s2ab(s) {
+    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    var view = new Uint8Array(buf);  //create uint8array as viewer
+    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    return buf;
+  };
+  function toExcel() {
+    var wb = XLSX.utils.book_new();
+    wb.Props = {
+      Title: "Proving " + ws_title,
+      Subject: ws_title,
+      Author: "Proving",
+      CreatedDate: new Date(2017,12,19)
+    };
+    wb.SheetNames.push(ws_title);
+    var ws = XLSX.utils.aoa_to_sheet(ws_data);
+    ws['!cols'] = ws_cols;
+    wb.Sheets[ws_title] = ws;
+    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+    // saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), ws_title + ' Proving.xlsx');
+    $('a')
+    .download(ws_title + ' Proving.xlsx')
+    .rel('noopener')
+    .href(URL.createObjectURL(new Blob([s2ab(wbout)],{type:"application/octet-stream"})))
+    .click()
+    .remove();
+  };
+  const cols = {
+    title: {h:'Titel', t:'s', wch:80, },
+    // row.title.replace(/\r|\n/g,''),
+    inkPackPrice: { t:'n', z:'.00', wch:10, },
+    listPrice: {h:'Cat.Prijs' , t:'n', z:'.00', },
+    discount: {h:'Kort', t:'n', z:'.0', },
+    purchaseListPrice: {  },
+    purchaseDiscount: {  },
+    price: {calc:1, h:'Excl', t:'n', z:'.00', },
+    vatPrice: { h:'Incl', calc: row => row.price * 1.21, t:'n', z:'.00' },
+    partArtNr: { h:'Product Code', },
+    id: { h:'Artikel NR', },
+    product: { h:'Product', },
+    categorie: { h:'Categorie', },
+    toepassing: { h:'Toepassing', },
+    partBrand: { h:'Merk', },
+    partSerie: { h:'Serie', },
+    partAfmeting: { h:'Afm', },
+    partDiameter: { h:'Diameter', },
+    partGaten: { h:'Gaten', },
+    partLengte: { h:'Lengte', },
+    partGrofte: { h:'Grofte', },
+    partMaat: { h:'Maat', },
+    partKleur: { h:'Kleur', },
+    partOpening: { h:'Opening', },
+    partSds: { h:'Sds', },
+    partTds: { h:'Tds', },
+    partCode: { h:'Code', },
+    partDescription: { h:'Oms', },
+    partVosPerEenh: { h:'VOS', },
+    partContent: { h:'PI', },
+    partContentUnit: { h:'PIPE', },
+
+    stelling: { h:'Stel', calc: 1, t:'n',},
+    vak: { h:'Vak', calc: 1, t:'n',},
+    schap: { h:'Schap', calc: 1, t:'n',},
+
+    verzending: { h:'Verzending', },
+    ean: { h:'EAN', },
+    supplier: { h:'Leverancier', },
+    orderCode: { h:'OrderCode', },
+    minVoorraad: { h:'MV', t:'n',z:'0', },
+    stock: { h:'VR', t:'n',z:'0', },
+    minBestelAantal: { h:'MBA', t:'n', z:'0', },
+    bestelAantal: { h:'BA', t:'n',z:'0', },
+    storageLocation: { },
+  }
+  async function artlist(title, colnames, filter, sortby){
+    // ws_data = data;
+    ws_title = title;
+    ws_cols = colnames.filter(n => cols[n].h).map(n=>cols[n]).map(c => Object({ wch: c.wch || 8}));
+    console.log(ws_cols);
+    // wscols =
+    //   {wch:80},
+    // ];
+
+    console.log(colnames);
+    const [rows] = await $().url('https://aliconnect.nl/api/abis/data').query({
+      request_type: 'artlist',
+      top: 2000,
+      filter: filter,
+      select: colnames.filter(n => cols[n] && !cols[n].calc).join(','),
+    }).get().then(e => e.body);
+    const productlist = [
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Hoofdbescherming', exp: /\b(Hoofdbescherming)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Lashandschoen', exp: /\b(Lashandschoen)\b/i, },
+
+      { toepassing: 'Lassen', name: 'Lasdeken', exp: /\b(Lasdeken)\b/i, },
+      { toepassing: 'Lassen', name: 'Laskap', exp: /\b(Laskap)\b/i, },
+      { toepassing: 'Lassen', name: 'Lasspatdeken', exp: /\b(Lasspatdeken)\b/i, },
+
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Helmschaal', exp: /\b(Helmschaal)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Helmschaalscharnierring', exp: /\b(Helmschaalscharnierring)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Beschermruit', exp: /\b(Beschermruit)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Vizierhelm', exp: /\b(Vizierhelm)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Hoofdkap', exp: /\b(Hoofdkap)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Luchtstroomdeflector', exp: /\b(Luchtstroomdeflector)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Veiligheidshelm', exp: /\b(Veiligheidshelm)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Lashelm', exp: /\b(Lashelm)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Helm', exp: /\b(Helm)\b/i, },
+
+      { toepassing: 'Lassen', name: 'Lasstaafjes', exp: /\b(Lasstaafjes)\b/i, },
+      { toepassing: 'Lassen', name: 'Lasfilterhouder', exp: /\b(Lasfilterhouder)\b/i, },
+      { toepassing: 'Lassen', name: 'Glasreiniger', exp: /\b(Glasreiniger)\b/i, },
+
+      { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Lasrookmasker', exp: /\b(Lasrookmasker)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Oordoppen', exp: /\b(Oordoppen)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Keel- en oorbescherming', exp: /\b(Keel- en oorbescherming)\b/i, },
+      { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Stofmasker', exp: /\b(Stofmasker)\b/i, },
+
+      { toepassing: 'Plamuren', productgroep: 'Matten', name: 'Glasvezelmat', exp: /\b(glasvezelmat)\b/i, },
+
+
+
+
+      { toepassing: 'Schuren', name: 'Klitteband Schuurschijf', exp: /(klitteb. schuursch.)/i },
+      { toepassing: 'Schuren', name: 'Schuurblok', exp: /\b(Schuurblok|Schuurblokje)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurschijf', exp: /\b(schuursch\.|schuurschijf|schuurschijven)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurrol', exp: /\b(Schuurrol)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurdoek', exp: /\b(Schuurdoekje|Schuurdoek)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurblad', exp: /\b(Schuurbladen|Schuurblad)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurpad', exp: /\b(Schuurpad)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurkurk', exp: /\b(Schuurkurk)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurpapier', exp: /(Schuurpapier|Schuurpap\.)/i },
+      { toepassing: 'Schuren', name: 'Schuurvel', exp: /\b(Schuurvel|Schuurvellen)/i },
+      { toepassing: 'Schuren', name: 'Schuurstrook', exp: /\b(Schuurstrook|Schuurstroken)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurband', exp: /\b(Schuurband)\b/i },
+      { toepassing: 'Schuren', name: 'Schuurvijl', exp: /\b(Schuurvijl)\b/i, },
+      { toepassing: 'Schuren', productgroep: 'Machines', name: 'Arm', exp: /\b(Arm)\b/i, },
+      { toepassing: 'Schuren', productgroep: 'Machines', name: 'Schuurmachine', exp: /\b(Schuurmachine)\b/i, },
+      { toepassing: 'Schuren', productgroep: 'Machines', name: 'Bandschuurmachine', exp: /\b(Bandschuurmachine)\b/i, },
+      { toepassing: 'Schuren', productgroep: 'Machines', name: 'Vlakschuurmachine', exp: /\b(Vlakschuurmachine)\b/i, },
+      { toepassing: 'Schuren', productgroep: 'Machines', name: 'Excenterschuurmachine', exp: /\b(Excenterschuurmachine)\b/i, },
+
+      { toepassing: 'Plamuren', productgroep: 'Gereedschap', name: 'Plamuurmes', exp: /\b(Plamuurmes)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Gereedschap', name: 'Plamuurrubber', exp: /\b(Plamuurrubber)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Gereedschap', name: 'Plamuurspatel', exp: /\b(Plamuurspatel)\b/i, },
+
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Polyester plamuur', exp: /\b(Polyester plamuur)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Spuitplamuur', exp: /\b(Spuitplamuur)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Metaalplamuur', exp: /\b(Metaalplamuur)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Acrylaatplamuur', exp: /\b(Acrylaatplamuur)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Glasvezelplamuur', exp: /\b(Glasvezelplamuur)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Fijnplamuur', exp: /\b(Fijnplamuur)\b/i, },
+      { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Plamuur', exp: /\b(Plamuur)\b/i, },
+
+      { toepassing: 'Diversen', name: 'Steunschijf', exp: /\b(Steunschijf)\b/i, },
+
+      { toepassing: 'Diversen', productgroep: 'Matten', name: 'Neerlegmat', exp: /\b(Neerlegmat)\b/i, },
+      { toepassing: 'Diversen', productgroep: 'Matten', name: 'Voetmat', exp: /\b(Voetmat|Voetmatten)\b/i, },
+      { toepassing: 'Diversen', productgroep: 'Matten', name: 'Entreemat', exp: /\b(Entreematten|Entreemat)\b/i, },
+
+      { toepassing: 'Kitten', name: 'Carrosseriekit', exp: /\b(Carrosseriekit)\b/i, },
+
+      { toepassing: 'Diversen', name: 'Spray', exp: /\b(Spray)\b/i, },
+      // { toepassing: 'Diversen', name: 'Vormbare Tape', exp: /\b(Vormbare Tape)\b/i, },
+      { toepassing: 'Diversen', name: 'Epoxylijm', exp: /\b(Epoxylijm)\b/i, },
+
+      { toepassing: 'Diversen', name: 'Veiligheidsbril', exp: /\b(Veiligheidsbril|Veiligheidsbrillen)\b/i, },
+
+      { toepassing: 'Diversen', name: 'Coating', exp: /\b(Coating)\b/i, },
+      { toepassing: 'Diversen', name: 'Stootpet', exp: /\b(Stootpet)\b/i, },
+      { toepassing: 'Diversen', name: 'Haak', exp: /\b(Haak)\b/i, },
+      { toepassing: 'Diversen', name: 'Lamellenborstel', exp: /\b(Lamellenborstel)\b/i, },
+      { toepassing: 'Diversen', name: 'Ontbraamwiel', exp: /\b(Ontbraamwiel)\b/i, },
+      { toepassing: 'Diversen', name: 'Wielspray', exp: /\b(Wielspray)\b/i, },
+      { toepassing: 'Diversen', name: 'Bumperspray', exp: /\b(Bumperspray)\b/i, },
+
+
+      { toepassing: 'Diversen', name: 'Ademslang', exp: /\b(Ademslang)\b/i, },
+
+      { toepassing: 'Diversen', name: 'Acculader', exp: /\b(Acculader)\b/i, },
+      { toepassing: 'Diversen', name: 'Acculaadstation', exp: /\b(Acculaadstation)\b/i, },
+      { toepassing: 'Diversen', name: 'Batterij', exp: /\b(Batterij)\b/i, },
+
+      { toepassing: 'Kleding', name: 'Bretels', exp: /\b(Bretels)\b/i, },
+
+      { toepassing: 'Diversen', name: 'Afsluitdeksel', exp: /\b(Afsluitdeksel)\b/i, },
+
+      { toepassing: 'Filter', name: 'Standaardfilter', exp: /\b(Standaardfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Hoofdfilter', exp: /\b(Hoofdfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Geurfilter', exp: /\b(Geurfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Gasfilter', exp: /\b(Gasfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Deeltjesfilter', exp: /\b(Deeltjesfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Voorfilter', exp: /\b(Voorfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Combifilter', exp: /\b(Combifilter)\b/i, },
+      { toepassing: 'Filter', name: 'Gas, damp en stoffilter', exp: /(Gas(-|)(,|)(\s|)damp(-|)(\s|)en stoffilter)/i, },
+      { toepassing: 'Filter', name: 'Gas en dampfilter', exp: /\b(Gas(-|)(\s|)en dampfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Filterzak', exp: /\b(Filterzak|Filterzakken)\b/i, },
+      { toepassing: 'Filter', name: 'Vloerfilter', exp: /\b(Vloerfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Plafondfilter', exp: /\b(Plafondfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Aanzuigfilter', exp: /\b(Aanzuigfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Lasfilter', exp: /\b(Lasfilter)\b/i, },
+      { toepassing: 'Filter', name: 'Filtersysteem', exp: /\b(Filtersysteem)\b/i, },
+
+      { toepassing: 'Filter', name: 'Filter', exp: /\b(Filter)\b/i, },
+
+      { toepassing: 'Slijpen', name: 'Netschijf', exp: /\b(Netschijf|Netschijven)\b/i },
+      { toepassing: 'Slijpen', name: 'Netstrook', exp: /\b(Netstrook|Netstroken)\b/i },
+
+      { toepassing: 'Slijpen', name: 'Doorslijpschijf', exp: /\b(Doorslijpschijf|Doorslijpschijven)\b/i },
+
+      { toepassing: 'Maskeren', name: 'Maskeerpapier', exp: /\b(Maskeerpapier)\b/i, },
+      { toepassing: 'Maskeren', name: 'Maskeerfolie', exp: /\b(Maskeerfolie)\b/i, },
+      { toepassing: 'Maskeren', name: 'Maskeertape', exp: /\b(Maskeertape|Maskeer tape)\b/i, },
+      { toepassing: 'Maskeren', name: 'Maskeerfilm', exp: /\b(Maskeerfilm)\b/i, },
+
+      { toepassing: 'Maskeren', name: 'Montagetape', exp: /\b(Montagetape)\b/i, },
+
+
+
+      { toepassing: 'Tapen', name: 'Dubbelzijdig tape', exp: /\b(dubbelz. tape)\b/i },
+      { toepassing: 'Tapen', name: 'Afplaktape', exp: /\b(Afplaktape)\b/i },
+      { toepassing: 'Tapen', name: 'Afdichtingstape', exp: /\b(Afdichtingstape)\b/i, },
+      { toepassing: 'Tapen', name: 'Dozensluittape', exp: /\b(Dozensluittape)\b/i, },
+      { toepassing: 'Tapen', name: 'Isolatietape', exp: /\b(isolatietape)\b/i, },
+      { toepassing: 'Tapen', name: 'Anti-Sliptape', exp: /\b(Anti-Sliptape)\b/i, },
+      { toepassing: 'Tapen', name: 'Schuimtape', exp: /\b(Schuimtape)\b/i, },
+      { toepassing: 'Tapen', name: 'Electrical Tape', exp: /\b(Electrical Tape)\b/i, },
+      { toepassing: 'Tapen', name: 'Tape', exp: /\b(Tape)\b/i, },
+
+
+      { toepassing: 'Mengen', name: 'Verpakkingsemmer', exp: /\b(Verpakkingsemmer)\b/i, },
+      { toepassing: 'Mengen', name: 'Filterdeksel', exp: /\b(Filterdeksel)\b/i, },
+
+      { toepassing: 'Mengen', name: 'Bewaarbeker', exp: /\b(Bewaarbeker)\b/i, },
+      { toepassing: 'Mengen', name: 'Schakelaar', exp: /\b(Schakelaar)\b/i, },
+      { toepassing: 'Mengen', name: 'Dispenser', exp: /\b(Dispenser)\b/i, },
+      { toepassing: 'Mengen', name: 'Deksel', exp: /\b(Deksel|Deksels)\b/i, },
+
+      { toepassing: 'Mengen', name: 'Mengbeker', exp: /\b(Mengbeker|Mengbekers)\b/i, },
+      { toepassing: 'Mengen', name: 'Bovenbeker', exp: /\b(Bovenbeker)\b/i, },
+      { toepassing: 'Mengen', name: 'Onderbeker', exp: /\b(Onderbeker)\b/i, },
+      { toepassing: 'Mengen', name: 'Mengset', exp: /\b(Mengset)\b/i, },
+      { toepassing: 'Mengen', name: 'Mengneus', exp: /\b(Mengneus)\b/i, },
+      { toepassing: 'Mengen', name: 'Mengmondstuk', exp: /\b(Mengmondstuk)\b/i, },
+
+      { name: 'Starterset', exp: /\b(Starterset)\b/i, },
+
+      { toepassing: 'Lakken', name: 'Primer', exp: /\b(Primer)\b/i, },
+
+
+      { toepassing: 'Lakken', name: 'Lakschaaf', exp: /\b(Lakschaaf|Lakschaafje)\b/i, },
+      { toepassing: 'Lakken', name: 'Verfzeef', exp: /\b(Verfzeefjes|Verfzeefje)\b/i },
+      { toepassing: 'Lakken', name: 'Roerlat', exp: /\b(Roerlatten|Roerlat)\b/i, },
+      { toepassing: 'Lakken', name: 'Verfborstel', exp: /\b(Verfborstel)\b/i, },
+
+      { toepassing: 'Lakken', name: 'Kleefband', exp: /\b(kleefband)\b/i, },
+      { toepassing: 'Lakken', name: 'Kleefdoek', exp: /\b(Kleefdoeken|Kleefdoek)\b/i, },
+
+      { toepassing: 'Polieren', name: 'Poliermachine', exp: /\b(Poliermachine)\b/i, },
+      { toepassing: 'Polieren', name: 'Polierpad', exp: /\b(Polierpad)\b/i, },
+      { toepassing: 'Polieren', name: 'Polierspons', exp: /\b(Polierspons)\b/i, },
+
+      { toepassing: 'Spuiten', name: 'Spuitmasker', exp: /\b(Spuitmasker)\b/i, },
+      { toepassing: 'Spuiten', name: 'Spuitmond', exp: /\b(Spuitmond)\b/i, },
+      { toepassing: 'Spuiten', name: 'Spuitnozzle', exp: /\b(Spuitnozzles|Spuitnozzle)\b/i, },
+      { toepassing: 'Spuiten', name: 'Spuitpistool kit', exp: /\b(Spuitpistoolkit|Spuitpistolen kit|Spuitpistolenkit)\b/i, },
+      { toepassing: 'Spuiten', name: 'Spuitpistool', exp: /\b(Spuitpistool)\b/i, },
+      { toepassing: 'Spuiten', name: 'Wielspuithoes', exp: /\b(Wielspuithoes|Wielspuithoezen)\b/i, },
+      { toepassing: 'Spuiten', name: 'Verfspuitmasker', exp: /\b(Verfspuitmasker|Verfspuitmaskers)\b/i, },
+      { toepassing: 'Spuiten', name: 'Spuitjas', exp: /\b(Spuitjas)\b/i, },
+      { toepassing: 'Spuiten', name: 'Spuitoverall', exp: /\b(Spuitoverall)\b/i, },
+      { toepassing: 'Spuiten', name: 'Pistool', exp: /\b(Pistool|Pistole)\b/i, },
+      { toepassing: 'Spuiten', name: 'Adaptor', exp: /\b(Adaptor|Adapter)\b/i, },
+
+      { toepassing: 'Bescherming', name: 'Mondmasker', exp: /\b(Mondmasker)\b/i, },
+      { toepassing: 'Bescherming', name: 'Veiligheidsbril', exp: /\b(Veiligheidsbril)\b/i, },
+
+      { toepassing: 'Kleding', name: 'Handschoen', exp: /\b(Handschoenen|Handschoen)\b/i, },
+      { toepassing: 'Kleding', name: 'Handschoen wegwerp', exp: /\b(wegwerphandschoenen|wegwerphandschoen)\b/i, },
+      { toepassing: 'Kleding', name: 'Veiligheidsschoen', exp: /\b(Veiligheidsschoen)\b/i, },
+      { toepassing: 'Kleding', name: 'Polo', exp: /\b(Polo)\b/i, },
+      { toepassing: 'Kleding', name: 'Wegwerpoverall', exp: /\b(Wegwerpoverall)\b/i, },
+      { toepassing: 'Kleding', name: 'Overall', exp: /\b(Overall)\b/i, },
+      { toepassing: 'Kleding', name: 'Stofjas', exp: /\b(Stofjas)\b/i, },
+      { toepassing: 'Kleding', name: 'Protectjas', exp: /\b(Protectjas|Protect jas)\b/i, },
+      { toepassing: 'Kleding', name: 'Lab-, bezoekersjas', exp: /\b(Lab- \/ bezoekersjas)\b/i, },
+      { toepassing: 'Kleding', name: 'Riem', exp: /\b(Riem)\b/i, },
+
+      { toepassing: 'Reiniging', name: 'Handreiniger', exp: /\b(Handreiniger)\b/i, },
+
+      { name: 'Reparatie', exp: /\b(Reparatieset|Reparaturset)\b/i, },
+      { name: 'Reparatie', exp: /\b(Kunststofreparatiemateriaal)\b/i, },
+
+
+
+      { toepassing: 'Kitten', name: 'Kit', exp: /\b(Kit)\b/i, },
+    ];
+    ws_data = rows.map(row => {
+      function match(name, exp, exp2){
+        const match = row.title.match(exp);
+        if (match) {
+          // filter[name] = { name: name, title: name, values: {}};
+          // cols.push({ name: name, title: name, })
+          // console.log(name)
+          // console.log(row.title)
+          row.title = row.title.replace(exp,'').replace(/\s-|\(\)|-$/,'').replace(/\s\s/,' ').trim();
+
+          // console.log(match[1]);
+          row['part'+name] = (match[1] || match[0])
+          .replace(/,/g, '.')
+          .replace(/\.$/, '')
+          .replace(exp2, '')
+          .trim()
+          // .toLowerCase()
+          .replace(/\w/, s => s.toUpperCase());
+          // console.log(match)
+        }
+      }
+      var title = row.title.replace(/\r|\n/g,'');
+
+      row.title = row.partDescription
+      .replace(/Max Meyer/,'MaxMeyer')
+      .replace(/2-K/,'2K')
+      .replace(/1-K/,'1K')
+      .replace(/\r|\n/g,'');
+      match('Gaten', /(\d+)\s*?(gaten\s\d+mm|gaten|gat|gaat)/i);
+      // match('Merk', /(3M)/);
+      match('Inhoud', /([\d|\.|,]+\s*?(ml|ltr|l|gr\.|gr|kg\.|kg|paar|g)\b)/i);
+      match('Maat', /(\b(mt\.:|mt:|maat:|maat)(\s+?)(\d+|[A-Z]+))/i, /mt\.:|mt:|maat:|maat|\s/);
+      match('Spanning', /(\d+(V))\b/i);
+      match('Vermogen', /(\d+(W))\b/i);
+      match('Dichtheid', /(\d+\s*?(g\/m²))/i);
+      match('Hittebestendig', /(\d+°)/);
+      match('Schroefdraad', /(M\d+\s*?x[\d|,]+)/i);
+      match('Dikte', /(\d+\s*?(µm|mµ|µ))/i);
+      match('Diameter', /Ø((\s|)(\d[\d|\.|,]+)(\s|)(mm|))/i);
+      match('Afmeting', /[^-]\b(\d+(\.\d+|,\d+|[\/|\d]+)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m|)(\s|)(x|)(\s|)([\d|\.|,|\/]+|)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m|)(\s|)(x|)(\s|)([\d|\.|,|\/]+|)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m)\b)/i);
+      match('Maat', /\b(M|L|S|XL|XXL|Large|Medium|Small|XLarge|XXLarge)\b/);
+      match('Grofte', /(P\d+)/i);
+      match('Grofte', /((grofte|korrel)\s*?\d+)/i, /grofte|korrel|\s/);
+      match('RAL', /ral\s*?(\d+)/i);
+      match('Aantal', /([\d|\.|,|x|\s]+?(st\.|st\b))/i);
+      match('Kleur', /\b(roos|oranje|orange|red oxyde|red|black|blue phtalo|green phtalo|bright red|chrome yellow|cold yellow|dark rose|extra fine aluminium|fine aluminium|donker antraciet|antraciet|donkergrijs|lichtgrijs|donker grijs|licht grijs|blauw|geel|groen|grijs|wit|geel|zwart|bruin|rood)\b/i);
+      match('Serie', /Aquamax|Deltron|Hookit|Abralon|Abranet/i);
+      match('Brand', /3M|Mirka|MaxMeyer|Nexa|Airo|Selemix|Hamach|Color Matic/);
+
+      ['Aantal','Inhoud','Dikte','Diameter','Afmeting'].forEach(name => {
+        if (row[name]) {
+          row[name] = row[name].toLowerCase().replace(/([\d|\.|\/]+)/, ' $1 ').replace(/x/, ' x ').replace(/\s\s/, ' ').replace(/µm|mµ|µ/, 'µm')
+        }
+      })
+
+
+      const product = productlist.find(p => row.title.match(p.exp) );
+      if (product) {
+        row.title = row.title.replace(product.exp, '');
+        row.product = product.name;
+        row.toepassing = product.toepassing;
+        row.categorie = product.categorie || row.artGroup;
+      }
+
+      row.title = [
+        row.product,
+        row.title
+        .replace(row.partCode,'')
+        .replace(row.partBrand,'')
+        .replace(/,/g,'')
+        .replace(/  /g,' ')
+        .trim(),
+        row.partGaten,
+        row.partInhoud,
+        row.partMaat,
+        row.partSpanning,
+        row.partVermogen,
+        row.partDichtheid,
+        row.partHittebestendig,
+        row.partSchroefdraad,
+        row.partDikte,
+        row.partDiameter,
+        row.partAfmeting,
+        row.partMaat,
+        row.partGrofte,
+        row.partKleur,
+        row.partRAL,
+        row.partAantal,
+        row.partBrand,
+        row.partSerie,
+        row.partCode,
+      ].filter(Boolean).join(', ');
+
+      // console.log(row);
+
+      row.title = title;
+
+      if (row.storageLocation) {
+        [row.stelling,row.vak,row.schap] = ((row.storageLocation||'          ').match(/../g)||[]).slice(1);
+      }
+      if (row.inkPackPrice) {
+        row.purchaseListPrice = row.inkPackPrice;
+      }
+      if (row.purchaseDiscount) {
+        row.discount = row.purchaseDiscount * 0.1;
+      } else {
+        row.listPrice = row.purchaseListPrice * 2.5;
+        row.discount = 2;
+      }
+      row.price = row.listPrice * (100 - row.discount) / 100;
+      row.vatPrice = row.price * 1.21;
+      return colnames.filter(n => cols[n].h).map(n => {
+        if (n==='partSds') return {
+          f: `=HYPERLINK("${row.partSds}","SDS")`,
+          v: 'SDS',
+        }
+        return Object.assign({ v:row[n] || '' }, cols[n]);
+      });
+    });
+    var index = colnames.filter(n => cols[n].h).indexOf('title');
+    ws_data.sort((a,b) => (a[index].v||'').localeCompare((b[index].v||'')));
+    var index = colnames.filter(n => cols[n].h).indexOf(sortby);
+    ws_data.sort((a,b) => (a[index].v||'').localeCompare((b[index].v||'')));
+
+    // console.log(ws_data);
+
+    ws_data.unshift(colnames.filter(n => cols[n].h).map(n => Object({v:cols[n].h})));
+    // console.log('updated', ws_data);
+    $('.pv').text('');
+    $('.lv').text('').append(
+      $('nav').append(
+        $('button').text('excel').on('click', e => toExcel()),
+      ),
+      $('table').append(
+        ws_data.map(row => $('tr').append(
+          row.map(
+            v => $('td').align(v && v.t === 'n' ? 'right' : 'left').text(v && v.v && v.t === 'n' ? num(v.v, v.z ? String(v.z.match(/0/g)).length-1 : 2) : v.v || '')
+          ),
+        )),
+      )
+    );
+  }
+
   aim.om.treeview({
     Inkoop: {
       Producten: e => aim.list('product',{
@@ -2181,7 +2814,7 @@ $().on('load', async e => {
       // Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
     },
     Magazijn: {
-      Opslag() {
+      Opslag___() {
         $().url('https://aliconnect.nl/api/abis/data').query({
           request_type: 'storage',
         }).get().then(e => {
@@ -2386,8 +3019,8 @@ $().on('load', async e => {
           const [arts] = e.body;
           arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
           arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
-          arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
-          arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
+          // arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
+          // arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
           $(document.documentElement).class('');
           var k='';
           var to;
@@ -2417,24 +3050,18 @@ $().on('load', async e => {
                   const avalue = value.split(' ');
                   var artlist = arts.filter(a => avalue.every(value => [
                     a.ean,
-                    a.locCode,
-                    a.prodStorageLocation,
-                    a.newStorageLocation,
+                    a.loc1,
+                    a.loc,
                     a.prodTitle,
-                    a.prodArtNr,
-                    a.prodBrand,
                     a.artNr,
                     a.orderCode,
-                    a.supplier
                   ]
                     .some(v => v && v.toLowerCase().includes(value))
                   ));
                   console.log(artlist);
                   elems.art.text('').append(
                     artlist.map((a,i) => [
-                      $('div').text(a.artNr, rowCode(a), a.id),
-                      $('div').text(a.prodTitle),
-                      $('div').text(rowTitle(a)),
+                      $('div').text([a.prodTitle, a.id, a.loc1].join(', ')),
                       $('div').append(
                         a.eanElem = $('input').value(a.ean)
                         .type('number')
@@ -2450,9 +3077,9 @@ $().on('load', async e => {
                           });
                           a.newStorageLocationElem.select().focus();
                         }),
-                        a.newStorageLocationElem = $('input')
+                        a.locElem = $('input')
                         .style('width: 120px;')
-                        .value(a.newStorageLocation)
+                        .value(a.loc)
                         .type('number')
                         .step(1)
                         .placeholder('locatie')
@@ -2461,8 +3088,8 @@ $().on('load', async e => {
                             request_type: 'storageSave',
                           }).post({
                             id: a.id,
-                            name: 'newStorageLocation',
-                            value: a.newStorageLocation = e.target.value,
+                            name: 'loc',
+                            value: a.loc = e.target.value,
                           });
                           a.stockElem.select().focus();
                         }),
@@ -2493,6 +3120,34 @@ $().on('load', async e => {
                             id: a.id,
                             name: 'prodInhoud',
                             value: a.prodInhoud = e.target.value,
+                          })
+                        }),
+                        a.vosElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.vos)
+                        .type('number')
+                        .placeholder('VOS')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'vos',
+                            value: a.vos = e.target.value,
+                          })
+                        }),
+                        a.vosPerEenhElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.vosPerEenh)
+                        .type('number')
+                        .placeholder('VOS/Eenheid')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'vosPerEenh',
+                            value: a.vosPerEenh = e.target.value,
                           })
                         }),
                       )
@@ -3194,6 +3849,92 @@ $().on('load', async e => {
       // },
     },
     Overig: {
+      Hazard: e => artlist(
+        'Hazardlijst', [
+          'id',
+          'title',
+          'storageLocation',
+          'stelling',
+          'partContent',
+          'partContentUnit',
+          'partVosPerEenh',
+          'stock',
+          'stelling',
+          'partSds',
+        ],
+        // `partVosPerEenh>0`,
+        `partSds is not null`,
+        'title',
+      ),
+      Prijslijst: e => artlist('Prijslijst', [
+        'id',
+        'partArtNr',
+        'title',
+        'listPrice',
+        'discount',
+        'price',
+        'vatPrice',
+        // 'storageLocation',
+        'inkPackPrice',
+        'purchaseListPrice',
+        'purchaseDiscount',
+        'partBrand',
+        'partCode',
+        'supplier',
+        'partDescription',
+        //
+        // 'ean',
+        // 'verzending',
+        // 'partArtNr',
+        // 'partCode',
+        // 'partVosPerEenh',
+        // 'partBrand',
+        // 'categorie',
+        // 'title',
+        // 'discount',
+        // 'purchaseDiscount',
+        // 'inkPackPrice',
+        // 'purchaseListPrice',
+        // 'storageLocation',
+        // 'supplier',
+        // 'orderCode',
+        //
+        // 'stelling',
+        // 'vak',
+        // 'schap',
+        // 'minVoorraad',
+        // 'minBestelAantal',
+        // 'stock',
+        // 'bestelAantal',
+        //
+        // 'partDescription',
+        // 'partSerie',
+        // 'partAfmeting',
+        // 'partDiameter',
+        // 'partGaten',
+        // 'partLengte',
+        // 'partGrofte',
+        // 'partMaat',
+        // 'partKleur',
+        // 'partOpening',
+        // 'partSds',
+        // 'partTds'
+      ], ``, 'title'),
+      Inkoop: e => artlist('Inkooplijst', [
+        'id',
+        'supplier',
+        'orderCode',
+        'title',
+        'inkPackPrice',
+        'purchaseListPrice',
+        'purchaseDiscount',
+
+
+        'stock',
+        'minVoorraad',
+        'minBestelAantal',
+        'bestelAantal',
+      ], `minVoorraad > 0`, 'supplier'),
       MagazijnScannerKaart() {
         printElem().append(
           $('div').style('font-size:3em;text-align:center;').append(
@@ -3211,195 +3952,5 @@ $().on('load', async e => {
         ).print()
       },
     },
-  });
-  function readBinary(file){
-    return new Promise((resolve,fail) => {
-      const reader = new FileReader();
-      reader.readAsBinaryString(file);
-      // reader.onprogress = e => console.log(e);
-      reader.onload = e => resolve(e.target.result);
-    })
-  }
-  async function importFiles1(files){
-    let allrows = [];
-    files = Array.from(files);
-    for (var file of files) {
-      $('span.main').text('import:', file.name);
-      if (file.name.match(/\.xls/)) {
-        const result = await readBinary(file);
-        const workbook = XLSX.read(result, { type: 'binary' });
-        for (let sheetname of workbook.SheetNames) {
-          const sheet = workbook.Sheets[sheetname];
-          if (sheet['!ref']) {
-            let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
-            // console.log(sheet['!ref'], colEnd,rowEnd);
-            colEnd = XLSX.utils.decode_col(colEnd);
-            let maxCol = 0;
-            const rows = [];
-            for (var r = 1; r<=rowEnd; r++) {
-              const row = [];
-              for (var c=0; c<=colEnd; c++) {
-                var sheetcell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
-                var cell = null;
-                if (sheetcell) {
-                  maxCol = Math.max(maxCol,c);
-                  if (sheetcell.l) {
-                    cell = {
-                      v: sheetcell.l.display,
-                      href: sheetcell.l.Target,
-                    }
-                  } else {
-                    cell = {
-                      v: sheetcell.v,
-                    }
-                  }
-                }
-                row.push(cell);
-              }
-              rows.push(row);
-            }
-            rows.forEach(row => row.length = maxCol + 1);
-            // console.log(file.name, sheetname, maxCol, rows);
-            $('span.main').text('upload:', file.name, sheetname);
-            await $().url('https://aliconnect.nl/api/abis/data')
-            .input(rows)
-            .query({
-              request_type: 'importdata',
-              filename: file.name + '-' + sheetname,
-            })
-            .post()
-            .then(console.log)
-          }
-        }
-      }
-      $('span.main').text('import done');
-    }
-  }
-  async function importFiles(files){
-    let allrows = [];
-    files = Array.from(files);
-    for (var file of files) {
-      $('span.main').text('import:', file.name);
-      for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename.toLowerCase()))) {
-        const result = await readBinary(file);
-        const workbook = XLSX.read(result, { type: 'binary' });
-        for (let tab of fileConfig.tabs) {
-          if (tab.disabled || !workbook.Sheets[tab.tabname]) continue;
-          $('span.main').text('import:', file.name, tab.tabname);
-
-          // return;
-          const data = {
-            rows: [],
-          };
-          const prefixArtcode = tab.artcode || '';
-          tab.colRow = tab.colRow || 1;
-          const sheet = workbook.Sheets[tab.tabname];
-          const toprow = [];
-          // console.log(sheet);
-          let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
-          colEnd = XLSX.utils.decode_col(colEnd);
-          function rowvalue(r,c){
-            var cell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
-            if (cell) {
-              if (cell.l) {
-                return `(${cell.l.display})[${cell.l.Target}]`;
-              }
-              // console.log(c,r,cell)
-              return cell.v;
-            }
-          }
-          for (var c=0; c<=colEnd; c++) {
-            toprow[c] = rowvalue(tab.colRow,c);
-          }
-          // console.log(toprow);
-          // const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
-          // const infoElem = $('footer>.main');
-          const rowStart = tab.colRow;
-          for (let cols of tab.cols) {
-            for (var name in cols) {
-              if (typeof cols[name] !== 'function' && String(cols[name]).match(/return /)) {
-                cols[name] = new Function('row', cols[name]);
-              }
-            }
-          // console.log(tab.cols);
-            for (var r = tab.colRow+1; r<=rowEnd; r++) {
-              let row;
-              for (var name in cols) {
-                var value;
-                if (Array.isArray(cols[name])) {
-                  value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
-                  // console.log(name, tab.cols[name]);
-                } else if (typeof cols[name] === 'function') {
-                  try {
-                    value = cols[name](row) || '';
-                  } catch(err) {
-
-                  }
-                } else if (toprow.includes(name)) {
-                  value = rowvalue(r, toprow.indexOf(name));
-                } else if (toprow.includes(cols[name])) {
-                  value = rowvalue(r, toprow.indexOf(cols[name]));
-                } else {
-                  value = cols[name];
-                }
-                if (value !== undefined) {
-                  (row = row || {})[name] = value;
-                }
-              }
-              if (row) {
-                // console.log(row);
-                // return;
-                data.rows.push(row);
-                allrows.push([row, tab]);
-              }
-            };
-          }
-        }
-      }
-    }
-    // return;
-    allrows = allrows.filter(entry => entry[0].packKeyGroup && entry[0].packKeyName && (entry[0].packPrice || entry[0].partPrice));
-    // console.log(allrows);
-    var max = allrows.length;
-    var i = 0;
-    const progressElem = $('footer>progress').max(max).value(i);
-    for (var [row,tab] of allrows) {
-      // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
-      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.packKeyGroup, row.packKeyName, row.partKeyGroup, row.partKeyName);
-      try {
-        // console.log(row);
-        await tab.callback(row);
-      } catch (err) {
-        console.error(row);
-      }
-      // return;
-      progressElem.value(++i);
-    }
-    $('span.main').text('import done');
-    progressElem.value(null);
-    // alert('Import gereed');
-  }
-  $(window).on('popstate', async e => {
-    const documentSearchParams = new URLSearchParams(document.location.search);
-    const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
-    if (!documentSearchParams.get('l') && !searchParams.get('l') && searchParams.get('$search')) {
-      aim.search(searchParams.get('$search'));
-
-      // aim.api('/abis/data').query({request_type: 'article',$search: searchParams.get('$search')}).get().then(response => response.json().then(data => aim.listview(data.rows)));
-    }
-  })
-  $(window).on('dragover', e => e.preventDefault())
-  $(window).on('drop', async e => {
-    e.preventDefault();
-    e.stopPropagation();
-    const data = e.dataTransfer || e.clipboardData;
-    if (data.types.includes('Files')) {
-      importFiles(data.files);
-      // const config = await fetch('https://aliconnect.nl/yaml.php', {
-      //   method: 'POST',
-      //   body: await fetch('config/import.yaml').then(res => res.text()),
-      // }).then(res => res.json());
-      // console.log(1, config, files);
-    }
   });
 });

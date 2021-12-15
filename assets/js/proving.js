@@ -2691,6 +2691,15 @@ $().on('load', async e => {
         $filter: `archivedDateTime NE NULL`,
         $search: ``,
       }),
+      "Klanten Actief Mailadressen": async e => {
+        const [rows] = await aim.req('https://aliconnect.nl/api/abis/data').query({request_type: 'klanten_actief_mailadressen'}).then(res=>res.json());
+        var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
+      },
+      "Klanten PPG Mailadressen": async e => {
+        const [rows] = await aim.req('https://aliconnect.nl/api/abis/data').query({request_type: 'klanten_ppg_mailadressen'}).then(res=>res.json());
+        var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
+      },
+
       // Analyse: {
       //   Airo: () => analyseBedrijf('Airo'),
       //   Proving: () => analyseBedrijf('Proving'),

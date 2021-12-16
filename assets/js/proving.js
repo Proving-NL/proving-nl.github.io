@@ -1391,41 +1391,42 @@ $().on('load', async e => {
       var price;
       var listPrice = row.inkPackPrice || row.purchaseListPrice || row.listPrice;
 
-      if (row.purchaseListPrice && row.purchaseListPrice != listPrice) {
-        elem.append(
-          $('div').append(
-            'inkoop bruto gewijzigd ',
-            $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
-            ' € ',
-            $('span').text(num(price = listPrice)).style('color:red;font-size:1.2em'),
-          ),
-        );
-      }
-      row.purchaseDiscount = Math.round( row.purchaseDiscount * 10) / 10;
+      // if (row.purchaseListPrice && row.purchaseListPrice != listPrice) {
+      //   elem.append(
+      //     $('div').append(
+      //       'inkoop bruto gewijzigd ',
+      //       $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
+      //       ' € ',
+      //       $('span').text(num(price = listPrice)).style('color:red;font-size:1.2em'),
+      //     ),
+      //   );
+      // }
 
-      var style = 'color:lightgreen;';
-      elem.append(
-        $('div').style('font-size:0.8em;').append(
-          'Inkoop € ',
-          $('span').text(num(price = listPrice*(100-row.purchaseDiscount)/100)).style(style),
-          ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-          // $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
-          ' korting ',
-          $('span').style('color:green;').text(num(row.purchaseDiscount).replace(/,00$|0$/g,'') + '%'),
-          row.inkPackPrice ? '' : ' (niet gekoppeld)',
-        ),
-      );
-
-      discount = Math.floor( ( row.discount || row.purchaseDiscount * 0.4) * 10 ) / 10;
       if (!row.purchaseDiscount) {
         listPrice *= 2;
-        discount = 20;
+        row.purchaseDiscount = 60;
       }
+      row.purchaseDiscount = Math.round( row.purchaseDiscount * 10 ) / 10;
+      discount = Math.floor( ( row.discount || (row.purchaseDiscount / 3) ) * 10 ) / 10;
+
+      var style = 'color:lightgreen;';
+      // elem.append(
+      //   $('div').style('font-size:0.8em;').append(
+      //     'Inkoop € ',
+      //     $('span').text(num(price = listPrice*(100-row.purchaseDiscount)/100)).style(style),
+      //     ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+      //     // $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
+      //     ' korting ',
+      //     $('span').style('color:green;').text(num(row.purchaseDiscount).replace(/,00$|0$/g,'') + '%'),
+      //     row.inkPackPrice ? '' : ' (niet gekoppeld)',
+      //   ),
+      // );
+
 
 
       var style = 'color:orange;';
       if (row.clientArtDiscount) {
-        discount = row.clientArtDiscount;
+        discount = Math.floor( row.clientArtDiscount * 10 ) / 10;
         elem.append(
           $('div').append(
             $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
@@ -1450,39 +1451,17 @@ $().on('load', async e => {
           ),
         );
       }
-
-
-      var meerpack = 12;
-      discount = Math.floor(discount * 1.8 * 10) / 10;
-      listPrice *= meerpack;
-      // var style = 'color:blue;';
-      elem.append(
-        $('div').style('font-size:0.8em;').append(
-          meerpack, ' stuks ',
-          $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
-          ', € ',
-          $('span').text(num(price = listPrice*(100-discount)/100)).style(style),
-          ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-          ' korting ',
-          $('span').style(style).text(num(discount).replace(/,00$|0$/g,'') + '%')
-        ),
-      );
-      // } else if (listPrice) {
-      //   elem.append(
-      //     $('div').append(
-      //       '€ ',
-      //       $('span').text(num(price = listPrice)).style('color:lightblue;font-size:1.2em'),
-      //       ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-      //     ),
-      //   );
-      // }
-
-
+      row.verzending = row.stock ? '0-1 dag' : '1-4 dagen';
       elem.append(
         $('div').append(
           $('span').style('font-size:0.8em;').append(
             'Verzending in: ',
             $('b').text(row.verzending).style('color:green;'),
+            row.stock ? [
+              ' (nog ',
+              $('b').text(row.stock).style('color:green;'),
+              ' beschikbaar)',
+            ] : null,
           ),
           elem.input = $('input')
           .tabindex(-1)
@@ -1855,42 +1834,10 @@ $().on('load', async e => {
   aim.config.import.forEach(imp => {
     for (let tab of imp.tabs) {
       tab.callback = async row => {
-        // console.log(row);
-        // return;
-        await $().url('https://aliconnect.nl/api/abis/data')
-        .query({request_type: 'art'})
+        return await $().url('https://aliconnect.nl/api/abis/data')
+        .query({request_type: 'art_ink'})
         .input(row)
-        // .input({
-        //   code: row.code,
-        //   partNr: row.partNr,
-        //   companyName: row.companyName,
-        //   orderCode: row.orderCode,
-        //   unit: (row.unit||'').toLowerCase(),
-        //   partCode: row.partCode,
-        //   contentQuantity: row.contentQuantity,
-        //   contentUnit: (row.contentUnit||'').toLowerCase(),
-        //   ean: row.ean,
-        //   description: description(row.description),
-        //   description_nl: description(row.description_nl),
-        //   description_en: description(row.description_en),
-        //   description_de: description(row.description_de),
-        //   description_fr: description(row.description_fr),
-        //   partPrice: row.partPrice,
-        //   packPrice: row.packPrice,
-        //   discount: row.discount,
-        //   productGroep: row.productGroep,
-        //   weight: row.weight !== 'NB' ? row.weight : null,
-        //   width: row.width !== 'NB' ? row.width : null,
-        //   length: row.length !== 'NB' ? row.length : null,
-        //   height: row.height !== 'NB' ? row.height : null,
-        //   countryOrigin: row.countryOrigin,
-        //   shelfLife: row.shelfLife,
-        //   remark: row.remark,
-        //   discountCode: row.discountCode,
-        //   data: row,
-        // })
         .post()
-        .then(e => e.body ? console.error(e.body) : null);
       }
     }
   });
@@ -2192,7 +2139,7 @@ $().on('load', async e => {
     }
     // return;
     console.log(allrows);
-    allrows = allrows.filter(entry => entry[0].packKeyGroup && entry[0].packKeyName && (entry[0].packPrice || entry[0].partPrice));
+    allrows = allrows.filter(entry => entry[0].keyGroup && entry[0].keyName && (entry[0].packPrice || entry[0].packListPrice || entry[0].partListPrice || entry[0].partPrice));
     console.log(allrows);
     var max = allrows.length;
     var i = 0;
@@ -2273,7 +2220,9 @@ $().on('load', async e => {
     purchaseDiscount: {  },
     price: {calc:1, h:'Excl', t:'n', z:'.00', },
     vatPrice: { h:'Incl', calc: row => row.price * 1.21, t:'n', z:'.00' },
-    partArtNr: { h:'Product Code', },
+    partArtNr: { h:'Product ArtNr', },
+    partArtCode: { h:'Product ArtCode', },
+    artCode: { h:'Artikel code', },
     id: { h:'Artikel NR', },
     product: { h:'Product', },
     categorie: { h:'Categorie', },
@@ -2288,11 +2237,15 @@ $().on('load', async e => {
     partMaat: { h:'Maat', },
     partKleur: { h:'Kleur', },
     partOpening: { h:'Opening', },
-    partSds: { h:'Sds', },
-    partTds: { h:'Tds', },
+
+    inkSds: { h:'Sds', },
+    inkTds: { h:'Tds', },
+
     partCode: { h:'Code', },
     partDescription: { h:'Oms', },
-    partVosPerEenh: { h:'VOS', },
+
+    vosPerEenh: { h:'VOS', },
+
     partContent: { h:'PI', },
     partContentUnit: { h:'PIPE', },
 
@@ -2322,7 +2275,7 @@ $().on('load', async e => {
     console.log(colnames);
     const [rows] = await $().url('https://aliconnect.nl/api/abis/data').query({
       request_type: 'artlist',
-      top: 2000,
+      top: 10000,
       filter: filter,
       select: colnames.filter(n => cols[n] && !cols[n].calc).join(','),
     }).get().then(e => e.body);
@@ -2644,8 +2597,8 @@ $().on('load', async e => {
       row.price = row.listPrice * (100 - row.discount) / 100;
       row.vatPrice = row.price * 1.21;
       return colnames.filter(n => cols[n].h).map(n => {
-        if (n==='partSds') return {
-          f: `=HYPERLINK("${row.partSds}","SDS")`,
+        if (n==='inkSds') return {
+          f: `=HYPERLINK("${row.inkSds}","SDS")`,
           v: 'SDS',
         }
         return Object.assign({ v:row[n] || '' }, cols[n]);
@@ -2665,20 +2618,21 @@ $().on('load', async e => {
       $('nav').append(
         $('button').text('excel').on('click', e => toExcel()),
       ),
-      $('table').append(
-        ws_data.map(row => $('tr').append(
-          row.map(
-            v => $('td').align(v && v.t === 'n' ? 'right' : 'left').text(v && v.v && v.t === 'n' ? num(v.v, v.z ? String(v.z.match(/0/g)).length-1 : 2) : v.v || '')
-          ),
-        )),
+      $('div').style('overflow: overlay').append(
+        $('table').append(
+          ws_data.map(row => $('tr').append(
+            row.map(
+              v => $('td').align(v && v.t === 'n' ? 'right' : 'left').text(v && v.v && v.t === 'n' ? num(v.v, v.z ? String(v.z.match(/0/g)).length-1 : 2) : v.v || '')
+            ),
+          )),
+        )
       )
     );
   }
 
   aim.om.treeview({
     Inkoop: {
-      Producten: e => aim.list('product',{
-        $filter: `clientName='${clientName}'`,
+      Producten: e => aim.list('artink',{
         $search: ``,
       }),
     },
@@ -3862,22 +3816,27 @@ $().on('load', async e => {
         'Hazardlijst', [
           'id',
           'title',
+          'partDescription',
           'storageLocation',
           'stelling',
           'partContent',
           'partContentUnit',
-          'partVosPerEenh',
+          'vosPerEenh',
           'stock',
           'stelling',
-          'partSds',
+          'inkSds',
         ],
         // `partVosPerEenh>0`,
-        `partSds is not null`,
+        `inkSds is not null`,
         'title',
       ),
       Prijslijst: e => artlist('Prijslijst', [
         'id',
         'partArtNr',
+        'partArtCode',
+        'artCode',
+        'partBrand',
+        'partCode',
         'title',
         'listPrice',
         'discount',
@@ -3887,8 +3846,6 @@ $().on('load', async e => {
         'inkPackPrice',
         'purchaseListPrice',
         'purchaseDiscount',
-        'partBrand',
-        'partCode',
         'supplier',
         'partDescription',
         //
@@ -3928,7 +3885,7 @@ $().on('load', async e => {
         // 'partOpening',
         // 'partSds',
         // 'partTds'
-      ], ``, 'title'),
+      ], ``, 'partArtCode'),
       Inkoop: e => artlist('Inkooplijst', [
         'id',
         'supplier',

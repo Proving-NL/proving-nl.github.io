@@ -769,7 +769,29 @@ $().on('load', async e => {
     let totaal = 0;
     let betaald = 0;
     const elem = printElem().append(
-      briefElem(salesorder, 'FACTUUR ' + factuurNr).class('invoice').append(
+      $('div').class('brief invoice').append(
+        $('div').append(
+          $('img').src(`https://${salesorder.accountName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountName.toLowerCase()}.png`
+          ),
+        ),
+        $('table').style('margin-bottom:10mm;width:100%;').append(
+          $('tr').append(
+            $('td').style('padding-left:10mm;padding-top:25mm;').append(
+              $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.clientOtherContactName),
+              $('div').text(salesorder.clientOtherAddressStreet),
+              $('div').text(salesorder.clientOtherAddressCity),
+            ),
+            $('td').style('width:65mm;').append(
+              $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;font-size:0.8em;'),
+            ),
+          )
+        ),
+        $('div').append(
+          $('span').text('FACTUUR', factuurNr).style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
+        ),
+      ).append(
         $('table').class('grid summary').style('margin-bottom:2mm;').append(
           $('thead').append(
             els.trh = $('tr').append(

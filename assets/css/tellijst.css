@@ -1,0 +1,14 @@
+body{
+  font-family: sans-serif;
+}
+table{
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+td,th {
+  border: solid 1px #ccc;
+  vertical-align: top;
+}
+.dr{
+  height: 10mm;
+}

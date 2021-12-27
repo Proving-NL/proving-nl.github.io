@@ -4,47 +4,17 @@ function gettext(selector){
 function getnumber(selector){
   return (selector.match(/\\d+/)||[]).shift()
 }
-$().on('message', data => {
-  // const {data,target} = e;
-  console.log('ON MESSAGE', data);
-})
 
 $().on('load', async e => {
-  // console.log('JA', aim);
-  // console.log('JA', sessionStorage.getItem('access_token'));
-  const {aimClient,dmsClient} = aim;
-  console.log('AIM', aimClient, dmsClient);
-  // dmsClient.api('/salesorder', {
-  //   filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
-  //   order: `nr DESC`,
-  //   search: '*',
-  //   top: 10,
-  //   select: 'clientName,orderDateTime',
-  // }).get().then(body => console.log(5,body));
-  // return;
-  //
-  // return;
-  //
-
-  // console.log('aliconnect_token', sessionStorage.getItem('aliconnect_token'));
-  // if (!sessionStorage.getItem('aliconnect_token')){
-  //   return document.location.href = 'https://login.aliconnect.nl/silent_signin?redirect_uri='+encodeURI(document.location.href);
-  // } else {
-  //   // sessionStorage.removeItem('aliconnect_token');
-  // }
-
+  console.log('JA', aim.config);
   let clientart = [];
   let clientName = [];
-
-  console.log(1111, aimClient);
-  // aimClient.ws().headers({'X-ApiKey': 'MY_KEY'}).method('subscribe').resource('zones').then(console.log);
-
 
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
     // console.log($('button.account>span'));
     // return;
-    $('button.account span.company').text(clientName||'');
+    $('button.account>span').text(clientName);
     [clientart] = await fetch('https://aliconnect.nl/api/abis/data?request_type=clientArt&clientName=' + clientName).then(res => res.json());
     aim.idfilter = `clientName EQ '${clientName}'`;
     // console.log('JA', clientname);
@@ -76,9 +46,11 @@ $().on('load', async e => {
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   await selectClient(localStorage.getItem('clientName'));
   // $('button.account>span').text(clientName);
-  $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
+  $('.abtn.menu>ul')
+  .on('click', e => e.stopPropagation())
+  .append(
     $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
-  );
+  )
   function locCode(loc){
     return loc
     .replace(/^I/, '1.')
@@ -162,7 +134,7 @@ $().on('load', async e => {
     { title: 'Afhalen', style: 'background-color:#ccc;', },
     { title: 'Brengen', style: 'background-color:green;color:white;', },
   ];
-  const stelling = [
+  const rijen = [
     {
       nr: 1,
       racks: [
@@ -287,6 +259,22 @@ $().on('load', async e => {
         { nr: 5, code: 'oe', shelfs: 5 },
         { nr: 6, code: 'of', shelfs: 5 },
         { nr: 7, code: 'og', shelfs: 5 },
+        { nr: 8, code: '', shelfs: 1 },
+        { nr: 9, code: '', shelfs: 1 },
+        { nr: 10, code: '', shelfs: 1 },
+        { nr: 11, code: '', shelfs: 1 },
+      ]
+    },
+    {
+      nr: 8,
+      racks: [
+        { nr: 1, code: '', shelfs: 1 },
+        { nr: 2, code: '', shelfs: 1 },
+        { nr: 3, code: '', shelfs: 1 },
+        { nr: 4, code: '', shelfs: 1 },
+        { nr: 5, code: '', shelfs: 1 },
+        { nr: 6, code: '', shelfs: 1 },
+        { nr: 7, code: '', shelfs: 1 },
         { nr: 8, code: '', shelfs: 1 },
         { nr: 9, code: '', shelfs: 1 },
         { nr: 10, code: '', shelfs: 1 },
@@ -472,7 +460,7 @@ $().on('load', async e => {
     },
   ];
   const locaties=[];
-  stelling.forEach(rij => {
+  rijen.forEach(rij => {
     rij.racks.forEach(rack => {
       Array(rack.shelfs).fill(null).forEach((shelf,shelfnr) => {
         locaties.push({
@@ -675,18 +663,92 @@ $().on('load', async e => {
     );
   }
   async function order(orderNr) {
-    const data = await dmsClient.api('/abis/paklijst')
-    .post({
+    var [salesorders,rows] = await dmsClient.api('/abis/paklijst').post({
       id: orderNr,
       set: 'printDateTime = GETDATE()'
     })
-    var [salesorders,rows] = data;
     var [salesorder] = salesorders;
     if (!rows.length) alert('Order bevat geen regels');
     return orderPage(salesorder,rows);
   }
+  // async function offertebon(orderNr) {
+  //   var [salesorders,rows] = await dmsClient.api('/abis/salesorder').post({
+  //     id: orderNr,
+  //   })
+  //   var [salesorder] = salesorders;
+  //   rows.forEach(row => row.storageLocation = row.newStorageLocation ? row.newStorageLocation.match(/../g).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
+  //   rows = rows.filter(row => row.orderNr === salesorder.nr);
+  //   rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
+  //   console.log(salesorder, rows);
+  //   return printElem().append(
+  //     briefElem(salesorder, 'OFFERT BON').append(
+  //       $('table').class('grid').append(
+  //         $('thead').append(
+  //           $('tr').append(
+  //             $('th').align('left').text('Orderdatum'),
+  //             $('th').align('left').text('OrderNr'),
+  //             $('th').align('left').text('Debiteurnummer'),
+  //             $('th').align('left').text('Referentie'),
+  //           ),
+  //         ),
+  //         $('tbody').append(
+  //           $('tr').append(
+  //             $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
+  //             $('td').text(salesorder.nr),
+  //             $('td').text(salesorder.clientDebNr),
+  //             $('td').text(salesorder.ref),
+  //           ),
+  //         ),
+  //       ),
+  //       $('table').class('grid').append(
+  //         $('thead').append(
+  //           $('tr').append(
+  //             $('th').align('left').text('Artikelcode'),
+  //             $('th').align('left').text('Omschrijving'),
+  //             $('th').align('right').text('Prijs'),
+  //             $('th').align('right').text('Aantal'),
+  //             $('th').align('right').text('Totaal'),
+  //           ),
+  //         ),
+  //         $('tbody').append(
+  //           rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
+  //             $('td').text(rowCode(row)).style('font-family:monospace;font-size:0.9em;'),
+  //             $('td').text(rowTitle(row)).style('white-space:normal;'),
+  //             $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
+  //             $('td').align('right').text(row.quant),
+  //             $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
+  //           )),
+  //           $('tr').append(
+  //             $('td'),
+  //             $('td').align('right').text('SUBTOTAAL'),
+  //             $('td'),
+  //             $('td'),
+  //             $('td').align('right').text(num(rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
+  //           ),
+  //           $('tr').append(
+  //             $('td'),
+  //             $('td').align('right').text('BTW specificatie 21.0%'),
+  //             $('td'),
+  //             $('td'),
+  //             $('td').align('right').text(num(0.21 * rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
+  //           ),
+  //           $('tr').append(
+  //             $('td'),
+  //             $('td').align('right').text('TOTAAL (incl. BTW)'),
+  //             $('td'),
+  //             $('td'),
+  //             $('td').align('right').text(num(1.21 * rows.filter(row=>row.quant && row.netto).map(row =>row.quant * row.netto).reduce((tot,val)=>tot += val))),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
   async function factuur(factuurNr) {
-    factuurData = await dmsClient.api('/abis/factuur').post({factuurNr: factuurNr});
+    factuurData = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'factuur',
+      factuurNr: factuurNr,
+    }).then(e => e.body);
     console.log(factuurNr,factuurData);
     const [clientInvoices, clientOrders, rows] = factuurData;
     const [invoice] = clientInvoices;
@@ -879,18 +941,21 @@ $().on('load', async e => {
         }]
       };
       console.log(maildata);
-      await dmsClient.api('/abis/sendInvoice').body(maildata).post().then(e => console.log(e.body));
+      await dmsClient.api('/abis/sendInvoice').input(maildata).post().then(e => console.log(e.body));
       // elem.remove();
     }
   async function factureren(salesorder, id){
-    const data = await dmsClient.api('/abis/createInvoice').post({
+    const data = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'createInvoice',
       accountName: salesorder.accountName,
       ordernummers: id,
-    });
+    }).then(e => e.body);
+    console.log(data);
     const [bedrijven] = data;
     const [accountCompany] = bedrijven;
     const invoiceNr = accountCompany.invoiceNr;
     const factuurElem = await factuur(invoiceNr);
+
     const [clientInvoices,clientOrders,rows] = factuurData;
     const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
@@ -904,10 +969,11 @@ $().on('load', async e => {
     document.location.href = '#?id='+pageId;
   }
   async function lijstPakken() {
-    const data = await dmsClient.api('/abis/paklijst').post({
+    const data = await $().url('https://aliconnect.nl/api/abis/data').post({
+      request_type: 'paklijst',
       id: aim.listRows.map(row => row.nr).join(','),
       set: 'printDateTime = GETDATE()'
-    });
+    }).then(e => e.body);
     const [salesorders,rows] = data;
     const [salesorder] = salesorders;
     // console.log(rows);
@@ -1023,7 +1089,9 @@ $().on('load', async e => {
       // $('.pv').text('').html(content);
       // console.log(content);
       // return;
-      await dmsClient.api('/abis/send').body({
+      await $().url('https://aliconnect.nl/api/abis/data').query({
+        request_type: 'send',
+      }).input({
         from: from,
         bcc: from,
         to: 'max.van.kampen@alicon.nl',
@@ -1111,21 +1179,24 @@ $().on('load', async e => {
         $('div').append(
           $('button').text('Paklijst').on('click', lijstPakken),
           $('button').text('Gepakt').on('click', async e => {
-            await dmsClient.api('/abis/paklijst').post({
+            await $().url('https://aliconnect.nl/api/abis/data').post({
+              request_type: 'paklijst',
               id: aim.listRows.map(row => row.nr).join(','),
               set: 'pickDateTime = GETDATE()'
             });
             alert('Status gepakt');
           }),
           $('button').text('Verzonden').on('click', async e => {
-            await dmsClient.api('/abis/paklijst').post({
+            await $().url('https://aliconnect.nl/api/abis/data').post({
+              request_type: 'paklijst',
               id: aim.listRows.map(row => row.nr).join(','),
               set: 'sendDateTime = GETDATE()'
             });
             alert('Status verzonden');
           }),
           $('button').text('Geleverd').on('click', async e => {
-            await dmsClient.api('/abis/paklijst').post({
+            await $().url('https://aliconnect.nl/api/abis/data').post({
+              request_type: 'paklijst',
               id: aim.listRows.map(row => row.nr).join(','),
               set: 'deliverDateTime = GETDATE()'
             });
@@ -1404,10 +1475,6 @@ $().on('load', async e => {
               $('b').text(row.stock).style('color:green;'),
               ' beschikbaar)',
             ] : null,
-            ` (Leverancier ${row.supplier})`,
-            ` (ID ${row.purchaseId})`,
-            ` (P ${row.prodIsVervallen})`,
-            ` (A ${row.artIsVervallen})`,
           ),
           elem.input = $('input')
           .tabindex(-1)
@@ -1780,7 +1847,10 @@ $().on('load', async e => {
   aim.config.import.forEach(imp => {
     for (let tab of imp.tabs) {
       tab.callback = async row => {
-        return await dmsClient.api('/abis/art_ink').body(row).post()
+        return await $().url('https://aliconnect.nl/api/abis/data')
+        .query({request_type: 'art_ink'})
+        .input(row)
+        .post()
       }
     }
   });
@@ -1794,11 +1864,11 @@ $().on('load', async e => {
         saldo: 'Saldo',
       },
       callback(rows) {
-        rows.forEach(row => row.invoiceNr = row.invoiceNr.replace(/(\d+).*/, '$1'));
-        dmsClient.api('/abis/facturen_openstaand')
-        .body(rows)
-        .post()
-        .then(e => console.log(e.body));
+        rows.forEach(row => row.invoiceNr = row.invoiceNr.replace(/(\d+).*/, '$1'))
+        $().url('https://aliconnect.nl/api/abis/data').input(rows).query({
+          request_type: 'facturen_openstaand',
+          // invoiceNrs: rows.map(row => row.invoiceNr).join(','),
+        }).post().then(e => console.log(e.body));
       },
     }]
   },{
@@ -1811,8 +1881,8 @@ $().on('load', async e => {
         saldo: 'Saldo',
       },
       callback(rows) {
-        dmsClient.api('/abis/facturen_openstaand')
-        .post({
+        $().url('https://aliconnect.nl/api/abis/data').post({
+          request_type: 'facturen_openstaand',
           invoiceNrs: rows.map(row => row.invoiceNr).join(','),
         }).then(e => console.log(e.body));
       },
@@ -1941,6 +2011,61 @@ $().on('load', async e => {
       // reader.onprogress = e => console.log(e);
       reader.onload = e => resolve(e.target.result);
     })
+  }
+  async function importFiles1(files){
+    let allrows = [];
+    files = Array.from(files);
+    for (var file of files) {
+      $('span.main').text('import:', file.name);
+      if (file.name.match(/\.xls/)) {
+        const result = await readBinary(file);
+        const workbook = XLSX.read(result, { type: 'binary' });
+        for (let sheetname of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetname];
+          if (sheet['!ref']) {
+            let [s,colEnd,rowEnd] = sheet['!ref'].match(/:([A-Z]+)(\d+)/);
+            // console.log(sheet['!ref'], colEnd,rowEnd);
+            colEnd = XLSX.utils.decode_col(colEnd);
+            let maxCol = 0;
+            const rows = [];
+            for (var r = 1; r<=rowEnd; r++) {
+              const row = [];
+              for (var c=0; c<=colEnd; c++) {
+                var sheetcell = sheet[XLSX.utils.encode_cell({c:c,r:r-1})];
+                var cell = null;
+                if (sheetcell) {
+                  maxCol = Math.max(maxCol,c);
+                  if (sheetcell.l) {
+                    cell = {
+                      v: sheetcell.l.display,
+                      href: sheetcell.l.Target,
+                    }
+                  } else {
+                    cell = {
+                      v: sheetcell.v,
+                    }
+                  }
+                }
+                row.push(cell);
+              }
+              rows.push(row);
+            }
+            rows.forEach(row => row.length = maxCol + 1);
+            // console.log(file.name, sheetname, maxCol, rows);
+            $('span.main').text('upload:', file.name, sheetname);
+            await $().url('https://aliconnect.nl/api/abis/data')
+            .input(rows)
+            .query({
+              request_type: 'importdata',
+              filename: file.name + '-' + sheetname,
+            })
+            .post()
+            .then(console.log)
+          }
+        }
+      }
+      $('span.main').text('import done');
+    }
   }
   async function importFiles(files){
     let allrows = [];
@@ -2161,12 +2286,12 @@ $().on('load', async e => {
     // ];
 
     console.log(colnames);
-    const [rows] = await dmsClient.api('/abis/artlist')
-    .query({
+    const [rows] = await $().url('https://aliconnect.nl/api/abis/data').query({
+      request_type: 'artlist',
       top: 10000,
       filter: filter,
       select: colnames.filter(n => cols[n] && !cols[n].calc).join(','),
-    }).get();
+    }).get().then(e => e.body);
     const productlist = [
       { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Hoofdbescherming', exp: /\b(Hoofdbescherming)\b/i, },
       { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Lashandschoen', exp: /\b(Lashandschoen)\b/i, },
@@ -2533,31 +2658,13 @@ $().on('load', async e => {
         $filter: `archivedDateTime NE NULL`,
         $search: ``,
       }),
-      Klanten:{
-        Actief:{
-          Mailadressen:{
-            Proving: async e => {
-              const [rows] = await aimClient.api('https://dms.aliconnect.nl/api/abis/klanten/actief/mailadressen/proving').then(res=>res.json());
-              var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
-            },
-            Airo: async e => {
-              const [rows] = await aimClient.api('https://dms.aliconnect.nl/api/abis/klanten/actief/mailadressen/airo').then(res=>res.json());
-              var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
-            },
-          },
-        },
-        PPG:{
-          Mailadressen:{
-            Proving: async e => {
-              const [rows] = await aimClient.api('https://dms.aliconnect.nl/api/abis/klanten/ppg/mailadressen/proving').then(res=>res.json());
-              var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
-            },
-            Airo: async e => {
-              const [rows] = await aimClient.api('https://dms.aliconnect.nl/api/abis/klanten/ppg/mailadressen/airo').then(res=>res.json());
-              var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
-            },
-          },
-        },
+      "Klanten Actief Mailadressen": async e => {
+        const [rows] = await aim.req('https://aliconnect.nl/api/abis/data').query({request_type: 'klanten_actief_mailadressen'}).then(res=>res.json());
+        var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
+      },
+      "Klanten PPG Mailadressen": async e => {
+        const [rows] = await aim.req('https://aliconnect.nl/api/abis/data').query({request_type: 'klanten_ppg_mailadressen'}).then(res=>res.json());
+        var promise = navigator.clipboard.writeText(rows.map(row=>row.email).join('; '));
       },
 
       // Analyse: {
@@ -2683,9 +2790,209 @@ $().on('load', async e => {
       // Doorfacturatie: e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=doorfacturatie',
     },
     Magazijn: {
+      Opslag___() {
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storage',
+        }).get().then(e => {
+          const [arts] = e.body;
+          // const storageLocations = arts.map(a=>a.storageLocation).unique();
+          // console.log(storageLocations);
+          // art.length=100;
+          // arts.forEach(a=>a.storageLocation = a.storageLocation || a.prodStorageLocation || 'xxx');
+          arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
+          arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
+          arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
+          arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
+          // console.log(arts);
+          $(document.documentElement).class('');
+          var k='';
+          var to;
+          const elems = {
+            locatie: $('div'),
+            ean: $('div'),
+            artcode: $('div'),
+            art: $('div').style('font-family:monospace;'),
+          }
+          $(document.body).text('').append(
+            $('style').text('input{text-align:right;font:inherit;}'),
+            $('div').style('font-size:20px;').append(
+              $('input').style('font-size:20px;').type('number').on('keyup', e => {
+                if (e.code === 'Enter') {
+                  const value = e.target.value;
+                  e.target.value = '';
+                  if (value[0]==='0' && value[1]==='0') {
+                    console.log(value);
+                    const loc = value.slice(-6).match(/../g).map(Number).join('.');
+                    elems.locatie.text(loc);
+                    var artlist = arts.filter(a => a.locCode === loc);
+                  } else {
+                    elems.ean.text(value);
+                    var artlist = arts.filter(a => a.ean == value);
+                  }
+                  // console.log(artlist);
+                  elems.art.text('').append(
+                    artlist.map((a,i) => [
+                      $('div').text(a.artNr, rowCode(a), a.id),
+                      // $('div').text(rowTitle(a)),
+                      $('div').append(
+                        a.eanElem = $('input').value(a.ean)
+                        .type('number')
+                        .placeholder('ean')
+                        .step(1)
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'ean',
+                            value: a.ean = e.target.value,
+                          });
+                          a.newStorageLocationElem.select().focus();
+                        }),
+                        a.newStorageLocationElem = $('input')
+                        .style('width: 120px;')
+                        .value(a.newStorageLocation)
+                        .type('number')
+                        .step(1)
+                        .placeholder('locatie')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'newStorageLocation',
+                            value: a.newStorageLocation = e.target.value,
+                          });
+                          a.stockElem.select().focus();
+                        }),
+                        a.stockElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.stock)
+                        .type('number')
+                        .placeholder('aantal')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'stock',
+                            value: a.stock = e.target.value,
+                          });
+                          artlist[i+1].eanElem.select().focus();
+                        }),
+                        a.prodInhoudElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.prodInhoud)
+                        .type('number')
+                        .placeholder('inhoud')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'prodInhoud',
+                            value: a.prodInhoud = e.target.value,
+                          })
+                        }),
+                      )
+                    ]),
+                  )
+                }
+              }),
+              elems.locatie,
+              elems.ean,
+              elems.artcode,
+              elems.art,
+            )
+          );
+          return;
+          return;
+          $(document.body).text('').style('overflow:auto;').append(
+            $('table').style('font-family:consolas;').append(
+              arts.map(a => $('tr').append(
+                // $('td').append($('input').value(a.storageLocation.substr(0,3))),
+                $('td').text(a.storageLocation),
+                $('td').text(locCode(a.storageLocation)),
+                $('td').text(rowCode(a)),
+                $('td').text(a.orderCode),
+                $('td').append($('input').value(a.ean)),
+                // $('td').text(a.ean),
+                $('td').append($('input').value(a.stockStart).on('keyup', e => {
+                  if (e.code === 'Enter') {
+                    alert(e.target.value);
+                  }
+                  // k=k+'['+e.code+']';
+                  // k=k+e.key;
+                  // clearTimeout(to);
+                  // to = setTimeout(e => alert(k), 500);
+                })),
+                // $('td').text(a.stockStart),
+                // $('td').text(a.unit),
+                $('td').text(rowTitle(a)),
+              ))
+            )
+          )
+          return;
+
+          const store = { art: [], children:{} };
+          for (art of arts) {
+            var a = (art.storageLocation||'?').substring(0,3).toUpperCase().split('');
+            // console.log(art.storageLocation);
+            var s = store;
+            for (c1 of a) {
+              s = s.children[c1] = s.children[c1] || { name: c1, art: [], children:{} };
+            }
+            s.art.push(art);
+          }
+          console.log(store);
+          const elem = $('.lv').text('');
+          function artrows(rows){
+            return $('table').style('font-family:consolas;').append(
+              rows.map(a => $('tr').append(
+                $('td').text(a.storageLocation || a.prodStorageLocation),
+                $('td').text(a.stockStart),
+                $('td').text([
+                  (a.prodBrand||'xxx').substr(0,3).toUpperCase(),
+                  a.artNr||a.prodArtNr||a.orderCode,
+                  a.quantity,
+                  (a.supplier||'xxx').substr(0,3).toUpperCase()
+                ].join('-').toLowerCase()),
+                $('td').text(a.unit),
+                $('td').text(
+                  a.prodBrand,
+                  a.prodTitle,
+                  a.prodInhoud ? a.prodInhoud + (a.prodInhoudEenheid || 'st') : null,
+                  a.quantity>1 ? a.quantity + 'st': '',
+                ),
+                $('td').text(a.ean),
+              ))
+            )
+          }
+          for (let [s1,o1] of Object.entries(store.children)) {
+            let e1 = $('details').parent(elem).open(1).append(
+              $('summary').text(s1),
+              artrows(o1.art),
+            )
+            for (let [s2,o2] of Object.entries(o1.children)) {
+              let e2 = $('details').parent(e1).open(1).append(
+                $('summary').text(s1,s2),
+                artrows(o2.art),
+              )
+              for (let [s3,o3] of Object.entries(o2.children)) {
+                let e3 = $('details').parent(e2).open(1).append(
+                  $('summary').text(s1,s2,s3),
+                  artrows(o3.art),
+                )
+              }
+            }
+          }
+        });
+      },
       Opslag() {
-        dmsClient.api('/abis/storage').get().then(data => {
-          const [arts] = data;
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storage',
+        }).get().then(e => {
+          const [arts] = e.body;
           arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
           arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
           // arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
@@ -2737,8 +3044,9 @@ $().on('load', async e => {
                         .placeholder('ean')
                         .step(1)
                         .on('change', e => {
-                          dmsClient.api('/abis/storageSave')
-                          .post({
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
                             id: a.id,
                             name: 'ean',
                             value: a.ean = e.target.value,
@@ -2752,8 +3060,9 @@ $().on('load', async e => {
                         .step(1)
                         .placeholder('locatie')
                         .on('change', e => {
-                          dmsClient.api('/abis/storageSave')
-                          .post({
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
                             id: a.id,
                             name: 'loc',
                             value: a.loc = e.target.value,
@@ -2766,8 +3075,9 @@ $().on('load', async e => {
                         .type('number')
                         .placeholder('aantal')
                         .on('change', e => {
-                          dmsClient.api('/abis/storageSave')
-                          .post({
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
                             id: a.id,
                             name: 'stock',
                             value: a.stock = e.target.value,
@@ -2780,8 +3090,9 @@ $().on('load', async e => {
                         .type('number')
                         .placeholder('inhoud')
                         .on('change', e => {
-                          dmsClient.api('/abis/storageSave')
-                          .post({
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
                             id: a.id,
                             name: 'prodInhoud',
                             value: a.prodInhoud = e.target.value,
@@ -2793,8 +3104,9 @@ $().on('load', async e => {
                         .type('number')
                         .placeholder('VOS')
                         .on('change', e => {
-                          dmsClient.api('/abis/storageSave')
-                          .post({
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
                             id: a.id,
                             name: 'vos',
                             value: a.vos = e.target.value,
@@ -2806,8 +3118,9 @@ $().on('load', async e => {
                         .type('number')
                         .placeholder('VOS/Eenheid')
                         .on('change', e => {
-                          dmsClient.api('/abis/storageSave')
-                          .post({
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
                             id: a.id,
                             name: 'vosPerEenh',
                             value: a.vosPerEenh = e.target.value,
@@ -2907,17 +3220,217 @@ $().on('load', async e => {
           }
         });
       },
+      Opslag2() {
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storage',
+        }).get().then(e => {
+          const [arts] = e.body;
+          // const storageLocations = arts.map(a=>a.storageLocation).unique();
+          // console.log(storageLocations);
+          // art.length=100;
+          // arts.forEach(a=>a.storageLocation = a.storageLocation || a.prodStorageLocation || 'xxx');
+          arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
+          arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
+          arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
+          arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
+          // console.log(arts);
+          $(document.documentElement).class('');
+          var k='';
+          var to;
+          const elems = {
+            locatie: $('div'),
+            ean: $('div'),
+            artcode: $('div'),
+            art: $('div').style('font-family:monospace;'),
+          }
+          $(document.body).text('').append(
+            $('style').text('input{text-align:right;font:inherit;}'),
+            $('div').style('font-size:20px;').append(
+              $('input').style('font-size:20px;').type('number').on('keyup', e => {
+                if (e.code === 'Enter') {
+                  const value = e.target.value;
+                  e.target.value = '';
+                  if (value[0]==='0' && value[1]==='0') {
+                    console.log(value);
+                    const loc = value.slice(-6).match(/../g).map(Number).join('.');
+                    elems.locatie.text(loc);
+                    var artlist = arts.filter(a => a.locCode === loc);
+                  } else {
+                    elems.ean.text(value);
+                    var artlist = arts.filter(a => a.ean == value);
+                  }
+                  console.log(artlist);
+                  elems.art.text('').append(
+                    artlist.map((a,i) => [
+                      $('div').text(a.artNr, rowCode(a), a.id),
+                      // $('div').text(rowTitle(a)),
+                      $('div').append(
+                        a.eanElem = $('input').value(a.ean)
+                        .type('number')
+                        .placeholder('ean')
+                        .step(1)
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'ean',
+                            value: a.ean = e.target.value,
+                          });
+                          a.newStorageLocationElem.select().focus();
+                        }),
+                        a.newStorageLocationElem = $('input')
+                        .style('width: 120px;')
+                        .value(a.newStorageLocation)
+                        .type('number')
+                        .step(1)
+                        .placeholder('locatie')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'newStorageLocation',
+                            value: a.newStorageLocation = e.target.value,
+                          });
+                          a.stockElem.select().focus();
+                        }),
+                        a.stockElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.stock)
+                        .type('number')
+                        .placeholder('aantal')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'stock',
+                            value: a.stock = e.target.value,
+                          });
+                          artlist[i+1].eanElem.select().focus();
+                        }),
+                        a.prodInhoudElem = $('input')
+                        .style('width: 80px;')
+                        .value(a.prodInhoud)
+                        .type('number')
+                        .placeholder('inhoud')
+                        .on('change', e => {
+                          $().url('https://aliconnect.nl/api/abis/data').query({
+                            request_type: 'storageSave',
+                          }).post({
+                            id: a.id,
+                            name: 'prodInhoud',
+                            value: a.prodInhoud = e.target.value,
+                          })
+                        }),
+                      )
+                    ]),
+                  )
+                }
+              }),
+              elems.locatie,
+              elems.ean,
+              elems.artcode,
+              elems.art,
+            )
+          );
+          return;
+          return;
+          $(document.body).text('').style('overflow:auto;').append(
+            $('table').style('font-family:consolas;').append(
+              arts.map(a => $('tr').append(
+                // $('td').append($('input').value(a.storageLocation.substr(0,3))),
+                $('td').text(a.storageLocation),
+                $('td').text(locCode(a.storageLocation)),
+                $('td').text(rowCode(a)),
+                $('td').text(a.orderCode),
+                $('td').append($('input').value(a.ean)),
+                // $('td').text(a.ean),
+                $('td').append($('input').value(a.stockStart).on('keyup', e => {
+                  if (e.code === 'Enter') {
+                    alert(e.target.value);
+                  }
+                  // k=k+'['+e.code+']';
+                  // k=k+e.key;
+                  // clearTimeout(to);
+                  // to = setTimeout(e => alert(k), 500);
+                })),
+                // $('td').text(a.stockStart),
+                // $('td').text(a.unit),
+                $('td').text(rowTitle(a)),
+              ))
+            )
+          )
+          return;
+
+          const store = { art: [], children:{} };
+          for (art of arts) {
+            var a = (art.storageLocation||'?').substring(0,3).toUpperCase().split('');
+            // console.log(art.storageLocation);
+            var s = store;
+            for (c1 of a) {
+              s = s.children[c1] = s.children[c1] || { name: c1, art: [], children:{} };
+            }
+            s.art.push(art);
+          }
+          console.log(store);
+          const elem = $('.lv').text('');
+          function artrows(rows){
+            return $('table').style('font-family:consolas;').append(
+              rows.map(a => $('tr').append(
+                $('td').text(a.storageLocation || a.prodStorageLocation),
+                $('td').text(a.stockStart),
+                $('td').text([
+                  (a.prodBrand||'xxx').substr(0,3).toUpperCase(),
+                  a.artNr||a.prodArtNr||a.orderCode,
+                  a.quantity,
+                  (a.supplier||'xxx').substr(0,3).toUpperCase()
+                ].join('-').toLowerCase()),
+                $('td').text(a.unit),
+                $('td').text(
+                  a.prodBrand,
+                  a.prodTitle,
+                  a.prodInhoud ? a.prodInhoud + (a.prodInhoudEenheid || 'st') : null,
+                  a.quantity>1 ? a.quantity + 'st': '',
+                ),
+                $('td').text(a.ean),
+              ))
+            )
+          }
+          for (let [s1,o1] of Object.entries(store.children)) {
+            let e1 = $('details').parent(elem).open(1).append(
+              $('summary').text(s1),
+              artrows(o1.art),
+            )
+            for (let [s2,o2] of Object.entries(o1.children)) {
+              let e2 = $('details').parent(e1).open(1).append(
+                $('summary').text(s1,s2),
+                artrows(o2.art),
+              )
+              for (let [s3,o3] of Object.entries(o2.children)) {
+                let e3 = $('details').parent(e2).open(1).append(
+                  $('summary').text(s1,s2,s3),
+                  artrows(o3.art),
+                )
+              }
+            }
+          }
+        });
+      },
       'Opruimen locaties'() {
-        dmsClient.api('/abis/storage')
-        .get().then(data => {
-          const [artlist] = data;
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storage',
+        }).get().then(e => {
+          const [artlist] = e.body;
           console.log(artlist);
+
         });
       },
 
       Locaties() {
         const codes={};
-        stelling.forEach(rij => {
+        rijen.forEach(rij => {
           rij.racks.forEach(rack => {
             Array(rack.shelfs).fill(null).forEach((shelf,shelfnr) => {
               const locbarcode = `*00${("00"+rij.nr).slice(-2)}${("00"+rack.nr).slice(-2)}${("00"+(shelfnr+1)).slice(-2)}*`;
@@ -2930,9 +3443,10 @@ $().on('load', async e => {
           });
         });
         // return;
-        dmsClient.api('/abis/storageLocaties')
-        .get().then(data => {
-          const [art] = data;
+        $().url('https://aliconnect.nl/api/abis/data').query({
+          request_type: 'storageLocaties',
+        }).get().then(e => {
+          const [art] = e.body;
           art.forEach(art => {
             art.storageLocation = (art.storageLocation||art.prodStorageLocation||'').toLowerCase();
             art.codeNew = codes[String(art.storageLocation).toLowerCase()];
@@ -2949,86 +3463,6 @@ $().on('load', async e => {
           ).print();
           // console.log(codes);
           console.log(art);
-        });
-      },
-      voorraad_tellijst() {
-        dmsClient.api('/abis/voorraad_tellijst')
-        .get().then(data => {
-          console.log($('div').text)
-          var [rows] = data;
-          rows.sort((a,b) => String(a.loc||a.locOld||'').localeCompare(String(b.loc||b.locOld||'')))
-          var table = $('table').append(
-            $('thead').append(
-              $('tr').append(
-                $('th').text('Vak'),
-                $('th').text('Omschrijving'),
-                // $('th').text('Loc'),
-                // $('th').text('VOC'),
-                // $('th').text('Gewicht'),
-                $('th').text('Aantal'),
-              )
-            )
-          );
-          var tbody = $('tbody').parent(table);
-          for (let stel of stelling) {
-            for (let rack of stel.racks) {
-              for (var i = 1;i<=rack.shelfs;i++) {
-                tbody.append(
-                  $('tr').style('background-color:#eee;').append(
-                    $('td').text([stel.nr, rack.nr, i].join('.')).style('font-weight:bold;'),
-                    $('td'),
-                    $('td'),
-                  )
-                )
-                var shelfrows = rows.filter(row => row.loc === '00'+stel.nr.pad(2)+rack.nr.pad(2)+i.pad(2) || row.locOld.toLowerCase() === (rack.code + i));
-                for (var r=0;r<Math.max(5,shelfrows.length);r++) {
-                  var row = shelfrows[r] || {};
-                  row.done = true;
-                  tbody.append(
-                    $('tr').class('dr').append(
-                      $('td').append(
-                        [stel.nr, rack.nr, i].join('.'),
-                        $('div').style('color:red;font-weight:bold;').text(row.loc ? '' : row.locOld),
-                      ),
-                      $('td').text(row.title, row.voc ? ', ' + row.voc + 'gr/liter' : '',row.gewicht ? ', ' + row.gewicht + 'KG' : ''),
-                      // $('td').text(row.loc),
-                      // $('td').text(row.voc),
-                      // $('td').text(row.gewicht),
-                      $('td').text(row.artVoorraad),
-                    )
-                  )
-                }
-              }
-            }
-          }
-          tbody.append(
-            $('tr').append(
-              $('td').text('ONBEKEND/FOUT').style('font-weight:bold;'),
-              $('td'),
-              $('td'),
-            )
-          )
-          rows.filter(row => !row.done).forEach(row => {
-            tbody.append(
-              $('tr').class('dr').append(
-                $('td').append(
-                  row.loc,
-                  $('div').style('color:red;font-weight:bold;').text(row.loc ? '' : row.locOld),
-                ),
-                $('td').text(row.title, row.voc ? ', ' + row.voc + 'gr/liter' : '',row.gewicht ? ', ' + row.gewicht + 'KG' : ''),
-                // $('td').text(row.loc),
-                // $('td').text(row.voc),
-                // $('td').text(row.gewicht),
-                $('td').text(row.artVoorraad, '<br>', row.prodBeginVoorraad),
-              )
-            )
-          });
-
-          console.log(data);
-          $('div').append(
-            $('link').rel('stylesheet').href('assets/css/tellijst.css'),
-            table,
-          ).print();
         });
       },
       async ArtikelAnalyse() {
@@ -3498,34 +3932,4 @@ $().on('load', async e => {
       },
     },
   });
-
-  // dmsClient.api('/me/children').select('name').get().then(console.log);
-  // dmsClient.api('/Contact').select('CompanyName,name,FirstName,Surname').search('alicon.nl').get().then(console.log);
-  // dmsClient.api('/me/children').select('title, schemaName').get().then(data => {
-  //   console.log(data);
-  //   aim.om.treeview({
-  //     Mappen: Object.fromEntries(data.map(row => [row.title, e => {
-  //       dmsClient.api(`/${row.schemaName}/${row.id}/children`).select('title').get().then(console.log);
-  //       dmsClient.api(`/${row.schemaName}/${row.id}`).select('*').get().then(row => {
-  //         pageviewrow(row);
-  //       });
-  //     }])),
-  //   })
-  // });
-
-  // dmsClient.api('/Website/3562759').select('*').get().then(data => {
-  //   console.log(1, data);
-  // });
-
-  // dmsClient.api('/Contact/265090/children').select('title, schemaName').get().then(data => {
-  //   console.log(data);
-  //   aim.om.treeview({
-  //     Mappen: Object.fromEntries(data.map(row => [row.title, e => {
-  //       const url = `/Contact/${row.id}/children`;
-  //       console.log(url);
-  //       dmsClient.api(url).select('title').get().then(console.log);
-  //     }])),
-  //   })
-  // });
-
 });

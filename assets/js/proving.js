@@ -686,8 +686,9 @@ $().on('load', async e => {
     return orderPage(salesorder,rows);
   }
   async function factuur(factuurNr) {
+    console.log('start factuurt',factuurNr);
     factuurData = await dmsClient.api('/abis/factuur').post({factuurNr: factuurNr});
-    console.log(factuurNr,factuurData);
+    console.log('done',factuurNr,factuurData);
     const [clientInvoices, clientOrders, rows] = factuurData;
     const [invoice] = clientInvoices;
     const [salesorder] = clientOrders;
@@ -1204,7 +1205,10 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.invoice.app = {
     nav: row => [
-      $('button').class('abtn print').title('Print').on('click', async e => (await factuur(row.nr)).printpdf()),
+      $('button').class('abtn print').title('Print').on('click', async e => {
+        console.log(333, row);
+        (await factuur(row.id)).printpdf();
+      }),
       !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
     ],
     navList: () => [

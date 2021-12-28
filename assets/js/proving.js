@@ -2701,7 +2701,7 @@ $().on('load', async e => {
             locatie: $('div'),
             ean: $('div'),
             artcode: $('div'),
-            art: $('div').style('font-family:monospace;'),
+            art: $('div'),//.style('font-family:monospace;'),
           }
           $(document.body).text('').append(
             $('style').text('input{text-align:right;font:inherit;}'),
@@ -2911,6 +2911,128 @@ $().on('load', async e => {
           }
         });
       },
+      Opslag() {
+        $(document.body).text('').append(
+          $('style').text('input{text-align:right;font:inherit;}'),
+          $('div').style('font-size:20px;').append(
+            $('div').append(
+              $('input').style('font-size:20px;').on('keyup', e => {
+                if (e.code === 'Enter') {
+                  e.target.select();
+                  dmsClient.api('/abis/storage').query({search:e.target.value}).get().then(data => {
+                    console.log(data);
+                    const [arts] = data;
+                    arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
+                    arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
+                    // arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
+                    // arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
+                    var k='';
+                    var to;
+                    $('.data').text('').append(
+                      arts.map((a,i) => [
+                        $('div').text(a.prodTitle),
+                        $('div').append(
+                          $('input')
+                          .style('width: 120px;')
+                          .value(a.loc)
+                          .type('number')
+                          .step(1)
+                          .placeholder('locatie')
+                          .on('change', e => {
+                            dmsClient.api('/abis/storage').post({
+                              id: a.id,
+                              name: name,
+                              value: e.target.value,
+                            });
+                          }),
+                          $('input').value(a.ean)
+                          .type('number')
+                          .placeholder('ean')
+                          .step(1)
+                          .on('change', e => {
+                            dmsClient.api('/abis/storage')
+                            .post({
+                              id: a.id,
+                              name: 'ean',
+                              value: e.target.value,
+                            });
+                          }),
+                          $('input')
+                          .style('width: 80px;')
+                          .value(a.stock)
+                          .type('number')
+                          .placeholder('aantal')
+                          .on('change', e => {
+                            dmsClient.api('/abis/storage')
+                            .post({
+                              id: a.id,
+                              name: 'stock',
+                              value: e.target.value,
+                            });
+                          }),
+                          $('input')
+                          .style('width: 80px;')
+                          .value(a.inh)
+                          .type('number')
+                          .placeholder('inh')
+                          .on('change', e => {
+                            dmsClient.api('/abis/storage')
+                            .post({
+                              id: a.id,
+                              name: 'inh',
+                              value: e.target.value,
+                            })
+                          }),
+                          $('input')
+                          .style('width: 80px;')
+                          .value(a.voc)
+                          .type('number')
+                          .placeholder('voc')
+                          .on('change', e => {
+                            dmsClient.api('/abis/storage')
+                            .post({
+                              id: a.id,
+                              name: 'voc',
+                              value: e.target.value,
+                            })
+                          }),
+                          $('input')
+                          .style('width: 80px;')
+                          .value(a.gewicht)
+                          .type('number')
+                          .placeholder('gewicht')
+                          .on('change', e => {
+                            dmsClient.api('/abis/storage')
+                            .post({
+                              id: a.id,
+                              name: 'gewicht',
+                              value: e.target.value,
+                            })
+                          }),
+                          // $('input')
+                          // .style('width: 80px;')
+                          // .value(a.vosPerEenh)
+                          // .type('number')
+                          // .placeholder('VOS/Eenheid')
+                          // .on('change', e => {
+                          //   dmsClient.api('/abis/storageSave')
+                          //   .post({
+                          //     id: a.id,
+                          //     name: 'vosPerEenh',
+                          //     value: e.target.value,
+                          //   })
+                          // }),
+                        )
+                      ]),
+                    )
+                  });
+                }
+              }),
+              $('div').class('data'),
+            ),
+          )
+        );
+      },
       'Opruimen locaties'() {
         dmsClient.api('/abis/storage')
         .get().then(data => {
@@ -2957,82 +3079,90 @@ $().on('load', async e => {
       },
       voorraad_tellijst() {
         dmsClient.api('/abis/voorraad_tellijst')
-        .get().then(data => {
-          console.log($('div').text)
+        .get().then(async data => {
+          // console.log($('div').text)
           var [rows] = data;
           rows.sort((a,b) => String(a.loc||a.locOld||'').localeCompare(String(b.loc||b.locOld||'')))
-          var table = $('table').append(
-            $('thead').append(
-              $('tr').append(
-                $('th').text('Vak'),
-                $('th').text('Omschrijving'),
-                // $('th').text('Loc'),
-                // $('th').text('VOC'),
-                // $('th').text('Gewicht'),
-                $('th').text('Aantal'),
-              )
-            )
-          );
-          var tbody = $('tbody').parent(table);
+          // var table = $('table').append(
+          //   $('thead').append(
+          //     $('tr').append(
+          //       $('th').text('Vak'),
+          //       $('th').text('Omschrijving'),
+          //       // $('th').text('Loc'),
+          //       // $('th').text('VOC'),
+          //       // $('th').text('Gewicht'),
+          //       $('th').text('Aantal'),
+          //     )
+          //   )
+          // );
+          // var tbody = $('tbody').parent(table);
           for (let stel of stelling) {
             for (let rack of stel.racks) {
               for (var i = 1;i<=rack.shelfs;i++) {
-                tbody.append(
-                  $('tr').style('background-color:#eee;').append(
-                    $('td').text([stel.nr, rack.nr, i].join('.')).style('font-weight:bold;'),
-                    $('td'),
-                    $('td'),
-                  )
-                )
-                var shelfrows = rows.filter(row => row.loc === '00'+stel.nr.pad(2)+rack.nr.pad(2)+i.pad(2) || row.locOld.toLowerCase() === (rack.code + i));
-                for (var r=0;r<Math.max(5,shelfrows.length);r++) {
-                  var row = shelfrows[r] || {};
-                  row.done = true;
-                  tbody.append(
-                    $('tr').class('dr').append(
-                      $('td').append(
-                        [stel.nr, rack.nr, i].join('.'),
-                        $('div').style('color:red;font-weight:bold;').text(row.loc ? '' : row.locOld),
-                      ),
-                      $('td').text(row.title, row.voc ? ', ' + row.voc + 'gr/liter' : '',row.gewicht ? ', ' + row.gewicht + 'KG' : ''),
-                      // $('td').text(row.loc),
-                      // $('td').text(row.voc),
-                      // $('td').text(row.gewicht),
-                      $('td').text(row.artVoorraad),
-                    )
-                  )
+                // tbody.append(
+                //   $('tr').style('background-color:#eee;').append(
+                //     $('td').text([stel.nr, rack.nr, i].join('.')).style('font-weight:bold;'),
+                //     $('td'),
+                //     $('td'),
+                //   )
+                // )
+                var loc = '00'+stel.nr.pad(2)+rack.nr.pad(2)+i.pad(2);
+                var shelfrows = rows.filter(row => row.loc === loc || row.locOld.toLowerCase() === (rack.code + i));
+                for (let row of shelfrows) {
+                  if (!row.loc) {
+                    console.log([stel.nr, rack.nr, i].join('.'), loc, row.id, row.locOld, loc, row.title);
+                    //await dmsClient.api('/abis/producten_set').post({id:row.id, name:'loc', value:loc}).then(console.log);
+                    // return;
+                  }
                 }
+                // for (var r=0;r<Math.max(5,shelfrows.length);r++) {
+                  // var row = shelfrows[r] || {};
+                  // row.done = true;
+                  // tbody.append(
+                  //   $('tr').class('dr').append(
+                  //     $('td').append(
+                  //       [stel.nr, rack.nr, i].join('.'),
+                  //       $('div').style('color:red;font-weight:bold;').text(row.loc ? '' : row.locOld),
+                  //     ),
+                  //     $('td').text(row.title, row.voc ? ', ' + row.voc + 'gr/liter' : '',row.gewicht ? ', ' + row.gewicht + 'KG' : ''),
+                  //     // $('td').text(row.loc),
+                  //     // $('td').text(row.voc),
+                  //     // $('td').text(row.gewicht),
+                  //     $('td').text(row.artVoorraad),
+                  //   )
+                  // )
+                // }
               }
             }
           }
-          tbody.append(
-            $('tr').append(
-              $('td').text('ONBEKEND/FOUT').style('font-weight:bold;'),
-              $('td'),
-              $('td'),
-            )
-          )
-          rows.filter(row => !row.done).forEach(row => {
-            tbody.append(
-              $('tr').class('dr').append(
-                $('td').append(
-                  row.loc,
-                  $('div').style('color:red;font-weight:bold;').text(row.loc ? '' : row.locOld),
-                ),
-                $('td').text(row.title, row.voc ? ', ' + row.voc + 'gr/liter' : '',row.gewicht ? ', ' + row.gewicht + 'KG' : ''),
-                // $('td').text(row.loc),
-                // $('td').text(row.voc),
-                // $('td').text(row.gewicht),
-                $('td').text(row.artVoorraad, '<br>', row.prodBeginVoorraad),
-              )
-            )
-          });
+          // tbody.append(
+          //   $('tr').append(
+          //     $('td').text('ONBEKEND/FOUT').style('font-weight:bold;'),
+          //     $('td'),
+          //     $('td'),
+          //   )
+          // )
+          // rows.filter(row => !row.done).forEach(row => {
+          //   tbody.append(
+          //     $('tr').class('dr').append(
+          //       $('td').append(
+          //         row.loc,
+          //         $('div').style('color:red;font-weight:bold;').text(row.loc ? '' : row.locOld),
+          //       ),
+          //       $('td').text(row.title, row.voc ? ', ' + row.voc + 'gr/liter' : '',row.gewicht ? ', ' + row.gewicht + 'KG' : ''),
+          //       // $('td').text(row.loc),
+          //       // $('td').text(row.voc),
+          //       // $('td').text(row.gewicht),
+          //       $('td').text(row.artVoorraad, '<br>', row.prodBeginVoorraad),
+          //     )
+          //   )
+          // });
 
           console.log(data);
-          $('div').append(
-            $('link').rel('stylesheet').href('assets/css/tellijst.css'),
-            table,
-          ).print();
+          // $('div').append(
+          //   $('link').rel('stylesheet').href('assets/css/tellijst.css'),
+          //   table,
+          // ).print();
         });
       },
       async ArtikelAnalyse() {

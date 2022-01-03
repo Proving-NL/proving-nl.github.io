@@ -13,7 +13,7 @@ $().on('load', async e => {
   // console.log('JA', aim);
   // console.log('JA', sessionStorage.getItem('access_token'));
   const {aimClient,dmsClient} = aim;
-  console.log('AIM', aimClient, dmsClient);
+  console.log('AIM', aimClient, dmsClient, aim.config);
   // dmsClient.api('/salesorder', {
   //   filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
   //   order: `nr DESC`,
@@ -843,12 +843,13 @@ $().on('load', async e => {
     const [clientInvoices,clientOrders,rows] = factuurData;
     const [invoice] = clientInvoices;
     const invoiceNr = invoice.nr;
+    console.log(invoice);
     const from = `invoice@${invoice.accountName.toLowerCase()}.nl`;
     const maildata = {
       from: from,
       bcc: from,
       to: 'max.van.kampen@alicon.nl',
-      to: invoice.clientOtherMailAddress,
+      to: invoice.clientOtherMailAddress || invoice.clientBusinessMailAddress,
       invoiceNr: invoiceNr,
       chapters: [{
         title: `${invoice.accountCompanyName} factuur ${invoiceNr} voor ${invoice.clientCompanyName}`,
@@ -880,7 +881,7 @@ $().on('load', async e => {
         }]
       };
       console.log(maildata);
-      await dmsClient.api('/abis/sendInvoice').body(maildata).post().then(e => console.log(e.body));
+      await dmsClient.api('/abis/sendInvoice').body(maildata).post().then(e => console.log(e));
       // elem.remove();
     }
   async function factureren(salesorder, id){
@@ -1209,7 +1210,7 @@ $().on('load', async e => {
         console.log(333, row);
         (await factuur(row.id)).printpdf();
       }),
-      !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
+      !row.clientOtherMailAddress && !row.clientBusinessMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
     ],
     navList: () => [
       $('button').text('Facturen').append(
@@ -1953,6 +1954,8 @@ $().on('load', async e => {
       $('span.main').text('import:', file.name);
       console.log(file.name, aim.config.import);
       for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename.toLowerCase()))) {
+        await dmsClient.api('/abis/art_ink_reset').post({importCode: fileConfig.importCode = fileConfig.importCode || fileConfig.filename});
+
         const result = await readBinary(file);
         const workbook = XLSX.read(result, { type: 'binary' });
         for (let tab of fileConfig.tabs) {
@@ -1977,7 +1980,7 @@ $().on('load', async e => {
                 return `(${cell.l.display})[${cell.l.Target}]`;
               }
               // console.log(c,r,cell)
-              return cell.v;
+              return String(cell.v).trim().replace(/  /g,' ');
             }
           }
           for (var c=0; c<=colEnd; c++) {
@@ -2021,6 +2024,7 @@ $().on('load', async e => {
               if (row) {
                 // console.log(row);
                 // return;
+                row.importCode = fileConfig.importCode;
                 data.rows.push(row);
                 allrows.push([row, tab]);
               }
@@ -2031,7 +2035,7 @@ $().on('load', async e => {
     }
     // return;
     console.log(allrows);
-    allrows = allrows.filter(entry => entry[0].keyGroup && entry[0].keyName && (entry[0].packPrice || entry[0].packListPrice || entry[0].partListPrice || entry[0].partPrice));
+    allrows = allrows.filter(entry => entry[0].leverancier && entry[0].bestelCode);
     console.log(allrows);
     var max = allrows.length;
     var i = 0;
@@ -2048,8 +2052,12 @@ $().on('load', async e => {
       // return;
       progressElem.value(++i);
     }
+
+    await dmsClient.api('/abis/artCleanUp').get();
+
     $('span.main').text('import done');
     progressElem.value(null);
+
     // alert('Import gereed');
   }
   $(window).on('popstate', async e => {
@@ -2520,6 +2528,34 @@ $().on('load', async e => {
         )
       )
     );
+  }
+
+  async function prijslijst_xls(filter,cols) {
+    const [rows] = await aimClient.api('/abis/prijslijst_xls')
+    .query('select', cols.map(col => col.n).join(','))
+    .query('filter', filter)
+    .get();
+    console.log(rows);
+    rows.forEach(row => {
+      // row.bruto
+    });
+    rows.sort((a,b)=>a.titel.localeCompare(b.titel));
+    const ws_title = "Prijslijst";
+
+    var wb = XLSX.utils.book_new();
+    wb.Props = {
+      Title: "Proving " + ws_title,
+      Subject: ws_title,
+      Author: "Proving",
+      CreatedDate: new Date(2017,12,19)
+    };
+    wb.SheetNames.push(ws_title);
+    var ws = XLSX.utils.aoa_to_sheet([cols].concat(rows.map(row => cols.map(col => Object.assign({v: String(row[col.n] || '').trim() }, col.f)))));
+    ws['!cols'] = cols;
+    wb.Sheets[ws_title] = ws;
+    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+    // saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), ws_title + ' Proving.xlsx');
+    $('a').download(ws_title + ' Proving.xlsx').rel('noopener').href(URL.createObjectURL(new Blob([s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
   }
 
   aim.om.treeview({
@@ -3078,11 +3114,11 @@ $().on('load', async e => {
         });
       },
       voorraad_tellijst() {
-        dmsClient.api('/abis/voorraad_tellijst')
+        dmsClient.api('/abis/abis_tool_voorraad')
         .get().then(async data => {
           // console.log($('div').text)
           var [rows] = data;
-          rows.sort((a,b) => String(a.loc||a.locOld||'').localeCompare(String(b.loc||b.locOld||'')))
+          // rows.sort((a,b) => String(a.loc||a.locOld||'').localeCompare(String(b.loc||b.locOld||'')))
           // var table = $('table').append(
           //   $('thead').append(
           //     $('tr').append(
@@ -3107,11 +3143,11 @@ $().on('load', async e => {
                 //   )
                 // )
                 var loc = '00'+stel.nr.pad(2)+rack.nr.pad(2)+i.pad(2);
-                var shelfrows = rows.filter(row => row.loc === loc || row.locOld.toLowerCase() === (rack.code + i));
+                var shelfrows = rows.filter(row => row.loc === loc || String(row.locOld).toLowerCase() === (rack.code + i));
                 for (let row of shelfrows) {
                   if (!row.loc) {
-                    console.log([stel.nr, rack.nr, i].join('.'), loc, row.id, row.locOld, loc, row.title);
-                    //await dmsClient.api('/abis/producten_set').post({id:row.id, name:'loc', value:loc}).then(console.log);
+                    console.log(1111, [stel.nr, rack.nr, i].join('.'), loc, row.id, row.locOld, loc, row.title);
+                    await dmsClient.api('/abis/abis_tool_voorraad').post({id:row.id, name:'storageCode', value:loc}).then(body => console.log(body));
                     // return;
                   }
                 }
@@ -3543,6 +3579,64 @@ $().on('load', async e => {
         `inkSds is not null`,
         'title',
       ),
+      'Inkoop.xls': async e => {
+        prijslijst_xls('', [
+          { n: 'nr', v: 'ArtNr', wch: 10  },
+          { n: 'artGroep', v: 'Categorie', wch: 20 },
+          { n: 'titel', v: 'Titel', wch: 80 },
+          { n: 'eenheid', v: 'Eenheid', wch: 10 },
+          { n: 'aantalStuks', v: 'VerpakAantal', wch: 10, f: { t:'n' } },
+
+          { n: 'inkBruto', v: 'InkBruto', wch: 10, f:{t:'n', z:'.00' } },
+          { n: 'inkKorting', v: 'InkKort', wch: 10, f:{t:'n' } },
+          { n: 'inkNetto', v: 'InkNetto', wch: 10, f:{t:'n', z:'.00' } },
+          { n: 'artInkBruto', v: 'InkBrutoOud', wch: 10, f:{t:'n', z:'.00' } },
+          { n: 'artInkKorting', v: 'InkKortOud', wch: 10, f:{t:'n' } },
+          { n: 'bruto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
+          { n: 'korting', v: 'Kort', wch: 10, f:{t:'n', z:'.0'} },
+          { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
+
+          { n: 'merk', v: 'Merk', wch: 10 },
+          { n: 'serie', v: 'Serie', wch: 10 },
+          { n: 'type', v: 'Type', wch: 10 },
+          { n: 'code', v: 'Code', wch: 10 },
+          { n: 'barcode', v: 'EAN', wch: 10, f: { t:'n' } },
+          { n: 'kleur', v: 'Kleur', wch: 10 },
+          { n: 'verhouding', v: 'Verhouding', wch: 10 },
+          { n: 'extra1', v: 'Extra1', wch: 16 },
+          { n: 'extra2', v: 'Extra2', wch: 16 },
+          { n: 'inhoud', v: 'Inh', wch: 10, f: { t:'n' } },
+          { n: 'inhoudEenheid', v: 'Eenh', wch: 10 },
+          { n: 'artGroep', v: 'Categorie', wch: 20 },
+        ]);
+      },
+      'Verkoop.xls': async e => {
+        prijslijst_xls('', [
+          { n: 'nr', v: 'ArtikelNr', wch: 10, f:{t:'n'} },
+          { n: 'artCode', v: 'ArtikelCode', wch: 10 },
+          { n: 'titel', v: 'Titel', wch: 80 },
+          { n: 'inkBruto', v: 'Prijs', wch: 10, f:{t:'n', z:'.00'} },
+          { n: 'verkKorting', v: 'Kort', wch: 10, f:{t:'n', z:'.0'} },
+          { n: 'bruto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
+          { n: 'merk', v: 'Merk', wch: 10 },
+          { n: 'serie', v: 'Serie', wch: 10 },
+          { n: 'type', v: 'Type', wch: 10 },
+          { n: 'code', v: 'Code', wch: 10 },
+          { n: 'barcode', v: 'EAN', wch: 10, f: { t:'n' } },
+          { n: 'kleur', v: 'Kleur', wch: 10 },
+          { n: 'verhouding', v: 'Verhouding', wch: 10 },
+          { n: 'extra1', v: 'Extra1', wch: 16 },
+          { n: 'extra2', v: 'Extra2', wch: 16 },
+          { n: 'inhoud', v: 'Inh', wch: 10, f: { t:'n' } },
+          { n: 'inhoudEenheid', v: 'Eenh', wch: 10 },
+          { n: 'aantalStuks', v: 'VerpakAantal', wch: 10, f: { t:'n' } },
+          { n: 'artGroep', v: 'Categorie', wch: 20 },
+        ]);
+      },
+      PrijslijstPdf: async e => {
+        const [rows] = await aimClient.api('/abis/art_alles').query().get();
+      },
+
       Prijslijst: e => artlist('Prijslijst', [
         'id',
         'partArtNr',
@@ -3599,6 +3693,7 @@ $().on('load', async e => {
         // 'partSds',
         // 'partTds'
       ], ``, 'partArtCode'),
+
       Inkoop: e => artlist('Inkooplijst', [
         'id',
         'supplier',

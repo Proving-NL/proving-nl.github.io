@@ -580,6 +580,7 @@ $().on('load', async e => {
             $('tr').append(
               $('th').align('left').class('datum').text('Orderdatum'),
               $('th').align('left').class('datum').text('Leverdatum'),
+              $('th').align('left').class('nr').text('Orderid'),
               $('th').align('left').class('nr').text('Ordernummer'),
               $('th').align('left').class('nr').text('Debiteurnummer'),
               $('th').align('left').text('Referentie'),
@@ -591,6 +592,7 @@ $().on('load', async e => {
             $('tr').append(
               $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
               $('td').text(new Date(salesorder.plannedDateTime).toLocaleDateString()),
+              $('td').text(salesorder.id),
               $('td').text(salesorder.nr),
               $('td').text(salesorder.clientDebNr),
               $('td').text(salesorder.ref),
@@ -3561,6 +3563,9 @@ $().on('load', async e => {
       // },
     },
     Overig: {
+      cleanup(){
+        aimClient.api('/abis/cleanup');
+      },
       Hazard: e => artlist(
         'Hazardlijst', [
           'id',
@@ -3612,11 +3617,11 @@ $().on('load', async e => {
       },
       'Verkoop.xls': async e => {
         prijslijst_xls('', [
-          { n: 'nr', v: 'ArtikelNr', wch: 10, f:{t:'n'} },
+          { n: 'artId', v: 'ArtikelNr', wch: 10, f:{t:'n'} },
           { n: 'artCode', v: 'ArtikelCode', wch: 10 },
           { n: 'titel', v: 'Titel', wch: 80 },
           { n: 'inkBruto', v: 'Prijs', wch: 10, f:{t:'n', z:'.00'} },
-          { n: 'verkKorting', v: 'Kort', wch: 10, f:{t:'n', z:'.0'} },
+          { n: 'korting', v: 'Kort', wch: 10, f:{t:'n', z:'.0'} },
           { n: 'bruto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
           { n: 'merk', v: 'Merk', wch: 10 },
           { n: 'serie', v: 'Serie', wch: 10 },

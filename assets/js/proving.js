@@ -1096,6 +1096,9 @@ $().on('load', async e => {
       $('button').class('abtn view').title('Selecteren').on('click', e => {
         selectClient(row.name);
       }),
+      $('button').class('abtn').text('Prijslijst').on('click', e => {
+        prijslijst_xls(`proving-prijslijst-${row.name}-${new Date().toISOString().substr(0,10)}`, `KlantName = '${row.name}'`, colsPrijslijst);
+      }),
     ],
   }
   aim.config.components.schemas.salesorder.app = {
@@ -1431,204 +1434,6 @@ $().on('load', async e => {
     },
   }
 
-  const productlist = [
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Hoofdbescherming', exp: /\b(Hoofdbescherming)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Lashandschoen', exp: /\b(Lashandschoen)\b/i, },
-
-    { toepassing: 'Lassen', name: 'Lasdeken', exp: /\b(Lasdeken)\b/i, },
-    { toepassing: 'Lassen', name: 'Laskap', exp: /\b(Laskap)\b/i, },
-    { toepassing: 'Lassen', name: 'Lasspatdeken', exp: /\b(Lasspatdeken)\b/i, },
-
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Helmschaal', exp: /\b(Helmschaal)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Helmschaalscharnierring', exp: /\b(Helmschaalscharnierring)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Beschermruit', exp: /\b(Beschermruit)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Vizierhelm', exp: /\b(Vizierhelm)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Hoofdkap', exp: /\b(Hoofdkap)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Luchtstroomdeflector', exp: /\b(Luchtstroomdeflector)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Veiligheidshelm', exp: /\b(Veiligheidshelm)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Lashelm', exp: /\b(Lashelm)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Kleding', name: 'Helm', exp: /\b(Helm)\b/i, },
-
-    { toepassing: 'Lassen', name: 'Lasstaafjes', exp: /\b(Lasstaafjes)\b/i, },
-    { toepassing: 'Lassen', name: 'Lasfilterhouder', exp: /\b(Lasfilterhouder)\b/i, },
-    { toepassing: 'Lassen', name: 'Glasreiniger', exp: /\b(Glasreiniger)\b/i, },
-
-    { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Lasrookmasker', exp: /\b(Lasrookmasker)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Oordoppen', exp: /\b(Oordoppen)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Keel- en oorbescherming', exp: /\b(Keel- en oorbescherming)\b/i, },
-    { toepassing: 'Lassen', productgroep: 'Bescherming', name: 'Stofmasker', exp: /\b(Stofmasker)\b/i, },
-
-
-
-    { toepassing: 'Schuren', name: 'Schuurblok', exp: /\b(Schuurblok|Schuurblokje)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurschijf', exp: /\b(schuursch\.|schuurschijf|schuurschijven)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurrol', exp: /\b(Schuurrol)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurdoek', exp: /\b(Schuurdoekje|Schuurdoek)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurblad', exp: /\b(Schuurbladen|Schuurblad)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurpad', exp: /\b(Schuurpad)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurkurk', exp: /\b(Schuurkurk)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurpapier', exp: /(Schuurpapier|Schuurpap\.)/i },
-    { toepassing: 'Schuren', name: 'Schuurvel', exp: /\b(Schuurvel|Schuurvellen)/i },
-    { toepassing: 'Schuren', name: 'Schuurstrook', exp: /\b(Schuurstrook|Schuurstroken)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurband', exp: /\b(Schuurband)\b/i },
-    { toepassing: 'Schuren', name: 'Schuurvijl', exp: /\b(Schuurvijl)\b/i, },
-    { toepassing: 'Schuren', productgroep: 'Machines', name: 'Arm', exp: /\b(Arm)\b/i, },
-    { toepassing: 'Schuren', productgroep: 'Machines', name: 'Schuurmachine', exp: /\b(Schuurmachine)\b/i, },
-    { toepassing: 'Schuren', productgroep: 'Machines', name: 'Bandschuurmachine', exp: /\b(Bandschuurmachine)\b/i, },
-    { toepassing: 'Schuren', productgroep: 'Machines', name: 'Vlakschuurmachine', exp: /\b(Vlakschuurmachine)\b/i, },
-    { toepassing: 'Schuren', productgroep: 'Machines', name: 'Excenterschuurmachine', exp: /\b(Excenterschuurmachine)\b/i, },
-
-    { toepassing: 'Plamuren', productgroep: 'Gereedschap', name: 'Plamuurmes', exp: /\b(Plamuurmes)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Gereedschap', name: 'Plamuurrubber', exp: /\b(Plamuurrubber)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Gereedschap', name: 'Plamuurspatel', exp: /\b(Plamuurspatel)\b/i, },
-
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Polyester plamuur', exp: /\b(Polyester plamuur)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Spuitplamuur', exp: /\b(Spuitplamuur)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Metaalplamuur', exp: /\b(Metaalplamuur)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Acrylaatplamuur', exp: /\b(Acrylaatplamuur)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Glasvezelplamuur', exp: /\b(Glasvezelplamuur)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Fijnplamuur', exp: /\b(Fijnplamuur)\b/i, },
-    { toepassing: 'Plamuren', productgroep: 'Plamuur', name: 'Plamuur', exp: /\b(Plamuur)\b/i, },
-
-    { toepassing: 'Diversen', name: 'Steunschijf', exp: /\b(Steunschijf)\b/i, },
-
-    { toepassing: 'Diversen', productgroep: 'Matten', name: 'Neerlegmat', exp: /\b(Neerlegmat)\b/i, },
-    { toepassing: 'Diversen', productgroep: 'Matten', name: 'Voetmat', exp: /\b(Voetmat|Voetmatten)\b/i, },
-    { toepassing: 'Diversen', productgroep: 'Matten', name: 'Entreemat', exp: /\b(Entreematten|Entreemat)\b/i, },
-
-    { toepassing: 'Kitten', name: 'Carrosseriekit', exp: /\b(Carrosseriekit)\b/i, },
-
-    { toepassing: 'Diversen', name: 'Spray', exp: /\b(Spray)\b/i, },
-    // { toepassing: 'Diversen', name: 'Vormbare Tape', exp: /\b(Vormbare Tape)\b/i, },
-    { toepassing: 'Diversen', name: 'Epoxylijm', exp: /\b(Epoxylijm)\b/i, },
-
-    { toepassing: 'Diversen', name: 'Veiligheidsbril', exp: /\b(Veiligheidsbril|Veiligheidsbrillen)\b/i, },
-
-    { toepassing: 'Diversen', name: 'Coating', exp: /\b(Coating)\b/i, },
-    { toepassing: 'Diversen', name: 'Stootpet', exp: /\b(Stootpet)\b/i, },
-    { toepassing: 'Diversen', name: 'Haak', exp: /\b(Haak)\b/i, },
-    { toepassing: 'Diversen', name: 'Lamellenborstel', exp: /\b(Lamellenborstel)\b/i, },
-    { toepassing: 'Diversen', name: 'Ontbraamwiel', exp: /\b(Ontbraamwiel)\b/i, },
-    { toepassing: 'Diversen', name: 'Wielspray', exp: /\b(Wielspray)\b/i, },
-
-
-    { toepassing: 'Diversen', name: 'Ademslang', exp: /\b(Ademslang)\b/i, },
-
-    { toepassing: 'Diversen', name: 'Acculader', exp: /\b(Acculader)\b/i, },
-    { toepassing: 'Diversen', name: 'Acculaadstation', exp: /\b(Acculaadstation)\b/i, },
-    { toepassing: 'Diversen', name: 'Batterij', exp: /\b(Batterij)\b/i, },
-
-    { toepassing: 'Kleding', name: 'Bretels', exp: /\b(Bretels)\b/i, },
-
-    { toepassing: 'Diversen', name: 'Afsluitdeksel', exp: /\b(Afsluitdeksel)\b/i, },
-
-    { toepassing: 'Filter', name: 'Standaardfilter', exp: /\b(Standaardfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Hoofdfilter', exp: /\b(Hoofdfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Geurfilter', exp: /\b(Geurfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Gasfilter', exp: /\b(Gasfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Deeltjesfilter', exp: /\b(Deeltjesfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Voorfilter', exp: /\b(Voorfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Combifilter', exp: /\b(Combifilter)\b/i, },
-    { toepassing: 'Filter', name: 'Gas, damp en stoffilter', exp: /(Gas(-|)(,|)(\s|)damp(-|)(\s|)en stoffilter)/i, },
-    { toepassing: 'Filter', name: 'Gas en dampfilter', exp: /\b(Gas(-|)(\s|)en dampfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Filterzak', exp: /\b(Filterzak|Filterzakken)\b/i, },
-    { toepassing: 'Filter', name: 'Vloerfilter', exp: /\b(Vloerfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Plafondfilter', exp: /\b(Plafondfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Aanzuigfilter', exp: /\b(Aanzuigfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Lasfilter', exp: /\b(Lasfilter)\b/i, },
-    { toepassing: 'Filter', name: 'Filtersysteem', exp: /\b(Filtersysteem)\b/i, },
-
-    { toepassing: 'Filter', name: 'Filter', exp: /\b(Filter)\b/i, },
-
-    { toepassing: 'Slijpen', name: 'Netschijf', exp: /\b(Netschijf|Netschijven)\b/i },
-    { toepassing: 'Slijpen', name: 'Netstrook', exp: /\b(Netstrook|Netstroken)\b/i },
-
-    { toepassing: 'Slijpen', name: 'Doorslijpschijf', exp: /\b(Doorslijpschijf|Doorslijpschijven)\b/i },
-
-    { toepassing: 'Maskeren', name: 'Maskeerpapier', exp: /\b(Maskeerpapier)\b/i, },
-    { toepassing: 'Maskeren', name: 'Maskeerfolie', exp: /\b(Maskeerfolie)\b/i, },
-    { toepassing: 'Maskeren', name: 'Maskeertape', exp: /\b(Maskeertape|Maskeer tape)\b/i, },
-    { toepassing: 'Maskeren', name: 'Maskeerfilm', exp: /\b(Maskeerfilm)\b/i, },
-
-    { toepassing: 'Maskeren', name: 'Montagetape', exp: /\b(Montagetape)\b/i, },
-
-    { toepassing: 'Tapen', name: 'Afplaktape', exp: /\b(Afplaktape)\b/i },
-    { toepassing: 'Tapen', name: 'Afdichtingstape', exp: /\b(Afdichtingstape)\b/i, },
-    { toepassing: 'Tapen', name: 'Dozensluittape', exp: /\b(Dozensluittape)\b/i, },
-    { toepassing: 'Tapen', name: 'Isolatietape', exp: /\b(isolatietape)\b/i, },
-    { toepassing: 'Tapen', name: 'Anti-Sliptape', exp: /\b(Anti-Sliptape)\b/i, },
-    { toepassing: 'Tapen', name: 'Schuimtape', exp: /\b(Schuimtape)\b/i, },
-    { toepassing: 'Tapen', name: 'Electrical Tape', exp: /\b(Electrical Tape)\b/i, },
-    { toepassing: 'Tapen', name: 'Tape', exp: /\b(Tape)\b/i, },
-
-
-    { toepassing: 'Mengen', name: 'Verpakkingsemmer', exp: /\b(Verpakkingsemmer)\b/i, },
-    { toepassing: 'Mengen', name: 'Filterdeksel', exp: /\b(Filterdeksel)\b/i, },
-
-    { toepassing: 'Mengen', name: 'Bewaarbeker', exp: /\b(Bewaarbeker)\b/i, },
-    { toepassing: 'Mengen', name: 'Schakelaar', exp: /\b(Schakelaar)\b/i, },
-    { toepassing: 'Mengen', name: 'Dispenser', exp: /\b(Dispenser)\b/i, },
-    { toepassing: 'Mengen', name: 'Deksel', exp: /\b(Deksel|Deksels)\b/i, },
-
-    { toepassing: 'Mengen', name: 'Mengbeker', exp: /\b(Mengbeker|Mengbekers)\b/i, },
-    { toepassing: 'Mengen', name: 'Bovenbeker', exp: /\b(Bovenbeker)\b/i, },
-    { toepassing: 'Mengen', name: 'Onderbeker', exp: /\b(Onderbeker)\b/i, },
-    { toepassing: 'Mengen', name: 'Mengset', exp: /\b(Mengset)\b/i, },
-    { toepassing: 'Mengen', name: 'Mengneus', exp: /\b(Mengneus)\b/i, },
-    { toepassing: 'Mengen', name: 'Mengmondstuk', exp: /\b(Mengmondstuk)\b/i, },
-
-    { name: 'Starterset', exp: /\b(Starterset)\b/i, },
-
-    { toepassing: 'Lakken', name: 'Primer', exp: /\b(Primer)\b/i, },
-
-
-    { toepassing: 'Lakken', name: 'Lakschaaf', exp: /\b(Lakschaaf|Lakschaafje)\b/i, },
-    { toepassing: 'Lakken', name: 'Verfzeef', exp: /\b(Verfzeefjes|Verfzeefje)\b/i },
-    { toepassing: 'Lakken', name: 'Roerlat', exp: /\b(Roerlatten|Roerlat)\b/i, },
-    { toepassing: 'Lakken', name: 'Verfborstel', exp: /\b(Verfborstel)\b/i, },
-
-    { toepassing: 'Lakken', name: 'Kleefband', exp: /\b(kleefband)\b/i, },
-    { toepassing: 'Lakken', name: 'Kleefdoek', exp: /\b(Kleefdoeken|Kleefdoek)\b/i, },
-
-    { toepassing: 'Polieren', name: 'Poliermachine', exp: /\b(Poliermachine)\b/i, },
-    { toepassing: 'Polieren', name: 'Polierpad', exp: /\b(Polierpad)\b/i, },
-    { toepassing: 'Polieren', name: 'Polierspons', exp: /\b(Polierspons)\b/i, },
-
-    { toepassing: 'Spuiten', name: 'Spuitmasker', exp: /\b(Spuitmasker)\b/i, },
-    { toepassing: 'Spuiten', name: 'Spuitmond', exp: /\b(Spuitmond)\b/i, },
-    { toepassing: 'Spuiten', name: 'Spuitnozzle', exp: /\b(Spuitnozzles|Spuitnozzle)\b/i, },
-    { toepassing: 'Spuiten', name: 'Spuitpistool kit', exp: /\b(Spuitpistoolkit|Spuitpistolen kit|Spuitpistolenkit)\b/i, },
-    { toepassing: 'Spuiten', name: 'Spuitpistool', exp: /\b(Spuitpistool)\b/i, },
-    { toepassing: 'Spuiten', name: 'Wielspuithoes', exp: /\b(Wielspuithoes|Wielspuithoezen)\b/i, },
-    { toepassing: 'Spuiten', name: 'Verfspuitmasker', exp: /\b(Verfspuitmasker|Verfspuitmaskers)\b/i, },
-    { toepassing: 'Spuiten', name: 'Spuitjas', exp: /\b(Spuitjas)\b/i, },
-    { toepassing: 'Spuiten', name: 'Spuitoverall', exp: /\b(Spuitoverall)\b/i, },
-    { toepassing: 'Spuiten', name: 'Pistool', exp: /\b(Pistool|Pistole)\b/i, },
-    { toepassing: 'Spuiten', name: 'Adaptor', exp: /\b(Adaptor|Adapter)\b/i, },
-
-    { toepassing: 'Bescherming', name: 'Mondmasker', exp: /\b(Mondmasker)\b/i, },
-    { toepassing: 'Bescherming', name: 'Veiligheidsbril', exp: /\b(Veiligheidsbril)\b/i, },
-
-    { toepassing: 'Kleding', name: 'Handschoen', exp: /\b(Handschoenen|Handschoen)\b/i, },
-    { toepassing: 'Kleding', name: 'Handschoen wegwerp', exp: /\b(wegwerphandschoenen|wegwerphandschoen)\b/i, },
-    { toepassing: 'Kleding', name: 'Veiligheidsschoen', exp: /\b(Veiligheidsschoen)\b/i, },
-    { toepassing: 'Kleding', name: 'Polo', exp: /\b(Polo)\b/i, },
-    { toepassing: 'Kleding', name: 'Wegwerpoverall', exp: /\b(Wegwerpoverall)\b/i, },
-    { toepassing: 'Kleding', name: 'Overall', exp: /\b(Overall)\b/i, },
-    { toepassing: 'Kleding', name: 'Stofjas', exp: /\b(Stofjas)\b/i, },
-    { toepassing: 'Kleding', name: 'Protectjas', exp: /\b(Protectjas|Protect jas)\b/i, },
-    { toepassing: 'Kleding', name: 'Lab-, bezoekersjas', exp: /\b(Lab- \/ bezoekersjas)\b/i, },
-    { toepassing: 'Kleding', name: 'Riem', exp: /\b(Riem)\b/i, },
-
-    { toepassing: 'Reiniging', name: 'Handreiniger', exp: /\b(Handreiniger)\b/i, },
-
-    { name: 'Reparatie', exp: /\b(Reparatieset|Reparaturset)\b/i, },
-    { name: 'Reparatie', exp: /\b(Kunststofreparatiemateriaal)\b/i, },
-
-
-
-    { toepassing: 'Kitten', name: 'Kit', exp: /\b(Kit)\b/i, },
-  ];
 
   function artrow(row, filter){
     if (!row.title) return;
@@ -1955,7 +1760,7 @@ $().on('load', async e => {
     for (var file of files) {
       $('span.main').text('import:', file.name);
       console.log(file.name, aim.config.import);
-      for (fileConfig of aim.config.import.filter(fileConfig => file.name.match(fileConfig.filename.toLowerCase()))) {
+      for (fileConfig of aim.config.import.filter(fileConfig => file.name.toLowerCase().match(fileConfig.filename.toLowerCase()))) {
         await dmsClient.api('/abis/art_ink_reset').post({importCode: fileConfig.importCode = fileConfig.importCode || fileConfig.filename});
 
         const result = await readBinary(file);
@@ -2047,7 +1852,9 @@ $().on('load', async e => {
       $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.packKeyGroup, row.packKeyName, row.partKeyGroup, row.partKeyName);
       try {
         // console.log(row);
-        await tab.callback(row);
+        // await tab.callback(row);
+        await dmsClient.api('/abis/art_ink').body(row).post()
+
       } catch (err) {
         console.error(row);
       }
@@ -2055,7 +1862,7 @@ $().on('load', async e => {
       progressElem.value(++i);
     }
 
-    await dmsClient.api('/abis/artCleanUp').get();
+    // await dmsClient.api('/abis/artCleanUp').get();
 
     $('span.main').text('import done');
     progressElem.value(null);
@@ -2532,7 +2339,7 @@ $().on('load', async e => {
     );
   }
 
-  async function prijslijst_xls(filter,cols) {
+  async function prijslijst_xls(title,filter,cols) {
     const [rows] = await aimClient.api('/abis/prijslijst_xls')
     .query('select', cols.map(col => col.n).join(','))
     .query('filter', filter)
@@ -2542,23 +2349,55 @@ $().on('load', async e => {
       // row.bruto
     });
     rows.sort((a,b)=>a.titel.localeCompare(b.titel));
-    const ws_title = "Prijslijst";
+    const ws_title = title.split(/\s|-/)[1];
 
     var wb = XLSX.utils.book_new();
     wb.Props = {
-      Title: "Proving " + ws_title,
+      Title: ws_title,
       Subject: ws_title,
-      Author: "Proving",
+      Author: "",
       CreatedDate: new Date(2017,12,19)
     };
     wb.SheetNames.push(ws_title);
-    var ws = XLSX.utils.aoa_to_sheet([cols].concat(rows.map(row => cols.map(col => Object.assign({v: String(row[col.n] || '').trim() }, col.f)))));
+    var ws = XLSX.utils.aoa_to_sheet([cols].concat(rows.map(row => cols.map(col => Object.assign({v: String(row[col.n] !== null ? row[col.n] : '').trim() }, col.f)))));
     ws['!cols'] = cols;
     wb.Sheets[ws_title] = ws;
     var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
     // saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), ws_title + ' Proving.xlsx');
-    $('a').download(ws_title + ' Proving.xlsx').rel('noopener').href(URL.createObjectURL(new Blob([s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
+    $('a').download(`${title}.xlsx`).rel('noopener').href(URL.createObjectURL(new Blob([s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
   }
+
+  const colsPrijslijst = [
+    { n: 'nr', v: 'ArtikelNr', wch: 10, f:{t:'s'} },
+    { n: 'bruto', v: 'Bruto', wch: 10, f:{t:'n', z:'.00'} },
+    { n: 'titel', v: 'Titel', wch: 80 },
+    { n: 'aantalStuks', v: 'Verpakt per', wch: 10, f: { t:'n' } },
+    { n: 'kortK', v: 'Korting', wch: 10, f:{t:'n' } },
+    { n: 'kortingCode', v: 'KortingCode', wch: 10, f:{t:'n' } },
+    { n: 'merk', v: 'Merk', wch: 10 },
+    { n: 'leverancier', v: 'Leverancier', wch: 10 },
+    { n: 'bestelCode', v: 'Bestelcode', wch: 10 },
+    { n: 'code', v: 'Code', wch: 10 },
+    { n: 'segment', v: 'Segment', wch: 12 },
+    { n: 'categorie', v: 'Categorie', wch: 12 },
+    { n: 'barcode', v: 'EAN', wch: 10, f: { t:'s' } },
+    { n: 'artCode', v: 'ArtikelCode', wch: 10 },
+    { n: 'klantNr', v: 'KlantNr', wch: 10, f:{t:'n'} },
+
+    // { n: 'korting', v: 'Korting', wch: 10, f:{t:'n' } },
+    // { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
+    // { n: 'productCode', v: 'ProductCode', wch: 12 },
+    // { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
+    // { n: 'serie', v: 'Serie', wch: 10 },
+    // { n: 'type', v: 'Type', wch: 10 },
+    // { n: 'kleur', v: 'Kleur', wch: 10 },
+    // { n: 'verhouding', v: 'Verhouding', wch: 10 },
+    // { n: 'extra1', v: 'Extra1', wch: 16 },
+    // { n: 'extra2', v: 'Extra2', wch: 16 },
+    // { n: 'inhoud', v: 'Inh', wch: 10, f: { t:'n' } },
+    // { n: 'inhoudEenheid', v: 'Eenh', wch: 10 },
+    // { n: 'artGroep', v: 'Categorie', wch: 20 },
+  ];
 
   aim.om.treeview({
     Inkoop: {
@@ -3563,6 +3402,96 @@ $().on('load', async e => {
       // },
     },
     Overig: {
+      set_arguments(){
+        aimClient.api('/abis/artikel').query('select', 'artId,merk,tekst').get().then(body => {
+          const [rows] = body;
+          var list = [];
+          for (var toepassing in productlist) {
+            for (var productgroep in productlist[toepassing]) {
+              for (var product of productlist[toepassing][productgroep]) {
+                product = product.split('|');
+                list.push({
+                  name: product[0],
+                  productgroep: productgroep,
+                  toepassing: toepassing,
+                  exp: new RegExp(`\\b${product.join('|')}\\b`, 'i'),
+                })
+              }
+            }
+          }
+          console.log(list);
+          rows.filter(row => row.tekst).forEach(row => {
+            row.tekstOud = row.tekst;
+            const product = list.find(p => row.tekst.match(p.exp) );
+            if (product) {
+              row.tekst = row.tekst.replace(product.exp, '');
+              row.product = product.name;
+              row.toepassing = product.toepassing;
+              row.productgroep = product.productgroep || row.artGroup;
+            }
+
+            function match(name, exp, exp2){
+              const match = row.tekst.match(exp);
+              if (match) {
+                // console.log(name, row.overig, match)
+                // filter[name] = { name: name, title: name, values: {}};
+                row.tekst = row.tekst.replace(exp,'').replace(/\s-|\(\)|-$/,'').replace(/\s\s/,' ').trim();
+                row[name] = match[1].replace(/,/g, '.').replace(/\.$/, '').replace(exp2, '').trim().toLowerCase().replace(/\w/, s => s.toUpperCase());
+              }
+            }
+            match('Inhoud', /([\d|\.|,]+\s*?(ml|ltr|l|gr\.|gr|kg\.|kg|paar|g)\b)/i);
+            match('Maat', /(\b(mt\.:|mt:|maat:|maat)(\s+?)(\d+|[A-Z]+))/i, /mt\.:|mt:|maat:|maat|\s/);
+            match('Spanning', /(\d+(V))\b/i);
+            match('Vermogen', /(\d+(W))\b/i);
+            match('Dichtheid', /(\d+\s*?(g\/m²))/i);
+            match('Hittebestendig', /(\d+°c|\d+°)/i, /c/i);
+            match('Schroefdraad', /(M\d+\s*?x[\d|,]+)/i);
+            match('Dikte', /(\d+\s*?(µm|mµ|µ))/i);
+            match('Diameter', /Ø((\s|)(\d[\d|\.|,]+)(\s|)(mm|))/i);
+
+            // match('Afmeting', /[^-]\b(\d+(\.\d+|,\d+|[\/|\d]+)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m|)([\s|x|]*)([\d|\.|,|\/]+|)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m|)([\s|x]*)([\d|\.|,|\/]+|)(\s|)(mm\.|mm|cm|mtr\.|mtr|meter|µm|mµ|µ|m))/i);
+            // match('Afmeting', /(\d[\d|(mm\.)|(mm)|(cm)|(mtr\.)|(mtr)|(meter)|(µm)|(mµ)|µ|m|\s|x]+)/i);
+            // match('Afmeting', /(\d[\d|(mm\.)|(mm)|(cm)|(mtr\.)|(mtr)|(meter)|(µm)|(mµ)|µ|m|\s|x|\.|,]+)/i);
+            match('Afmeting', /(\d[\sxmctrµe\d\.,]*(mm\.|mm|cm|mtr\.|mtr|meter|mt|µm|mµ|µ|m))/i);
+
+            match('Gaten', /(\d+)\s*?(gaten\s\d+mm|gaten|gat|gaat)/i);
+            match('Maat', /\b(M|L|S|XL|XXL|Large|Medium|Small|XLarge|XXLarge)\b/);
+            match('Grofte', /(P\d+)/i);
+            match('Grofte', /((grofte|korrel)\s*?\d+)/i, /grofte|korrel|\s/);
+            match('RAL', /ral\s*?(\d+)/i);
+            match('Aantal', /([\d|\.|,|x|\s]+?(st\.|st\b))/i);
+
+            ['Aantal','Inhoud','Dikte','Diameter','Afmeting'].forEach(name => {
+              if (row[name]) {
+                row[name] = row[name].toLowerCase()
+                // .replace(/([\d|\.|\/]+)/g, ' $1 ')
+                .replace(/µm|mµ|µ/, 'µm')
+                .replace(/mtr|mt/g, 'm')
+                .replace(/\s/g, '')
+                .replace(/x/, ' x ')
+                // .replace(/\s\s/g, ' ')
+                .trim()
+              }
+            })
+
+            for (let [name,vars] of Object.entries(rename)) {
+              // console.log(name,vars);
+              for (var v of vars) {
+                v = v.split('|');
+                // var regExp = new RegExp(rename[name]);
+                var regexp = new RegExp(`\\b${v.join('|')}\\b`, 'i');
+                var match = row.tekst.match(regexp);
+                if (match) {
+                  row.tekst = row.tekst.replace(regexp,'');
+                  row[name] = v[0];
+                }
+              }
+            }
+            console.log(row);
+          })
+          console.log(rows);
+        });
+      },
       cleanup(){
         aimClient.api('/abis/cleanup');
       },
@@ -3584,59 +3513,18 @@ $().on('load', async e => {
         `inkSds is not null`,
         'title',
       ),
-      'Inkoop.xls': async e => {
-        prijslijst_xls('', [
-          { n: 'nr', v: 'ArtNr', wch: 10  },
-          { n: 'artGroep', v: 'Categorie', wch: 20 },
-          { n: 'titel', v: 'Titel', wch: 80 },
-          { n: 'eenheid', v: 'Eenheid', wch: 10 },
-          { n: 'aantalStuks', v: 'VerpakAantal', wch: 10, f: { t:'n' } },
-
-          { n: 'inkBruto', v: 'InkBruto', wch: 10, f:{t:'n', z:'.00' } },
-          { n: 'inkKorting', v: 'InkKort', wch: 10, f:{t:'n' } },
-          { n: 'inkNetto', v: 'InkNetto', wch: 10, f:{t:'n', z:'.00' } },
-          { n: 'artInkBruto', v: 'InkBrutoOud', wch: 10, f:{t:'n', z:'.00' } },
-          { n: 'artInkKorting', v: 'InkKortOud', wch: 10, f:{t:'n' } },
-          { n: 'bruto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
-          { n: 'korting', v: 'Kort', wch: 10, f:{t:'n', z:'.0'} },
-          { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
-
-          { n: 'merk', v: 'Merk', wch: 10 },
-          { n: 'serie', v: 'Serie', wch: 10 },
-          { n: 'type', v: 'Type', wch: 10 },
-          { n: 'code', v: 'Code', wch: 10 },
-          { n: 'barcode', v: 'EAN', wch: 10, f: { t:'n' } },
-          { n: 'kleur', v: 'Kleur', wch: 10 },
-          { n: 'verhouding', v: 'Verhouding', wch: 10 },
-          { n: 'extra1', v: 'Extra1', wch: 16 },
-          { n: 'extra2', v: 'Extra2', wch: 16 },
-          { n: 'inhoud', v: 'Inh', wch: 10, f: { t:'n' } },
-          { n: 'inhoudEenheid', v: 'Eenh', wch: 10 },
-          { n: 'artGroep', v: 'Categorie', wch: 20 },
-        ]);
-      },
       'Verkoop.xls': async e => {
-        prijslijst_xls('', [
-          { n: 'artId', v: 'ArtikelNr', wch: 10, f:{t:'n'} },
-          { n: 'artCode', v: 'ArtikelCode', wch: 10 },
-          { n: 'titel', v: 'Titel', wch: 80 },
-          { n: 'inkBruto', v: 'Prijs', wch: 10, f:{t:'n', z:'.00'} },
-          { n: 'korting', v: 'Kort', wch: 10, f:{t:'n', z:'.0'} },
-          { n: 'bruto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
-          { n: 'merk', v: 'Merk', wch: 10 },
-          { n: 'serie', v: 'Serie', wch: 10 },
-          { n: 'type', v: 'Type', wch: 10 },
-          { n: 'code', v: 'Code', wch: 10 },
-          { n: 'barcode', v: 'EAN', wch: 10, f: { t:'n' } },
-          { n: 'kleur', v: 'Kleur', wch: 10 },
-          { n: 'verhouding', v: 'Verhouding', wch: 10 },
-          { n: 'extra1', v: 'Extra1', wch: 16 },
-          { n: 'extra2', v: 'Extra2', wch: 16 },
-          { n: 'inhoud', v: 'Inh', wch: 10, f: { t:'n' } },
-          { n: 'inhoudEenheid', v: 'Eenh', wch: 10 },
-          { n: 'aantalStuks', v: 'VerpakAantal', wch: 10, f: { t:'n' } },
-          { n: 'artGroep', v: 'Categorie', wch: 20 },
-        ]);
+        prijslijst_xls(`proving-prijslijst-${new Date().toISOString().substr(0,10)}`, 'KlantName IS NULL', colsPrijslijst);
+      },
+      'Inkoop.xls': async e => {
+        prijslijst_xls(`Proving Prijslijst INKOOP ${new Date().toLocaleDateString()} voor intern gebruik`, '', [
+          { n: 'levBruto', v: 'Bruto Lev', wch: 10, f:{t:'n', z:'.00'} },
+          { n: 'inkBruto', v: 'Bruto Ink', wch: 10, f:{t:'n', z:'.00'} },
+          { n: 'levKorting', v: 'Korting Lev', wch: 10, f:{t:'n' } },
+          { n: 'inkKorting', v: 'Korting Ink', wch: 10, f:{t:'n' } },
+          { n: 'inkKort', v: 'Kort Ink', wch: 10, f:{t:'n' } },
+          // { n: 'inkBruto', v: 'Bruto Ink', wch: 10, f:{t:'n', z:'.00'} },
+        ].concat(colsPrijslijst));
       },
       PrijslijstPdf: async e => {
         const [rows] = await aimClient.api('/abis/art_alles').query().get();

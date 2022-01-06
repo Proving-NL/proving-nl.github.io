@@ -578,28 +578,28 @@ $().on('load', async e => {
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
-              $('th').align('left').class('datum').text('Orderdatum'),
-              $('th').align('left').class('datum').text('Leverdatum'),
-              $('th').align('left').class('nr').text('Orderid'),
-              $('th').align('left').class('nr').text('Ordernummer'),
-              $('th').align('left').class('nr').text('Debiteurnummer'),
-              $('th').align('left').text('Referentie'),
-              $('th').align('left').style('width:20mm').text('Transport'),
-              $('th').align('right').style('width:20mm').text('KG'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Order'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Debiteur'),
+              $('th').align('left').style('width:80%').text('Referentie'),
+              $('th').align('left').style('width:10mm').text('Transport'),
+              $('th').align('right').style('width:10mm').text('KG'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Opdracht'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Levering'),
             ),
           ),
           $('tbody').append(
             $('tr').append(
-              $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
-              $('td').text(new Date(salesorder.plannedDateTime).toLocaleDateString()),
               $('td').text(salesorder.id),
-              $('td').text(salesorder.nr),
               $('td').text(salesorder.clientDebNr),
               $('td').text(salesorder.ref),
+              // $('td').text(salesorder.nr),
               $('td')
-              .text(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend')
-              .style(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].style : null),
+              .text(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend'),
+              // .style(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].style : null),
+
               $('td').align('right').text(num(rows.map(row =>(row.quant||0) * (row.artWeight||0)).reduce((tot,val)=>tot += val),1)),
+              $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
+              $('td').text(new Date(salesorder.plannedDateTime).toLocaleDateString()),
             ),
           ),
         ),
@@ -607,12 +607,11 @@ $().on('load', async e => {
           $('thead').append(
             $('tr').append(
               // $('th').align('left').text('Artikelnummer'),
-              $('th').align('right').style('width:16mm;').text('Aantal'),
-              $('th').align('left').style('width:20mm;').text('Eenheid'),
-              $('th').align('left').style('width:20mm;').text('Artikel'),
-              $('th').align('left').text('Omschrijving'),
-              $('th').align('right').style('width:16mm;').text('KG/st'),
-              $('th').align('left').style('width:16mm;').text('Mag'),
+              $('th').align('right').style('width:5mm;').text('St'),
+              $('th').align('left').style('width:5mm;').text('ArtNr'),
+              $('th').align('left').text('Eenheid, Code, Omschrijving'),
+              $('th').align('right').style('width:10mm;').text('KG/st'),
+              $('th').align('left').style('width:10mm;').text('Vak'),
             ),
           ),
           $('tbody').append(
@@ -621,11 +620,10 @@ $().on('load', async e => {
             .map(row => $('tr').append(
               // $('td').text(Number(row.artId).pad(9)),
               $('td').align('right').text(row.quant),
-              $('td').text(row.unit),
-              $('td').text(rowCode(row)),//.style('font-family:monospace;font-size:0.9em;'),
-              $('td').text(row.title).style('white-space:normal;'),
+              $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
+              $('td').text([row.unit, row.artCode, row.title].filter(Boolean).join(', ')).style('white-space:normal;'),
               $('td').align('right').text(!row.artWeight ? null : num(row.artWeight,1)),
-              $('td').text(row.storageLocation),
+              $('td').text((row.magLokatie||'').split('.').filter(Boolean).map(Number).join('.')),
             ))
           ),
         ),
@@ -634,30 +632,29 @@ $().on('load', async e => {
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
-              $('th').align('left').class('datum').text('Orderdatum'),
-              $('th').align('left').class('datum').text('Leverdatum'),
-              $('th').align('left').class('nr').text('Ordernummer'),
-              $('th').align('left').class('nr').text('Debiteurnummer'),
-              $('th').align('left').text('Referentie'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Order'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Debiteur'),
+              $('th').align('left').style('width:80%').text('Referentie'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Opdracht'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Levering'),
             ),
           ),
           $('tbody').append(
             $('tr').append(
-              $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
-              $('td').text(new Date(salesorder.plannedDateTime).toLocaleDateString()),
-              $('td').text(salesorder.nr),
+              $('td').text(salesorder.id),
               $('td').text(salesorder.clientDebNr),
               $('td').text(salesorder.ref),
+              $('td').text(new Date(salesorder.orderDateTime).toLocaleDateString()),
+              $('td').text(new Date(salesorder.plannedDateTime).toLocaleDateString()),
             ),
           ),
         ),
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
-              $('th').align('right').style('width:16mm;').text('Aantal'),
-              $('th').align('left').style('width:20mm;').text('Eenheid'),
-              $('th').align('left').style('width:20mm;').text('Artikelcode'),
-              $('th').align('left').text('Omschrijving'),
+              $('th').align('right').style('width:5mm;').text('St'),
+              $('th').align('left').style('width:5mm;').text('ArtNr'),
+              $('th').align('left').text('Eenheid, Code, Omschrijving'),
               // $('th').align('right').text('Prijs'),
               // $('th').align('right').text('Totaal'),
             ),
@@ -665,9 +662,8 @@ $().on('load', async e => {
           $('tbody').append(
             rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
               $('td').align('right').text(row.quant),
-              $('td').text(row.unit),
-              $('td').text(rowCode(row)),
-              $('td').text(rowTitle(row)).style('white-space:normal;'),
+              $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
+              $('td').text([row.unit, row.artCode, row.title].filter(Boolean).join(', ')).style('white-space:normal;'),
               // $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
               // $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
             )),

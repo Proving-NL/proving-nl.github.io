@@ -609,7 +609,8 @@ $().on('load', async e => {
               // $('th').align('left').text('Artikelnummer'),
               $('th').align('right').style('width:5mm;').text('St'),
               $('th').align('left').style('width:5mm;').text('ArtNr'),
-              $('th').align('left').text('Eenheid, Code, Omschrijving'),
+              $('th').align('left').text('Code'),
+              $('th').align('left').text('Omschrijving'),
               $('th').align('right').style('width:10mm;').text('KG/st'),
               $('th').align('left').style('width:10mm;').text('Vak'),
             ),
@@ -621,7 +622,8 @@ $().on('load', async e => {
               // $('td').text(Number(row.artId).pad(9)),
               $('td').align('right').text(row.quant),
               $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
-              $('td').text([row.unit, row.artCode, row.title].filter(Boolean).join(', ')).style('white-space:normal;'),
+              $('td').text(row.code).style('white-space:nowrap;'),
+              $('td').text(row.title).style('white-space:normal;'),
               $('td').align('right').text(!row.artWeight ? null : num(row.artWeight,1)),
               $('td').text((row.magLokatie||'').split('.').filter(Boolean).map(Number).join('.')),
             ))
@@ -654,7 +656,8 @@ $().on('load', async e => {
             $('tr').append(
               $('th').align('right').style('width:5mm;').text('St'),
               $('th').align('left').style('width:5mm;').text('ArtNr'),
-              $('th').align('left').text('Eenheid, Code, Omschrijving'),
+              $('th').align('left').text('Code'),
+              $('th').align('left').text('Omschrijving'),
               // $('th').align('right').text('Prijs'),
               // $('th').align('right').text('Totaal'),
             ),
@@ -663,12 +666,14 @@ $().on('load', async e => {
             rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
               $('td').align('right').text(row.quant),
               $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
-              $('td').text([row.unit, row.artCode, row.title].filter(Boolean).join(', ')).style('white-space:normal;'),
+              $('td').text(row.code).style('white-space:nowrap;'),
+              $('td').text(row.title).style('white-space:normal;'),
               // $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
               // $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
             )),
           ),
         ),
+        $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
       ).style('page-break-before:always;')
     );
   }

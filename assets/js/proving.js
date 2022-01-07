@@ -673,7 +673,7 @@ $().on('load', async e => {
             )),
           ),
         ),
-        $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
+        // $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
       ).style('page-break-before:always;')
     );
   }

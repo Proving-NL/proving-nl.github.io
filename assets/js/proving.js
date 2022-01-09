@@ -55,7 +55,7 @@ $().on('load', async e => {
   aim.om.treeview({
     'Shop': {
       Producten: e => aim.list('product',{
-        $filter: `clientName='${clientName}' && discount NE NULL`,
+        $filter: `klantnaam='${clientName}'`,
         $search: ``,
       }),
       Boodschappenlijst() {
@@ -892,6 +892,7 @@ $().on('load', async e => {
       accountName: salesorder.accountName,
       ordernummers: id,
     });
+    console.log(data);
     const [bedrijven] = data;
     const [accountCompany] = bedrijven;
     const invoiceNr = accountCompany.invoiceNr;
@@ -960,6 +961,7 @@ $().on('load', async e => {
     ).print();
   }
   async function lijstFactureren(orders) {
+    console.log(orders);
     for (let clientName of orders.map(row => row.clientName).unique()) {
       const clientOrders = orders.filter(row => row.clientName === clientName);
       const [salesorder] = clientOrders;
@@ -1342,92 +1344,44 @@ $().on('load', async e => {
     header(row){
       const elem = $('div').class('price');
       var price;
-      var listPrice = row.inkPackPrice || row.purchaseListPrice || row.listPrice;
-
-      // if (row.purchaseListPrice && row.purchaseListPrice != listPrice) {
-      //   elem.append(
-      //     $('div').append(
-      //       'inkoop bruto gewijzigd ',
-      //       $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
-      //       ' € ',
-      //       $('span').text(num(price = listPrice)).style('color:red;font-size:1.2em'),
-      //     ),
-      //   );
-      // }
-
-      if (!row.purchaseDiscount) {
-        listPrice *= 2;
-        row.purchaseDiscount = 60;
-      }
-      row.purchaseDiscount = Math.round( row.purchaseDiscount * 10 ) / 10;
-      discount = Math.floor( ( row.discount || (row.purchaseDiscount / 3) ) * 10 ) / 10;
-
-      var style = 'color:lightgreen;';
-      // elem.append(
-      //   $('div').style('font-size:0.8em;').append(
-      //     'Inkoop € ',
-      //     $('span').text(num(price = listPrice*(100-row.purchaseDiscount)/100)).style(style),
-      //     ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-      //     // $('span').text('€ ' + num(row.purchaseListPrice)).style('text-decoration:line-through;'),
-      //     ' korting ',
-      //     $('span').style('color:green;').text(num(row.purchaseDiscount).replace(/,00$|0$/g,'') + '%'),
-      //     row.inkPackPrice ? '' : ' (niet gekoppeld)',
-      //   ),
-      // );
-
-
-
-      var style = 'color:orange;';
-      if (row.clientArtDiscount) {
-        discount = Math.floor( row.clientArtDiscount * 10 ) / 10;
+      var listPrice = row.ppe;
+      var discount = row.k;
+      if (discount) {
         elem.append(
           $('div').append(
             $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
             ' € ',
-            $('span').text(num(price = listPrice*(100-discount)/100)).style(style+'font-size:1.2em;'),
+            $('span').text(num(price = listPrice*(100-discount)/100)).style('color:var(--discountprice);font-size:1.2em;'),
             ' (€ ' + num(price * 1.21) + ' incl. btw) ',
             ' korting ',
-            $('span').style(style).text(num(discount).replace(/,00$|0$/g,'') + '%')
-            ,' (alleen voor jou)',
+            $('span').text(num(discount).replace(/,00$|0$/g,'') + '%')
           ),
         );
       } else {
-        var style = 'color:lightblue;';
         elem.append(
           $('div').append(
-            $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
-            ' € ',
-            $('span').text(num(price = listPrice*(100-discount)/100)).style(style+'font-size:1.2em;'),
+            $('span').text('€ ' + num(price = listPrice)).style('color:var(--price);font-size:1.2em;'),
             ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-            ' korting ',
-            $('span').style(style).text(num(discount).replace(/,00$|0$/g,'') + '%')
           ),
         );
       }
-      row.verzending = row.stock ? '0-1 dag' : '1-4 dagen';
       elem.append(
         $('div').append(
           $('span').style('font-size:0.8em;').append(
             'Verzending in: ',
-            $('b').text(row.verzending).style('color:green;'),
-            row.stock ? [
-              ' (nog ',
-              $('b').text(row.stock).style('color:green;'),
-              ' beschikbaar)',
-            ] : null,
-            ` (Leverancier ${row.supplier})`,
-            ` (ID ${row.purchaseId})`,
-            ` (P ${row.prodIsVervallen})`,
-            ` (A ${row.artIsVervallen})`,
+            $('b').text(row.lt).style('color:var(--lt);'),
+            // row.stock ? [
+            //   ' (nog ',
+            //   $('b').text(row.stock).style('color:green;'),
+            //   ' beschikbaar)',
+            // ] : null,
           ),
           elem.input = $('input')
           .tabindex(-1)
           .type('number').step(1).min(0).value(row.quant).on('change', e => {
             row.quant = Number(e.target.value);
             console.log(row.quant);
-          }).on('click', e => {
-            e.stopPropagation();
-          }),
+          }).on('click', e => e.stopPropagation()),
         )
       );
 
@@ -1850,11 +1804,12 @@ $().on('load', async e => {
     const progressElem = $('footer>progress').max(max).value(i);
     for (var [row,tab] of allrows) {
       // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
-      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.packKeyGroup, row.packKeyName, row.partKeyGroup, row.partKeyName);
+      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.leverancier, row.bestelCode, row.aantalStuks);
       try {
         // console.log(row);
         // await tab.callback(row);
-        await dmsClient.api('/abis/art_ink').body(row).post()
+        if (row.levKortingFaktor) row.levKorting = row.levKortingFaktor*100;
+        await dmsClient.api('/abis/artlev').body(row).post()
 
       } catch (err) {
         console.error(row);
@@ -1893,12 +1848,6 @@ $().on('load', async e => {
       // console.log(1, config, files);
     }
   });
-  function s2ab(s) {
-    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-    var view = new Uint8Array(buf);  //create uint8array as viewer
-    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-    return buf;
-  };
   function toExcel() {
     var wb = XLSX.utils.book_new();
     wb.Props = {

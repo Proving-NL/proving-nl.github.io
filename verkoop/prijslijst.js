@@ -3,6 +3,8 @@ $().on('load', async e => {
     { n: 'id', v: 'ArtikelNr', wch: 8, f:{t:'s'} },
     { n: 'artCode', v: 'ArtikelCode', wch: 20 },
     { n: 'titel', v: 'Titel', wch: 100 },
+    { n: 'merk', v: 'Merk', wch: 10 },
+    { n: 'code', v: 'Code', wch: 10 },
     { n: 'va', v: 'VA', wch: 3, f: { t:'n' } },
     { n: 'ppa', v: 'PPA', wch: 10, f:{t:'n', z:'.00'} },
     { n: 'ppe', v: 'PPE', wch: 10, f:{t:'n', z:'.00'} },

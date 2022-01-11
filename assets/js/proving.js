@@ -25,7 +25,8 @@ $().on('load', async e => {
   //
   // return;
   //
-
+  // localStorage.clear();
+  // sessionStorage.clear();
   // console.log('aliconnect_token', sessionStorage.getItem('aliconnect_token'));
   // if (!sessionStorage.getItem('aliconnect_token')){
   //   return document.location.href = 'https://login.aliconnect.nl/silent_signin?redirect_uri='+encodeURI(document.location.href);
@@ -34,7 +35,7 @@ $().on('load', async e => {
   // }
 
   let clientart = [];
-  let clientName = [];
+  let clientName = null;
 
   console.log(1111, aimClient);
   // aimClient.ws().headers({'X-ApiKey': 'MY_KEY'}).method('subscribe').resource('zones').then(console.log);
@@ -55,7 +56,7 @@ $().on('load', async e => {
   aim.om.treeview({
     'Shop': {
       Producten: e => aim.list('product',{
-        $filter: `klantnaam='${clientName}'`,
+        $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
         $search: ``,
       }),
       Boodschappenlijst() {
@@ -74,7 +75,8 @@ $().on('load', async e => {
   });
 
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
-  await selectClient(localStorage.getItem('clientName'));
+  // localStorage.clear();
+  await selectClient(localStorage.getItem('clientName') || '');
   // $('button.account>span').text(clientName);
   $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
     $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),

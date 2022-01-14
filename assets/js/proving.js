@@ -36,19 +36,19 @@ $().on('load', async e => {
 
   let clientart = [];
   let clientName = null;
-
+  let mandregels = [];
   console.log(1111, aimClient);
   // aimClient.ws().headers({'X-ApiKey': 'MY_KEY'}).method('subscribe').resource('zones').then(console.log);
 
 
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
-    // console.log($('button.account>span'));
+    console.log(name);
     // return;
     $('button.account span.company').text(clientName||'');
-    [clientart] = await fetch('https://aliconnect.nl/api/abis/data?request_type=clientArt&clientName=' + clientName).then(res => res.json());
+    [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientName=' + clientName).then(res => res.json());
     aim.idfilter = `clientName EQ '${clientName}'`;
-    // console.log('JA', clientname);
+    console.log('JA', name, clientart, mandregels);
 
   }
 
@@ -548,7 +548,7 @@ $().on('load', async e => {
   }
   function orderPage(salesorder, rows) {
     rows.forEach(row => row.storageLocation = row.newStorageLocation ? (row.newStorageLocation.match(/../g)||[]).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
-    rows = rows.filter(row => row.orderNr === salesorder.nr);
+    rows = rows.filter(row => row.orderNr === salesorder.nr || row.orderId === salesorder.id);
     rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     console.log(salesorder, rows);
     return printElem().append(
@@ -609,12 +609,14 @@ $().on('load', async e => {
           $('thead').append(
             $('tr').append(
               // $('th').align('left').text('Artikelnummer'),
-              $('th').align('right').style('width:5mm;').text('St'),
-              $('th').align('left').style('width:5mm;').text('ArtNr'),
-              $('th').align('left').text('Code'),
-              $('th').align('left').text('Omschrijving'),
-              $('th').align('right').style('width:10mm;').text('KG/st'),
-              $('th').align('left').style('width:10mm;').text('Vak'),
+              $('th').align('right').text('Aantal'),
+              $('th').align('left').text('ArtNr'),
+              $('th').align('left').text('Merk code').style('white-space:nowrap;'),
+              $('th').align('left').text('Eenheid'),
+              $('th').align('left').style('width:100%;').text('Omschrijving'),
+              $('th').align('right').text('KG/st'),
+              $('th').align('left').text('Vak'),
+              $('th').align('right').text('Bruto'),
             ),
           ),
           $('tbody').append(
@@ -625,9 +627,11 @@ $().on('load', async e => {
               $('td').align('right').text(row.quant),
               $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
               $('td').text(row.code).style('white-space:nowrap;'),
+              $('td').text(row.unit),
               $('td').text(row.title).style('white-space:normal;'),
               $('td').align('right').text(!row.artWeight ? null : num(row.artWeight,1)),
-              $('td').text((row.magLokatie||'').split('.').filter(Boolean).map(Number).join('.')),
+              $('td').text((row.magLokatie||'').split('.').filter(Boolean).join('.')),
+              $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
             ))
           ),
         ),
@@ -656,10 +660,12 @@ $().on('load', async e => {
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
-              $('th').align('right').style('width:5mm;').text('St'),
-              $('th').align('left').style('width:5mm;').text('ArtNr'),
-              $('th').align('left').text('Code'),
-              $('th').align('left').text('Omschrijving'),
+              $('th').align('right').text('Aantal'),
+              $('th').align('left').text('ArtNr'),
+              $('th').align('left').text('Merk code').style('white-space:nowrap;'),
+              $('th').align('left').text('ArtNr Oud').style('white-space:nowrap;'),
+              $('th').align('left').text('Eenheid'),
+              $('th').align('left').style('width:100%;').text('Omschrijving'),
               // $('th').align('right').text('Prijs'),
               // $('th').align('right').text('Totaal'),
             ),
@@ -669,6 +675,8 @@ $().on('load', async e => {
               $('td').align('right').text(row.quant),
               $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
               $('td').text(row.code).style('white-space:nowrap;'),
+              $('td').text(row.artArtNr).style('white-space:nowrap;'),
+              $('td').text(row.unit),
               $('td').text(row.title).style('white-space:normal;'),
               // $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
               // $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
@@ -751,7 +759,7 @@ $().on('load', async e => {
           $('thead').append(
             $('tr').append(
               $('th').align('right').text('Aantal'),
-              $('th').align('left').text('Verpakking'),
+              // $('th').align('left').text('Verpakking'),
               $('th').align('left').text('Artikel'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
               $('th').align('right').text('Prijs/St'),
@@ -764,16 +772,16 @@ $().on('load', async e => {
                 $('td')
                 .colspan(6)
                 .align('left')
-                .text(
+                .text([
                   `Leverbon: ${salesorder.nr}`,
-                  salesorder.ref ? `uw referentie: ${salesorder.ref}`: '',
                   `Order datum: ${new Date(salesorder.orderDateTime).toLocaleDateString()}`,
-                ),
+                  salesorder.ref ? `uw referentie: ${salesorder.ref}`: '',
+                ].join(', ')),
               )
             ].concat(
               rows.filter(row => row.orderNr === salesorder.nr).map(row => $('tr').append(
                 $('td').align('right').text(row.quant),
-                $('td').text(row.unit),
+                // $('td').text(row.unit),
                 $('td').text(row.artNr),
                 $('td').style('white-space:normal;').text(row.title),
                 $('td').align('right').text(!row.netto ? '' : cur(row.netto)),
@@ -1346,7 +1354,8 @@ $().on('load', async e => {
     header(row){
       const elem = $('div').class('price');
       var price;
-      var listPrice = row.ppe;
+      const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
+      var listPrice = row.bruto || row.ppe;
       var discount = row.k;
       if (discount) {
         elem.append(
@@ -1367,6 +1376,7 @@ $().on('load', async e => {
           ),
         );
       }
+      console.log(mandregel,row.id,row.artId);
       elem.append(
         $('div').append(
           $('span').style('font-size:0.8em;').append(
@@ -1380,9 +1390,13 @@ $().on('load', async e => {
           ),
           elem.input = $('input')
           .tabindex(-1)
-          .type('number').step(1).min(0).value(row.quant).on('change', e => {
-            row.quant = Number(e.target.value);
-            console.log(row.quant);
+          .type('number').step(1).min(0).value(row.aantal).on('change', e => {
+            const body = dmsClient.api('/abis/OrderModArt').query({
+              clientName: clientName,
+              artId: row.artId,
+              aantal: e.target.value,
+            }).then(res => res.json());
+            console.log(body);
           }).on('click', e => e.stopPropagation()),
         )
       );
@@ -2432,12 +2446,12 @@ $().on('load', async e => {
     Orders: {
       Actief: e => aim.list('salesorder',{
         $filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
-        $order: `nr DESC`,
+        $order: `id DESC`,
         $search: '*',
       }),
       Mandje: e => aim.list('salesorder',{
         $filter: `isOrder NE 1`,
-        $order: `nr DESC`,
+        $order: `id DESC`,
         $search: '*',
       }),
       Aanbieding: e => aim.list('salesorder',{

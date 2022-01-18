@@ -580,8 +580,9 @@ $().on('load', async e => {
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Order'),
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Debiteur'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Klant nr.'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Order nr.'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Debiteur nr.'),
               $('th').align('left').style('width:80%').text('Referentie'),
               $('th').align('left').style('width:10mm').text('Transport'),
               $('th').align('right').style('width:10mm').text('KG'),
@@ -591,6 +592,7 @@ $().on('load', async e => {
           ),
           $('tbody').append(
             $('tr').append(
+              $('td').text(salesorder.clientNr),
               $('td').text(salesorder.id),
               $('td').text(salesorder.clientDebNr),
               $('td').text(salesorder.ref),
@@ -640,15 +642,17 @@ $().on('load', async e => {
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Order'),
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Debiteur'),
-              $('th').align('left').style('width:80%').text('Referentie'),
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Opdracht'),
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Levering'),
+              $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Klant nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Order nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Debiteur nr.'),
+              $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Referentie'),
+              $('th').style('text-align:left;white-space:nowrap;').class('datum').text('Opdracht'),
+              $('th').style('text-align:left;white-space:nowrap;').class('datum').text('Levering'),
             ),
           ),
           $('tbody').append(
             $('tr').append(
+              $('td').text(salesorder.clientNr),
               $('td').text(salesorder.id),
               $('td').text(salesorder.clientDebNr),
               $('td').text(salesorder.ref),
@@ -740,18 +744,20 @@ $().on('load', async e => {
         $('table').class('grid summary').style('margin-bottom:2mm;').append(
           $('thead').append(
             els.trh = $('tr').append(
-              $('th').align('left').class('datum').text('Datum'),
-              $('th').align('left').class('facnr').text('Factuur nummer'),
-              $('th').align('left').class('debnr').text('Debiteur nummer'),
-              $('th').align('left').class('btwnr').text('Debiteur BTW nummer'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Klant nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Factuur nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Debiteur nr.'),
+              $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Debiteur BTW nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Datum'),
             )
           ),
           $('tbody').append(
             els.trb = $('tr').append(
-              $('td').text(new Date(salesorder.invoiceDateTime || salesorder.abisInvoiceDateTime).toLocaleDateString()),
+              $('td').text(invoice.clientNr),
               $('td').text(factuurNr),
               $('td').text(invoice.clientDebNr),
               $('td').text(invoice.clientBtwNr),
+              $('td').text(new Date(salesorder.invoiceDateTime || salesorder.abisInvoiceDateTime).toLocaleDateString()),
             ),
           ),
         ),

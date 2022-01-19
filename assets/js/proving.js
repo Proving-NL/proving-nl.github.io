@@ -77,6 +77,25 @@ $().on('load', async e => {
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
   await selectClient(localStorage.getItem('clientName') || '');
+  $('button.menu').append(
+    $('ul').append(
+      Object.entries(aim.config.artikelgroepen).map(([key,group]) => $('li').text(key).append(
+        $('ul').append(
+          Object.entries(group).map(([key,group]) => $('li').text(key).append(
+            $('ul').append(
+              Object.entries(group).map(([key,group]) => $('li').text(key).on('click', e => {
+                e.stopPropagation();
+                aim.list('product', {
+                  $filter: `klantnaam eq ${clientName ? `'${clientName}'` : `null`} AND artGroep EQ '${key}'`,
+                  $search: `*`,
+                })
+              })),
+            ),
+          )),
+        ),
+      )),
+    ),
+  )
   // $('button.account>span').text(clientName);
   // $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
   //   $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
@@ -1382,7 +1401,7 @@ $().on('load', async e => {
           ),
         );
       }
-      console.log(mandregel,row.id,row.artId);
+      // console.log(mandregel,row.id,row.artId);
       elem.append(
         $('div').append(
           $('span').style('font-size:0.8em;').append(

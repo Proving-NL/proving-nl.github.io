@@ -78,9 +78,9 @@ $().on('load', async e => {
   // localStorage.clear();
   await selectClient(localStorage.getItem('clientName') || '');
   // $('button.account>span').text(clientName);
-  $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
-    $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
-  );
+  // $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
+  //   $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
+  // );
   function locCode(loc){
     return loc
     .replace(/^I/, '1.')

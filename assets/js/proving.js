@@ -40,7 +40,7 @@ $().on('load', async e => {
   console.log(1111, aimClient);
   // aimClient.ws().headers({'X-ApiKey': 'MY_KEY'}).method('subscribe').resource('zones').then(console.log);
 
-
+  aim.listselector = 'product';
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
     console.log(name);
@@ -56,7 +56,7 @@ $().on('load', async e => {
   aim.om.treeview({
     'Shop': {
       Producten: e => aim.list('product',{
-        $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
+        // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
         $search: ``,
       }),
       Boodschappenlijst() {
@@ -74,104 +74,49 @@ $().on('load', async e => {
     },
   });
 
+  aim.om.treeview(aim.config.artikelgroepen);
+
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
   await selectClient(localStorage.getItem('clientName') || '');
-  $('button.menu').append(
-    $('ul').append(
-      Object.entries(aim.config.artikelgroepen).map(([key,group]) => $('li').text(key).append(
-        $('ul').append(
-          Object.entries(group).map(([key,group]) => $('li').text(key).append(
-            $('ul').append(
-              Object.entries(group).map(([key,group]) => $('li').text(key).on('click', e => {
-                e.stopPropagation();
-                aim.list('product', {
-                  $filter: `klantnaam eq ${clientName ? `'${clientName}'` : `null`} AND artGroep EQ '${key}'`,
-                  $search: `*`,
-                })
-              })),
-            ),
-          )),
-        ),
-      )),
-    ),
-  )
+  $('button.menu')
+  // .on('mouseenter', e => $('.tv').elem.style.display = '')
+  // .on('mouseleave', e => $('.tv').elem.style.display = 'none')
+  .on('click', e => $('.tv').elem.style.display = !$('.tv').elem.style.display ? 'none' : '')
+
+  $('.tv').on('click', e => !['summary'].includes(e.target.localName) ? $('.tv').elem.style.display = 'none' : null);
+
+
+
+
+  // .on('mouseenter', e => $('button.menu>ul').elem.style.display = '')
+  // .on('mouseleave', e => $('button.menu>ul').elem.style.display = 'none')
+  // .on('click', e => $('button.menu>ul').elem.style.display = '')
+  // .append(
+  //   $('ul').style('display:none;').append(
+  //     Object.entries(aim.config.artikelgroepen).map(([key,group]) => $('li').text(key).append(
+  //       $('ul').append(
+  //         Object.entries(group).map(([key,group]) => $('li').text(key).append(
+  //           $('ul').append(
+  //             Object.entries(group).map(([key,group]) => $('li').text(key).on('click', e => {
+  //               e.stopPropagation();
+  //               $('button.menu>ul').elem.style.display='none';
+  //               $('.pv').text('');
+  //               aim.list('product', {
+  //                 $filter: `artGroep EQ '${key}'`,
+  //                 $search: `*`,
+  //               })
+  //             })),
+  //           ),
+  //         )),
+  //       ),
+  //     )),
+  //   ),
+  // )
   // $('button.account>span').text(clientName);
   // $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
   //   $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
   // );
-  function locCode(loc){
-    return loc
-    .replace(/^I/, '1.')
-    .replace(/^K/, '3.')
-    .replace(/^M/, '5.')
-    .replace(/\.A/, '.14.')
-    .replace(/\.B/, '.13.')
-    .replace(/\.C/, '.12.')
-    .replace(/\.D/, '.11.')
-    .replace(/\.E/, '.10.')
-    .replace(/\.F/, '.9.')
-    .replace(/\.G/, '.8.')
-    .replace(/\.H/, '.7.')
-    .replace(/\.I/, '.6.')
-    .replace(/\.J/, '.5.')
-    .replace(/\.K/, '.4.')
-    .replace(/\.L/, '.3.')
-    .replace(/\.M/, '.2.')
-    .replace(/\.N/, '.1.')
-    // .replace(/\.O/, '.0.')
-
-    .replace(/^J/, '2.')
-    .replace(/^L/, '4.')
-    .replace(/^N/, '6.')
-    // .replace(/^O/, '8.')
-    // .replace(/^A/, '12.')
-    // .replace(/^B/, '13.')
-    .replace(/\.A/, '.1.')
-    .replace(/\.B/, '.2.')
-    .replace(/\.C/, '.3.')
-    .replace(/\.D/, '.4.')
-    .replace(/\.E/, '.5.')
-    .replace(/\.F/, '.6.')
-    .replace(/\.G/, '.7.')
-    .replace(/\.H/, '.8.')
-    .replace(/\.I/, '.9.')
-    .replace(/\.J/, '.10.')
-    .replace(/\.K/, '.11.')
-    .replace(/\.L/, '.12.')
-    .replace(/\.M/, '.13.')
-    .replace(/\.N/, '.14.')
-    // .replace(/\.O/, '.15.')
-    //
-    // .replace(/^CA/, '10.1.')
-    // .replace(/^CB/, '10.2.')
-    // .replace(/^CC/, '10.3.')
-    // .replace(/^CD/, '10.4.')
-    // .replace(/^CE/, '10.5.')
-    // .replace(/^CF/, '10.6.')
-    // .replace(/^CG/, '10.7.')
-    // .replace(/^CH/, '10.8.')
-    // .replace(/^C/, '10.1.')
-    //
-    // .replace(/^D2/, '10.9.')
-    // .replace(/^D1/, '10.10.')
-    // .replace(/^DA/, '10.11.')
-    // .replace(/^DB/, '10.12.')
-    //
-    // .replace(/^E/, '10.4.')
-    // .replace(/^F2/, '10.5.')
-    // .replace(/^F1/, '10.6.')
-    // .replace(/^G2/, '10.7.')
-    // .replace(/^G1/, '10.8.')
-    // .replace(/^HA/, '11.4.')
-    // .replace(/^HB/, '11.3.')
-    // .replace(/^HC/, '11.2.')
-    // .replace(/^HD/, '11.1.')
-    // .replace(/^HE/, '1.3.')
-    // .replace(/^HF/, '1.2.')
-    // .replace(/^HG/, '1.1.')
-    // .replace(/^HG/, '1.1.')
-  }
 
   let factuurData;
   let facturenElem;

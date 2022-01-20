@@ -49,6 +49,7 @@ $().on('load', async e => {
     [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientName=' + clientName).then(res => res.json());
     aim.idfilter = `clientName EQ '${clientName}'`;
     console.log('JA', name, clientart, mandregels);
+    // clientart.length = 10;
 
   }
 
@@ -68,18 +69,17 @@ $().on('load', async e => {
     )
   );
 
+
   aim.om.treeview({
     'Shop': {
-      // Producten: e => aim.list('product',{
-      //   // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
-      //   $search: ``,
-      // }),
-      Boodschappenlijst() {
-        aim.list('art',{
-          $filter: `id IN (SELECT artId FROM abisingen.dbo.klantartikelen WHERE klantid = '${clientName}')`,
-          $search: '*',
-        });
-      },
+      Producten: e => aim.list('product', {
+        // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
+        $search: ``,
+      }),
+      Bestellijst: e => aim.list('productklant', {
+        $filter: `ClientName EQ '${clientName}'`,
+        $search: `*`,
+      }),
       Winkelmandje() {
         aim.list('salesorderrow',{$filter: `clientName EQ '${clientName}' and isOrder EQ 0`});
       },
@@ -97,7 +97,7 @@ $().on('load', async e => {
 
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
-  await selectClient(localStorage.getItem('clientName') || '');
+
   // $('button.menu').on('click', e => $('.tv').elem.style.display = !$('.tv').elem.style.display ? 'none' : '')
   // .on('mouseenter', e => $('.tv').elem.style.display = '')
   // .on('mouseleave', e => $('.tv').elem.style.display = 'none')
@@ -1228,122 +1228,15 @@ $().on('load', async e => {
   aim.config.components.schemas.art.app = {
     header: artHeader,
   }
-  aim.config.components.schemas.product.app = {
-    header(row){
-      const elem = $('div').class('price');
-      var price;
-
-      row.orderContent = row.orderContent == 1 ? row.partContent || 1 : row.orderContent;
-
-      row.orderPackPrice = row.orderPackPrice || row.orderPartPrice * row.orderContent;
-      row.orderDiscount = row.artikelInkKorting;
-      if (!row.orderDiscount) {
-        row.orderPackPrice *= 1.5;
-        row.orderDiscount = 50;
-      }
-
-      row.orderPartPrice = row.orderPackPrice / row.orderContent;
-      if (row.supplier) {
-        var discount = row.orderDiscount;
-        var style = 'color:lightgreen;font-size:1.2em';
-        elem.append(
-          $('div').append(
-            $('span').text('€ ' + num(row.orderPackPrice)).style('text-decoration:line-through;'),
-            ' (-' + num(discount).replace(/,00$|0$/g,'') + '%) € ',
-            $('span').text(num(price = row.orderPackPrice*(100-discount)/100)).style(style),
-            ' ',
-            row.orderContent == 1 ? null : ' € ' + num(row.orderPartPrice*(100-discount)/100) + '/' + row.orderContentUnit,
-            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-            row.supplier,
-          ),
-        );
-      }
-      var discount = row.orderDiscount * 0.4;
-      var style = 'color:lightblue;font-size:1.2em';
-      elem.append(
-        $('div').append(
-          $('span').text('€ ' + num(row.orderPackPrice)).style('text-decoration:line-through;'),
-          ' (-' + num(discount).replace(/,00$|0$/g,'') + '%) € ',
-          $('span').text(num(price = row.orderPackPrice*(100-discount)/100)).style(style),
-          ' ',
-          row.orderContent == 1 ? null : ' € ' + num(row.orderPartPrice*(100-discount)/100) + '/' + row.orderContentUnit,
-          ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-        ),
-      );
-      if (row.clientDiscount) {
-        var discount = row.clientDiscount;
-        var style = 'color:orange;font-size:1.2em';
-
-        elem.append(
-          $('div').append(
-            $('span').text('€ ' + num(row.orderPackPrice)).style('text-decoration:line-through;'),
-            ' (-' + num(discount).replace(/,00$|0$/g,'') + '%) € ',
-            $('span').text(num(price = row.orderPackPrice*(100-discount)/100)).style(style),
-            ' ',
-            row.orderContent == 1 ? null : ' € ' + num(row.orderPartPrice*(100-discount)/100) + '/' + row.orderContentUnit,
-            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-            row.clientName,
-          ),
-        );
-      }
-      elem.append(
-        $('div').append(
-          'Verzending in: ',
-          $('b').text(row.verzending).style('color:green;'),
-          elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
-            row.quant = Number(e.target.value);
-            console.log(row.quant);
-          }).on('click', e => {
-            e.stopPropagation();
-          }),
-        )
-      );
-
-
-      return elem;
-
-      const myart = clientart.find(a => a.artId === row.id);
-      if (myart) {
-        row.discount = myart.clientDiscount;
-      }
-      row.listPrice = Number(row.listPrice);
-      row.purchaseDiscount = Number(row.purchaseDiscount);
-      if (row.purchaseDiscount = Number(row.purchaseDiscount)) {
-        row.purchasePrice = row.listPrice * (100 - row.purchaseDiscount) / 100;
-      } else if (row.purchasePrice = Number(row.purchasePrice)) {
-        row.purchaseDiscount = row.purchasePrice / row.listPrice * 100;
-      }
-      row.price = row.listPrice * (100 - row.discount) / 100;
-      // console.log(row);
-      // const elem = $('div').class('price');
-      if (row.discount) {
-        elem.class('price discount', myart ? 'client' : '').append(
-          $('span').attr('listprice', num(row.listPrice)),
-          $('span').attr('discount', num(-row.discount,0)),
-        );
-      }
-      elem.append(
-        $('span').attr('price', num(row.price)),
-        $('span').attr('fatprice', num(row.price * 1.21)),
-        row.purchasePrice ? $('span').attr('purchaseprice', num(row.purchasePrice)) : null,
-        row.purchaseDiscount ? $('span').attr('purchasediscount', num(row.purchaseDiscount)) : null,
-
-        $('span'),
-        elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
-          row.quant = Number(e.target.value);
-          console.log(row.quant);
-        }).on('click', e => {
-          e.stopPropagation();
-        }),
-      );
-      return elem;
-    },
+  aim.config.components.schemas.product.app = aim.config.components.schemas.productklant.app = {
     header(row){
       const elem = $('div').class('price');
       var price;
       const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
       var listPrice = row.bruto || row.ppe;
       var discount = row.k;
+      // console.log(clientart);
+      clientart.filter(a => a.artId === row.id).forEach(a => discount = a.clientDiscount);
       if (discount) {
         elem.append(
           $('div').append(
@@ -1799,12 +1692,14 @@ $().on('load', async e => {
       }
     }
     // return;
-    console.log(allrows);
+    // console.log(allrows);
     allrows = allrows.filter(entry => entry[0].leverancier && entry[0].bestelCode);
-    console.log(allrows);
+    // console.log(allrows);
     var max = allrows.length;
     var i = 0;
     const progressElem = $('footer>progress').max(max).value(i);
+    const importDateTime = new Date().toISOString();
+    console.log('importDateTime', importDateTime);
     for (var [row,tab] of allrows) {
       // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
       $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.leverancier, row.bestelCode, row.aantalStuks);
@@ -1812,6 +1707,7 @@ $().on('load', async e => {
         // console.log(row);
         // await tab.callback(row);
         if (row.levKortingFaktor) row.levKorting = row.levKortingFaktor*100;
+        row.importDateTime = importDateTime;
         await dmsClient.api('/abis/artlev').body(row).post()
 
       } catch (err) {
@@ -3573,6 +3469,9 @@ $().on('load', async e => {
       },
     },
   });
+
+  await selectClient(localStorage.getItem('clientName') || '');
+
 
   // dmsClient.api('/me/children').select('name').get().then(console.log);
   // dmsClient.api('/Contact').select('CompanyName,name,FirstName,Surname').search('alicon.nl').get().then(console.log);

@@ -53,12 +53,27 @@ $().on('load', async e => {
   }
 
   // let clientName = localStorage.getItem('clientName');
+  Object.values(aim.config.artikelgroepen).forEach(obj =>
+    Object.values(obj).forEach(obj =>
+      Object.entries(obj).forEach(
+        ([key,value]) => obj[key] = e => {
+          $('.pv').text('');
+          $('.lv').text('');
+          aim.list('product', {
+            $filter: `artGroep EQ '${key}'`,
+            $search: `*`,
+          })
+        }
+      )
+    )
+  );
+
   aim.om.treeview({
     'Shop': {
-      Producten: e => aim.list('product',{
-        // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
-        $search: ``,
-      }),
+      // Producten: e => aim.list('product',{
+      //   // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
+      //   $search: ``,
+      // }),
       Boodschappenlijst() {
         aim.list('art',{
           $filter: `id IN (SELECT artId FROM abisingen.dbo.klantartikelen WHERE klantid = '${clientName}')`,
@@ -74,17 +89,19 @@ $().on('load', async e => {
     },
   });
 
+
+
+
+  console.log(aim.config.artikelgroepen);
   aim.om.treeview(aim.config.artikelgroepen);
 
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
   await selectClient(localStorage.getItem('clientName') || '');
-  $('button.menu')
+  // $('button.menu').on('click', e => $('.tv').elem.style.display = !$('.tv').elem.style.display ? 'none' : '')
   // .on('mouseenter', e => $('.tv').elem.style.display = '')
   // .on('mouseleave', e => $('.tv').elem.style.display = 'none')
-  .on('click', e => $('.tv').elem.style.display = !$('.tv').elem.style.display ? 'none' : '')
 
-  $('.tv').on('click', e => !['summary'].includes(e.target.localName) ? $('.tv').elem.style.display = 'none' : null);
 
 
 

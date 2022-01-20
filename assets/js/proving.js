@@ -500,7 +500,7 @@ $().on('load', async e => {
       // $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
     );
   }
-  function orderPage(salesorder, rows) {
+  async function orderPage(salesorder, rows) {
     // rows.forEach(row => row.storageLocation = row.newStorageLocation ? (row.newStorageLocation.match(/../g)||[]).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
     rows.forEach(row => row.loc = (row.magLokatie||'').split('.').filter(Boolean).join('.'));
     rows = rows.filter(row => row.orderNr === salesorder.nr || row.orderId === salesorder.id);
@@ -580,7 +580,9 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid summary').append(
+        $('table').class('grid summary')
+        .style('font-size:0.8em;')
+        .append(
           $('thead').append(
             $('tr').append(
               // $('th').align('left').text('Artikelnummer'),
@@ -590,6 +592,7 @@ $().on('load', async e => {
               $('th').align('left').text('Code').style('white-space:nowrap;'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
               $('th').align('right').text('KG/st'),
+              $('th').align('right').text('Aanw.'),
               $('th').align('left').text('Art.nr.'),
               $('th').align('right').text('Bruto'),
             ),
@@ -604,7 +607,8 @@ $().on('load', async e => {
               $('td').text(row.unit),
               $('td').text(row.code).style('white-space:nowrap;'),
               $('td').text(row.title).style('white-space:normal;'),
-              $('td').align('right').text(!row.artWeight ? null : num(row.artWeight,1)),
+              $('td').align('right').text(!row.weight ? null : num(row.weight,1)),
+              $('td').align('right').text(row.stock),
               $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
               $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
             ))
@@ -612,7 +616,8 @@ $().on('load', async e => {
         ),
       ).style('page-break-before:always;'),
     );
-    rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
+    const [backorder] = await dmsClient.api('/abis/backorder').query({id: salesorder.nr}).get();
+    console.log('backorder', backorder);
     elem.append(
       $('div').class('brief').append(
         $('div').append(
@@ -636,7 +641,8 @@ $().on('load', async e => {
         $('div').append(
           $('span').text('LEVERBON').style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
         ),
-        $('table').class('grid').append(
+        $('table').class('grid')
+        .append(
           $('thead').append(
             $('tr').append(
               $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Klant nr.'),
@@ -686,21 +692,42 @@ $().on('load', async e => {
             )),
           ),
         ),
+        backorder.length ? $('table').class('grid').append(
+          $('thead').append(
+            $('tr').append(
+              $('td').colspan(3).text('Voor u staat nog in bestelling'),
+            ),
+            $('tr').append(
+              $('th').align('left').text('Art.nr.'),
+              $('th').align('right').text('Aantal'),
+              $('th').align('left').style('width:100%;').text('Omschrijving'),
+            ),
+          ),
+          $('tbody').append(
+            backorder.map(row => $('tr').append(
+              $('td').text(row.nr),
+              $('td').align('right').text(row.quant),
+              $('td').text(row.title).style('white-space:normal;'),
+            )),
+          ),
+        ) : null,
+
         // $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
-      ).style('page-break-before:always;')
+      )
+      .style('page-break-before:always;')
     );
+
     return elem;
   }
   async function order(orderNr) {
-    const data = await dmsClient.api('/abis/paklijst')
-    .post({
+    const data = await dmsClient.api('/abis/paklijst').post({
       id: orderNr,
       set: 'printDateTime = GETDATE()'
     })
     var [salesorders,rows] = data;
     var [salesorder] = salesorders;
     if (!rows.length) alert('Order bevat geen regels');
-    return orderPage(salesorder,rows);
+    return await orderPage(salesorder,rows);
   }
   async function factuur(factuurNr) {
     console.log('start factuurt',factuurNr);

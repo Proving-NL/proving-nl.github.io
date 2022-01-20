@@ -72,6 +72,7 @@ table.grid td {
 table.grid th {
   font-style: italic;
   font-size: 0.8em;
+  color: gray;
 }
 
 h1 {

@@ -1,16 +1,17 @@
 $().on('load', async e => {
   const cols = [
-    { n: 'id', v: 'ArtikelNr', wch: 8, f:{t:'s'} },
-    { n: 'artCode', v: 'ArtikelCode', wch: 20 },
-    { n: 'titel', v: 'Titel', wch: 100 },
-    { n: 'merk', v: 'Merk', wch: 10 },
-    { n: 'code', v: 'Code', wch: 10 },
-    { n: 'eenheid', v: 'Code', wch: 10 },
-    { n: 'ppe', v: 'Prijs per eenheid', wch: 10, f:{t:'n', z:'.00'} },
-    { n: 'va', v: 'Verpakt per', wch: 3, f: { t:'n' } },
-    { n: 'ppa', v: 'Bruto', wch: 10, f:{t:'n', z:'.00'} },
-    { n: 'k', v: 'Korting', wch: 3, f:{t:'n'} },
-    { n: 'lt', v: 'Netto', wch: 12  },
+    { n: 'id', v: 'ArtNr', wch: 8, f:{t:'n'} },
+    { n: 'aantal', v: 'Aantal', wch: 8 },
+    // { n: 'artCode', v: 'ArtikelCode', wch: 20 },
+    { n: 'titel', v: 'Omschrijving', wch: 100 },
+    // { n: 'merk', v: 'Merk', wch: 10 },
+    // { n: 'code', v: 'Code', wch: 10 },
+    // { n: 'eenheid', v: 'Code', wch: 10 },
+    { n: 'ppe', v: 'Prijs', wch: 10, f:{t:'n', z:'.00'} },
+    // { n: 'va', v: 'Verpakt per', wch: 3, f: { t:'n' } },
+    // { n: 'ppa', v: 'Bruto', wch: 10, f:{t:'n', z:'.00'} },
+    // { n: 'k', v: 'Korting', wch: 3, f:{t:'n'} },
+    // { n: 'lt', v: 'Netto', wch: 12  },
     // // { n: 'kortK', v: 'Korting', wch: 10, f:{t:'n' } },
     // { n: 'kortingCode', v: 'KortingCode', wch: 10, f:{t:'n' } },
     // { n: 'merk', v: 'Merk', wch: 10 },
@@ -41,8 +42,8 @@ $().on('load', async e => {
   ];
 
   const searchParams = new URL(document.location).searchParams;
-  const customer_id = searchParams.get('customer_id');
-  const [rows] = await fetch(`https://dms.aliconnect.nl/api/v1/abis/prijslijst_xls?client_id=cac652da-dcdc-455a-a0de-e32bac08ea06&customer_id=${customer_id}&select=${cols.map(col => col.n).join(',')}`).then(res => res.json());
+  const klant_id = searchParams.get('klant_id');
+  const [rows,klant] = await fetch(`https://dms.aliconnect.nl/api/v1/abis/prijslijst_xls?client_id=cac652da-dcdc-455a-a0de-e32bac08ea06&klant_id=${klant_id}&select=${cols.map(col => col.n).join(',')}`).then(res => res.json());
   console.log(rows);
   rows.forEach(row => {
     // row.bruto
@@ -58,11 +59,13 @@ $().on('load', async e => {
     Author: "",
     CreatedDate: new Date(2017,12,19)
   };
-  wb.SheetNames.push(ws_title);
+  wb.SheetNames.push('artikelen');
   var ws = XLSX.utils.aoa_to_sheet([cols].concat(rows.map(row => cols.map(col => Object.assign({v: String(row[col.n] !== null ? row[col.n] : '').trim() }, col.f)))));
   ws['!cols'] = cols;
-  wb.Sheets[ws_title] = ws;
-  var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+  wb.Sheets['artikelen'] = ws;
+  wb.SheetNames.push('account');
+  wb.Sheets['account'] = XLSX.utils.aoa_to_sheet([[{v: 'klant_id'}],[{v: klant_id}]]);
   // saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), ws_title + ' Proving.xlsx');
-  $('a').download(`${title}-${customer_id}.xlsx`).rel('noopener').href(URL.createObjectURL(new Blob([aim.s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
+  var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+  $('a').download(`${title}-${klant_id}.xlsx`).rel('noopener').href(URL.createObjectURL(new Blob([aim.s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
 });

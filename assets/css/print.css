@@ -60,23 +60,19 @@ td,th {
 table.grid {
   margin-top:2mm;
 }
-table.grid th {
-  font-size: 0.9em;
-  /* border-top: solid 1px; */
-  /* border-bottom: solid 1px; */
-  /* background: #eee; */
-}
 table.grid td, table.grid th {
   border: solid 1px black;
   padding: 2px 5px;
+  font-weight: normal;
 }
 
 table.grid td {
   white-space: nowrap;
 }
-/* table.grid td.wrap {
-  white-space: normal;
-} */
+table.grid th {
+  font-style: italic;
+  font-size: 0.8em;
+}
 
 h1 {
   margin-top: 0;
@@ -114,9 +110,4 @@ div.header {
 
 .datum,.facnr,.nr,.debnr {
   width: 26mm;
-}
-th{
-  background-color: #eee;
-  font-weight: normal;
-  /* font-size: 0.9em; */
 }

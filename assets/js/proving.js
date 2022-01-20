@@ -500,40 +500,32 @@ $().on('load', async e => {
       // $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
     );
   }
-  function briefElem(row, title, bc = ''){
-    console.log(1, row.accountName);
-    return $('div').class('brief').append(
-      $('div').append(
-        $('img').src(`https://${row.accountName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${row.accountName.toLowerCase()}.png`
-        ),
-      ),
-      $('table').style('margin-bottom:10mm;width:100%;').append(
-        $('tr').append(
-          $('td').style('padding-left:10mm;padding-top:25mm;').append(
-            $('div').text(row.clientCompanyName).style('font-weight:bold;'),
-            $('div').text(row.clientBusinessContactName),
-            $('div').text(row.clientBusinessAddressStreet),
-            $('div').text(row.clientBusinessAddressPostalCode, row.clientBusinessAddressCity),
-          ),
-          $('td').style('width:65mm;').append(
-            $('div').text(row.accountCompanyName).style('font-weight:bold;'),
-            $('div').text(row.accountInvoiceText).style('word-wrap:pre;font-size:0.8em;'),
-          ),
-        )
-      ),
-      $('div').append(
-        $('span').text(title).style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
-        $('span').class('bc').text(bc),
-      ),
-    );
-  }
   function orderPage(salesorder, rows) {
-    rows.forEach(row => row.storageLocation = row.newStorageLocation ? (row.newStorageLocation.match(/../g)||[]).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
+    // rows.forEach(row => row.storageLocation = row.newStorageLocation ? (row.newStorageLocation.match(/../g)||[]).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
+    rows.forEach(row => row.loc = (row.magLokatie||'').split('.').filter(Boolean).join('.'));
     rows = rows.filter(row => row.orderNr === salesorder.nr || row.orderId === salesorder.id);
-    rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
-    console.log(salesorder, rows);
-    return printElem().append(
-      briefElem(salesorder, 'PAKBON (alleen voor intern gebruik)', `*${salesorder.nr}*`).class('order').append(
+    rows.sort((a,b) => a.loc.localeCompare(b.loc));
+    // console.log(salesorder, rows);
+    const elem = printElem().append(
+      $('div').class('brief').append(
+        $('div').append(
+          $('span').text('PAKBON (alleen voor intern gebruik)').style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
+        ),
+        $('table').append(
+          $('tr').append(
+            $('td').append(
+              $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.clientBusinessContactName),
+              $('div').text(salesorder.clientBusinessAddressStreet),
+              $('div').text(salesorder.clientBusinessAddressPostalCode, salesorder.clientBusinessAddressCity),
+            ),
+            $('td').style('width:65mm;').append(
+              $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
+              $('span').class('bc').text(`*${salesorder.nr}*`),
+            ),
+          )
+        ),
+      ).class('order').append(
         salesorder.remark ? $('div').text(salesorder.remark).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
         // $('div').class('barcode').text('*2345234*'),
         $('table').class('grid summary').style('table-layout:fixed;').append(
@@ -563,7 +555,7 @@ $().on('load', async e => {
             $('tr').append(
               $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Klant nr.'),
               $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Order nr.'),
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Debiteur nr.'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('nr').text('Deb.nr.'),
               $('th').align('left').style('width:80%').text('Referentie'),
               $('th').align('left').style('width:10mm').text('Transport'),
               $('th').align('right').style('width:10mm').text('KG'),
@@ -592,13 +584,13 @@ $().on('load', async e => {
           $('thead').append(
             $('tr').append(
               // $('th').align('left').text('Artikelnummer'),
+              $('th').align('left').text('Vak'),
               $('th').align('right').text('Aantal'),
-              $('th').align('left').text('ArtNr'),
-              $('th').align('left').text('Merk code').style('white-space:nowrap;'),
               $('th').align('left').text('Eenheid'),
+              $('th').align('left').text('Code').style('white-space:nowrap;'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
               $('th').align('right').text('KG/st'),
-              $('th').align('left').text('Vak'),
+              $('th').align('left').text('Art.nr.'),
               $('th').align('right').text('Bruto'),
             ),
           ),
@@ -607,25 +599,49 @@ $().on('load', async e => {
             // .sort((a,b) => a.storageLocation.localeCompare(b.storageLocation))
             .map(row => $('tr').append(
               // $('td').text(Number(row.artId).pad(9)),
+              $('td').text(row.loc),
               $('td').align('right').text(row.quant),
-              $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
-              $('td').text(row.code).style('white-space:nowrap;'),
               $('td').text(row.unit),
+              $('td').text(row.code).style('white-space:nowrap;'),
               $('td').text(row.title).style('white-space:normal;'),
               $('td').align('right').text(!row.artWeight ? null : num(row.artWeight,1)),
-              $('td').text((row.magLokatie||'').split('.').filter(Boolean).join('.')),
+              $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
               $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
             ))
           ),
         ),
       ).style('page-break-before:always;'),
-      briefElem(salesorder, 'LEVERBON', `*${salesorder.nr}*`).append(
+    );
+    rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
+    elem.append(
+      $('div').class('brief').append(
+        $('div').append(
+          $('img').src(`https://${salesorder.accountName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountName.toLowerCase()}.png`
+          ),
+        ),
+        $('table').style('margin-bottom:10mm;width:100%;').append(
+          $('tr').append(
+            $('td').style('padding-left:10mm;padding-top:25mm;').append(
+              $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.clientBusinessContactName),
+              $('div').text(salesorder.clientBusinessAddressStreet),
+              $('div').text(salesorder.clientBusinessAddressPostalCode, salesorder.clientBusinessAddressCity),
+            ),
+            $('td').style('width:65mm;').append(
+              $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;font-size:0.8em;'),
+            ),
+          )
+        ),
+        $('div').append(
+          $('span').text('LEVERBON').style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
+        ),
         $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
               $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Klant nr.'),
               $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Order nr.'),
-              $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Debiteur nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').class('nr').text('Deb.nr.'),
               $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Referentie'),
               $('th').style('text-align:left;white-space:nowrap;').class('datum').text('Opdracht'),
               $('th').style('text-align:left;white-space:nowrap;').class('datum').text('Levering'),
@@ -642,14 +658,16 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid').append(
+        $('table').class('grid')
+        // .style('font-size:0.9em;')
+        .append(
           $('thead').append(
             $('tr').append(
+              $('th').align('left').text('Art.nr.'),
               $('th').align('right').text('Aantal'),
-              $('th').align('left').text('ArtNr'),
-              $('th').align('left').text('Merk code').style('white-space:nowrap;'),
-              $('th').align('left').text('ArtNr Oud').style('white-space:nowrap;'),
-              $('th').align('left').text('Eenheid'),
+              // $('th').align('left').text('Code').style('white-space:nowrap;'),
+              // $('th').align('left').text('ArtNr Oud').style('white-space:nowrap;'),
+              // $('th').align('left').text('Eenheid'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
               // $('th').align('right').text('Prijs'),
               // $('th').align('right').text('Totaal'),
@@ -657,11 +675,11 @@ $().on('load', async e => {
           ),
           $('tbody').append(
             rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
-              $('td').align('right').text(row.quant),
               $('td').text(row.nr),//.style('font-family:monospace;font-size:0.9em;'),
-              $('td').text(row.code).style('white-space:nowrap;'),
-              $('td').text(row.artArtNr).style('white-space:nowrap;'),
-              $('td').text(row.unit),
+              $('td').align('right').text(row.quant),
+              // $('td').text(row.code).style('white-space:nowrap;'),
+              // $('td').text(row.artArtNr).style('white-space:nowrap;'),
+              // $('td').text(row.unit),
               $('td').text(row.title).style('white-space:normal;'),
               // $('td').align('right').text(!row.netto ? '' : Number(row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2})),
               // $('td').align('right').text(row.netto && row.quant ? Number(row.quant * row.netto).toLocaleString('nl-NL', {minimumFractionDigits: 2,maximumFractionDigits: 2}) : null),
@@ -671,6 +689,7 @@ $().on('load', async e => {
         // $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
       ).style('page-break-before:always;')
     );
+    return elem;
   }
   async function order(orderNr) {
     const data = await dmsClient.api('/abis/paklijst')
@@ -727,8 +746,8 @@ $().on('load', async e => {
             els.trh = $('tr').append(
               $('th').style('text-align:left;white-space:nowrap;').text('Klant nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Factuur nr.'),
-              $('th').style('text-align:left;white-space:nowrap;').text('Debiteur nr.'),
-              $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Debiteur BTW nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Deb.nr.'),
+              $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Deb. BTW nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Datum'),
             )
           ),
@@ -742,14 +761,15 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid').append(
+        $('table').class('grid')
+        // .style('font-size:0.9em;')
+        .append(
           $('thead').append(
             $('tr').append(
+              $('th').align('left').text('Art.nr.'),
               $('th').align('right').text('Aantal'),
-              // $('th').align('left').text('Verpakking'),
-              $('th').align('left').text('Artikel'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
-              $('th').align('right').text('Prijs/St'),
+              $('th').align('right').text('Prijs'),
               $('th').align('right').text('Totaal'),
             ),
           ),
@@ -757,19 +777,18 @@ $().on('load', async e => {
             ...clientOrders.map(salesorder => [
               $('tr').append(
                 $('td')
-                .colspan(6)
+                .colspan(5)
                 .align('left')
                 .text([
                   `Leverbon: ${salesorder.nr}`,
                   `Order datum: ${new Date(salesorder.orderDateTime).toLocaleDateString()}`,
                   salesorder.ref ? `uw referentie: ${salesorder.ref}`: '',
-                ].join(', ')),
+                ].filter(Boolean).join(', ')),
               )
             ].concat(
               rows.filter(row => row.orderNr === salesorder.nr).map(row => $('tr').append(
-                $('td').align('right').text(row.quant),
-                // $('td').text(row.unit),
                 $('td').text(row.artNr),
+                $('td').align('right').text(row.quant),
                 $('td').style('white-space:normal;').text(row.title),
                 $('td').align('right').text(!row.netto ? '' : cur(row.netto)),
                 $('td').align('right').text(row.quant && row.netto ? cur(row.totnetto = row.quant * row.netto, totaal += row.totnetto) : ''),
@@ -829,8 +848,8 @@ $().on('load', async e => {
 
     els.trh.append($('th').align('right').style('width:20mm;').text(`Btw ${invoice.btw}%`));
     els.trb.append($('td').align('right').text(cur(invoice.btwbedrag = totaal * invoice.btw/100, totaal += invoice.btwbedrag)));
-    els.trh.append($('th').align('right').style('width:20mm;').text(`Incl`));
-    els.trb.append($('td').align('right').text(cur(totaal)));
+    els.trh.append($('th').align('right').style('width:20mm;').text(`TE BETALEN`));
+    els.trb.append($('td').align('right').append($('b').text(cur(totaal))));
     if (betaald) {
       els.trh.append($('th').align('right').text(`Voldaan`));
       els.trb.append($('td').align('right').text(cur(betaald)));

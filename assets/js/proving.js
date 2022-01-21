@@ -13,6 +13,7 @@ $().on('load', async e => {
   // console.log('JA', aim);
   // console.log('JA', sessionStorage.getItem('access_token'));
   const {aimClient,dmsClient} = aim;
+
   console.log('AIM', aimClient, dmsClient, aim.config);
   // dmsClient.api('/salesorder', {
   //   filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
@@ -35,7 +36,7 @@ $().on('load', async e => {
   // }
 
   let clientart = [];
-  let clientName = null;
+  let clientName = '';
   let mandregels = [];
   console.log(1111, aimClient);
   // aimClient.ws().headers({'X-ApiKey': 'MY_KEY'}).method('subscribe').resource('zones').then(console.log);
@@ -97,44 +98,6 @@ $().on('load', async e => {
 
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
-
-  // $('button.menu').on('click', e => $('.tv').elem.style.display = !$('.tv').elem.style.display ? 'none' : '')
-  // .on('mouseenter', e => $('.tv').elem.style.display = '')
-  // .on('mouseleave', e => $('.tv').elem.style.display = 'none')
-
-
-
-
-
-  // .on('mouseenter', e => $('button.menu>ul').elem.style.display = '')
-  // .on('mouseleave', e => $('button.menu>ul').elem.style.display = 'none')
-  // .on('click', e => $('button.menu>ul').elem.style.display = '')
-  // .append(
-  //   $('ul').style('display:none;').append(
-  //     Object.entries(aim.config.artikelgroepen).map(([key,group]) => $('li').text(key).append(
-  //       $('ul').append(
-  //         Object.entries(group).map(([key,group]) => $('li').text(key).append(
-  //           $('ul').append(
-  //             Object.entries(group).map(([key,group]) => $('li').text(key).on('click', e => {
-  //               e.stopPropagation();
-  //               $('button.menu>ul').elem.style.display='none';
-  //               $('.pv').text('');
-  //               aim.list('product', {
-  //                 $filter: `artGroep EQ '${key}'`,
-  //                 $search: `*`,
-  //               })
-  //             })),
-  //           ),
-  //         )),
-  //       ),
-  //     )),
-  //   ),
-  // )
-  // $('button.account>span').text(clientName);
-  // $('.abtn.menu>ul').on('click', e => e.stopPropagation()).append(
-  //   $('li').text('Handboek').html(aim.markdown().render(await fetch('/docs/index.md').then(res => res.text()))),
-  // );
-
   let factuurData;
   let facturenElem;
   const transportOptions = [
@@ -1090,247 +1053,6 @@ $().on('load', async e => {
     document.querySelectorAll('iframe').forEach(el => el.remove());
     alert('Herinneringen verstuurd');
   }
-  function artHeader(row){
-    const myart = clientart.find(a => a.artId === row.id);
-    if (myart) {
-      row.discount = myart.clientDiscount;
-    }
-    row.listPrice = Number(row.listPrice);
-    row.purchaseDiscount = Number(row.purchaseDiscount);
-    if (row.purchaseDiscount = Number(row.purchaseDiscount)) {
-      row.purchasePrice = row.listPrice * (100 - row.purchaseDiscount) / 100;
-    } else if (row.purchasePrice = Number(row.purchasePrice)) {
-      row.purchaseDiscount = row.purchasePrice / row.listPrice * 100;
-    }
-    row.price = row.listPrice * (100 - row.discount) / 100;
-    // console.log(row);
-    const elem = $('div').class('price');
-    if (row.discount) {
-      elem.class('price discount', myart ? 'client' : '').append(
-        $('span').attr('listprice', num(row.listPrice)),
-        $('span').attr('discount', num(-row.discount,0)),
-      );
-    }
-    elem.append(
-      $('span').attr('price', num(row.price)),
-      $('span').attr('fatprice', num(row.price * 1.21)),
-      row.purchasePrice ? $('span').attr('purchaseprice', num(row.purchasePrice)) : null,
-      row.purchaseDiscount ? $('span').attr('purchasediscount', num(row.purchaseDiscount)) : null,
-
-      $('span'),
-      elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
-        row.quant = Number(e.target.value);
-        console.log(row.quant);
-      }).on('click', e => {
-        e.stopPropagation();
-      }),
-    );
-    return elem;
-  }
-  aim.config.components.schemas.company.app = {
-    nav: row => [
-      $('button').class('abtn print').title('Printen').on('click', e => {
-        const elem = $('article').parent('.lv').class('cover').append(
-          $('nav').append(
-            $('span'),
-            $('button').class('icn-close').on('click', e => elem.remove()),
-          ),
-          $('h1').text('Klant 1'),
-        )
-      }),
-      $('button').class('abtn view').title('Selecteren').on('click', e => {
-        selectClient(row.name);
-      }),
-      $('button').class('abtn').text('Prijslijst').on('click', e => {
-        prijslijst_xls(`proving-prijslijst-${row.name}-${new Date().toISOString().substr(0,10)}`, `KlantName = '${row.name}'`, colsPrijslijst);
-      }),
-    ],
-  }
-  aim.config.components.schemas.salesorder.app = {
-    nav: row => [
-      $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
-      // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
-      // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
-      row.invoiceNr ? [
-        $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNr)).printpdf()),
-        !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.invoiceNr), factuurData)),
-      ] : [
-        $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
-      ],
-    ],
-    navList: () => [
-      $('button').text('Bonnen').append(
-        $('div').append(
-          $('button').text('Paklijst').on('click', lijstPakken),
-          $('button').text('Gepakt').on('click', async e => {
-            await dmsClient.api('/abis/paklijst').post({
-              id: aim.listRows.map(row => row.nr).join(','),
-              set: 'pickDateTime = GETDATE()'
-            });
-            alert('Status gepakt');
-          }),
-          $('button').text('Verzonden').on('click', async e => {
-            await dmsClient.api('/abis/paklijst').post({
-              id: aim.listRows.map(row => row.nr).join(','),
-              set: 'sendDateTime = GETDATE()'
-            });
-            alert('Status verzonden');
-          }),
-          $('button').text('Geleverd').on('click', async e => {
-            await dmsClient.api('/abis/paklijst').post({
-              id: aim.listRows.map(row => row.nr).join(','),
-              set: 'deliverDateTime = GETDATE()'
-            });
-            alert('Status geleverd');
-          }),
-          $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
-        ),
-      ),
-    ]
-  }
-  aim.config.components.schemas.salesorderrow.app = {
-    nav: row => [
-      $('button').class('icn-print').title('Bon printen').on('click', async e => {
-        const title = [row.prodBrand, row.prodTitle].join(' ');
-        const extra = row.title.replace(title, '');
-        $('div').append(
-          $('link').href('assets/css/laklabel.css').rel('stylesheet'),
-          $('div').text(title),
-          $('div').style('font-weight:bold;').text([row.clientCompanyName].join(' / ')),
-          $('div').style('font-weight:bold;').text([extra, row.quant + row.unit].join(' / ')),
-          // $('div').text(extra),
-          // $('table').append(
-          //   $('tr').append(
-          //     // $('th').align('left').text('Kleur:'),
-          //     $('th').align('left').text('Kleur:'),
-          //     $('td').colspan(3).text(extra),
-          //   ),
-          //   $('tr').append(
-          //     // $('th').align('left').text('Kleur:'),
-          //     $('th').align('left').text('Klant:'),
-          //     $('td').colspan(3).text(row.clientCompanyName),
-          //   ),
-          //   $('tr').append(
-          //     // $('th').align('left').text('Kleur:'),
-          //     $('th').align('left').text('Inhoud:'),
-          //     $('td').text(row.quant, row.unit),
-          //     $('th').align('left').text('Datum:'),
-          //     $('td').text(new Date(row.orderDateTime).toLocaleDateString()),
-          //   ),
-          //   $('tr').append(
-          //     $('th').align('left').text('Opdrachtnr:'),
-          //     $('td').text(row.id),
-          //     $('th').align('left').text('Ordernr:'),
-          //     $('td').text(row.orderNr),
-          //   ),
-          // ),
-          $('div').class('small').text(`Verdunnen met acryl verdunner (4310/4320) +/- 75% tot 80%.`),
-          // $('div').class('small').text(`Alleen voor professioneel gebruik. Kleur voor gebruik controleren.`),
-          $('div').class('small').text([row.orderNr, row.id, new Date(row.orderDateTime).toISOString().substr(0,10).replace(/-/g,''), row.artNr].join('/').toLowerCase() ),
-        ).print().remove();
-      }),
-    ],
-    header(row){
-      const elem = $('div');
-      if (row.discount = row.clientDiscount || row.discount || 0) {
-        row.price = row.listPrice * (100 - row.discount) / 100;
-        elem.class('price discount').append(
-          $('span').attr('listprice', num(row.listPrice)),
-          $('span').attr('discount', num(-row.discount,1)),
-        );
-      }
-      elem.append(
-        $('span').attr('price', num(row.price)),
-        $('span').attr('fatprice', num(row.price * 1.21)),
-        $('span'),
-        elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
-          row.quant = Number(e.target.value);
-          console.log(row.quant);
-        }).on('click', e => {
-          e.stopPropagation();
-        }),
-      );
-      return elem;
-    },
-    header: artHeader,
-  }
-  aim.config.components.schemas.invoice.app = {
-    nav: row => [
-      $('button').class('abtn print').title('Print').on('click', async e => {
-        console.log(333, row);
-        (await factuur(row.id)).printpdf();
-      }),
-      !row.clientOtherMailAddress && !row.clientBusinessMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
-    ],
-    navList: () => [
-      $('button').text('Facturen').append(
-        $('div').append(
-          $('button').text('Herinneren').on('click', lijstHerinneren),
-        ),
-      ),
-    ]
-  }
-  aim.config.components.schemas.art.app = {
-    header: artHeader,
-  }
-  aim.config.components.schemas.product.app = aim.config.components.schemas.productklant.app = {
-    header(row){
-      const elem = $('div').class('price');
-      var price;
-      const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
-      var listPrice = row.bruto || row.ppe;
-      var discount = row.k;
-      // console.log(clientart);
-      clientart.filter(a => a.artId === row.id).forEach(a => discount = a.clientDiscount);
-      if (discount) {
-        elem.append(
-          $('div').append(
-            $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
-            ' € ',
-            $('span').text(num(price = listPrice*(100-discount)/100)).style('color:var(--discountprice);font-size:1.2em;'),
-            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-            ' korting ',
-            $('span').text(num(discount).replace(/,00$|0$/g,'') + '%')
-          ),
-        );
-      } else {
-        elem.append(
-          $('div').append(
-            $('span').text('€ ' + num(price = listPrice)).style('color:var(--price);font-size:1.2em;'),
-            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-          ),
-        );
-      }
-      // console.log(mandregel,row.id,row.artId);
-      elem.append(
-        $('div').append(
-          $('span').style('font-size:0.8em;').append(
-            'Verzending in: ',
-            $('b').text(row.lt).style('color:var(--lt);'),
-            // row.stock ? [
-            //   ' (nog ',
-            //   $('b').text(row.stock).style('color:green;'),
-            //   ' beschikbaar)',
-            // ] : null,
-          ),
-          elem.input = $('input')
-          .tabindex(-1)
-          .type('number').step(1).min(0).value(row.aantal).on('change', e => {
-            const body = dmsClient.api('/abis/OrderModArt').query({
-              clientName: clientName,
-              artId: row.artId,
-              aantal: e.target.value,
-            }).then(res => res.json());
-            console.log(body);
-          }).on('click', e => e.stopPropagation()),
-        )
-      );
-
-      return elem;
-    },
-  }
-
-
   function artrow(row, filter){
     if (!row.title) return;
     filter['toepassing'] = { name: 'toepassing', title: 'Toepassing', values: {} };
@@ -1427,106 +1149,46 @@ $().on('load', async e => {
     // row.title = row.product + Object.entries(options).map(entry => entry.join(':')).join(', ');
     row.title = [row.product, row.title].concat(Object.values(row.options)).filter(Boolean).join(', ');
   }
+  function artHeader(row){
+    const myart = clientart.find(a => a.artId === row.id);
+    if (myart) {
+      row.discount = myart.clientDiscount;
+    }
+    row.listPrice = Number(row.listPrice);
+    row.purchaseDiscount = Number(row.purchaseDiscount);
+    if (row.purchaseDiscount = Number(row.purchaseDiscount)) {
+      row.purchasePrice = row.listPrice * (100 - row.purchaseDiscount) / 100;
+    } else if (row.purchasePrice = Number(row.purchasePrice)) {
+      row.purchaseDiscount = row.purchasePrice / row.listPrice * 100;
+    }
+    row.price = row.listPrice * (100 - row.discount) / 100;
+    // console.log(row);
+    const elem = $('div').class('price');
+    if (row.discount) {
+      elem.class('price discount', myart ? 'client' : '').append(
+        $('span').attr('listprice', num(row.listPrice)),
+        $('span').attr('discount', num(-row.discount,0)),
+      );
+    }
+    elem.append(
+      $('span').attr('price', num(row.price)),
+      $('span').attr('fatprice', num(row.price * 1.21)),
+      row.purchasePrice ? $('span').attr('purchaseprice', num(row.purchasePrice)) : null,
+      row.purchaseDiscount ? $('span').attr('purchasediscount', num(row.purchaseDiscount)) : null,
+
+      $('span'),
+      elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
+        row.quant = Number(e.target.value);
+        console.log(row.quant);
+      }).on('click', e => {
+        e.stopPropagation();
+      }),
+    );
+    return elem;
+  }
   function description(s){
     if (s && s !== 'NB') return s.replace(/™|®/g,'').replace(/  /g,' ').trim();
   }
-
-
-  // aim.config.components.schemas.levart.app = {
-  //   precompile: artrow,
-  //   header: artHeader,
-  // }
-
-  aim.cols = {
-    catalogPrice(row, div) {
-      if ('catalogPrice' in row) {
-        // console.log(row);
-        // const elem = $('div').class('price');
-        const listPrice = row.catalogPrice;
-        var price = listPrice;
-        if (row.clientDiscount) {
-          div.append($('div').class('clientDiscount'));
-          var price = listPrice * (100 - row.clientDiscount) / 100;
-        } else if (row.clientNetPrice) {
-          div.append($('div').class('clientNetPrice'));
-          var price = row.clientNetPrice;
-        }
-        const discount = listPrice - price;
-        const discountPerc = (listPrice - price) / listPrice;
-        // const price = row.saleDiscount ? listPrice * (100 - Number(row.saleDiscount)) / 100 : listPrice;
-        const fatprice = price * 1.21;
-        // if (row.saleDiscount) div.class('discount');
-        const attr = {
-          listPrice: listPrice,
-          // clientNetPrice: row.clientNetPrice,
-          // clientDiscount: row.clientDiscount,
-          fatprice: num(fatprice),
-          discountperc: discountPerc ? discountPerc : null,//row.saleDiscount ? num(row.saleDiscount,0) : null,
-          discount: discount ? discount : null,//row.saleDiscount ? num(listPrice - price) : null,
-          // price: row.saleDiscount ? row.catalogPrice * (100 - Number(row.saleDiscount)) / 100 : row.catalogPrice;
-        }
-        // if (row.saleDiscount) {
-        //   div.append($('div').class('discount').attr('value', row.saleDiscount));
-        // }
-        return $('div').class('price').append(
-          $('div').attr(attr).append(
-            $('span').text(num(price)),
-          ),
-          $('input').type('number').min(0),
-        )
-        //   row.saleDiscount ? $('span').class('listPrice').text(row.catalogPrice) : null,
-        //   $('span').class('price').text(num(price)),
-        //   row.saleDiscount ? $('span').class('discount').text(num(listPrice - price)) : null,
-        //   row.saleDiscount ? $('span').class('discountperc').text(row.saleDiscount + '%') : null,
-        //   $('span').class('fatprice').text(num(fatprice)),
-        // );
-      }
-    },
-
-  }
-  aim.config.import = aim.config.import || [];
-  aim.config.import.forEach(imp => {
-    for (let tab of imp.tabs) {
-      tab.callback = async row => {
-        return await dmsClient.api('/abis/art_ink').body(row).post()
-      }
-    }
-  });
-  aim.config.import.push({
-    filename: 'Openstaande posten debiteuren.xlsx',
-    tabs: [{
-      tabname: 'Openstaande posten debiteuren',
-      cols: {
-        invoiceNr: 'Factuurnummer',
-        totaal: 'Totaal factuurbedrag',
-        saldo: 'Saldo',
-      },
-      callback(rows) {
-        rows.forEach(row => row.invoiceNr = row.invoiceNr.replace(/(\d+).*/, '$1'));
-        dmsClient.api('/abis/facturen_openstaand')
-        .body(rows)
-        .post()
-        .then(e => console.log(e.body));
-      },
-    }]
-  },{
-    filename: 'proving-openstaande-debiteuren.xlsx',
-    tabs: [{
-      tabname: 'Openstaande posten debiteuren',
-      cols: {
-        invoiceNr: 'Factuurnummer',
-        totaal: 'Totaal factuurbedrag',
-        saldo: 'Saldo',
-      },
-      callback(rows) {
-        dmsClient.api('/abis/facturen_openstaand')
-        .post({
-          invoiceNrs: rows.map(row => row.invoiceNr).join(','),
-        }).then(e => console.log(e.body));
-      },
-    }]
-  })
-  // console.log(aim.config.import);
   function clienttable(rows, cols, options = {}){
     // console.log(cols);
     return $('table').style('width:100%;').append(
@@ -1769,29 +1431,6 @@ $().on('load', async e => {
 
     // alert('Import gereed');
   }
-  $(window).on('popstate', async e => {
-    const documentSearchParams = new URLSearchParams(document.location.search);
-    const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
-    if (!documentSearchParams.get('l') && !searchParams.get('l') && searchParams.get('$search')) {
-      aim.search(searchParams.get('$search'));
-
-      // aim.api('/abis/data').query({request_type: 'article',$search: searchParams.get('$search')}).get().then(response => response.json().then(data => aim.listview(data.rows)));
-    }
-  })
-  $(window).on('dragover', e => e.preventDefault())
-  $(window).on('drop', async e => {
-    e.preventDefault();
-    e.stopPropagation();
-    const data = e.dataTransfer || e.clipboardData;
-    if (data.types.includes('Files')) {
-      importFiles(data.files);
-      // const config = await fetch('https://aliconnect.nl/yaml.php', {
-      //   method: 'POST',
-      //   body: await fetch('config/import.yaml').then(res => res.text()),
-      // }).then(res => res.json());
-      // console.log(1, config, files);
-    }
-  });
   function toExcel() {
     var wb = XLSX.utils.book_new();
     wb.Props = {
@@ -1813,59 +1452,6 @@ $().on('load', async e => {
     .click()
     .remove();
   };
-  const cols = {
-    title: {h:'Titel', t:'s', wch:80, },
-    // row.title.replace(/\r|\n/g,''),
-    inkPackPrice: { t:'n', z:'.00', wch:10, },
-    listPrice: {h:'Cat.Prijs' , t:'n', z:'.00', },
-    discount: {h:'Kort', t:'n', z:'.0', },
-    purchaseListPrice: {  },
-    purchaseDiscount: {  },
-    price: {calc:1, h:'Excl', t:'n', z:'.00', },
-    vatPrice: { h:'Incl', calc: row => row.price * 1.21, t:'n', z:'.00' },
-    partArtNr: { h:'Product ArtNr', },
-    partArtCode: { h:'Product ArtCode', },
-    artCode: { h:'Artikel code', },
-    id: { h:'Artikel NR', },
-    product: { h:'Product', },
-    categorie: { h:'Categorie', },
-    toepassing: { h:'Toepassing', },
-    partBrand: { h:'Merk', },
-    partSerie: { h:'Serie', },
-    partAfmeting: { h:'Afm', },
-    partDiameter: { h:'Diameter', },
-    partGaten: { h:'Gaten', },
-    partLengte: { h:'Lengte', },
-    partGrofte: { h:'Grofte', },
-    partMaat: { h:'Maat', },
-    partKleur: { h:'Kleur', },
-    partOpening: { h:'Opening', },
-
-    inkSds: { h:'Sds', },
-    inkTds: { h:'Tds', },
-
-    partCode: { h:'Code', },
-    partDescription: { h:'Oms', },
-
-    vosPerEenh: { h:'VOS', },
-
-    partContent: { h:'PI', },
-    partContentUnit: { h:'PIPE', },
-
-    stelling: { h:'Stel', calc: 1, t:'n',},
-    vak: { h:'Vak', calc: 1, t:'n',},
-    schap: { h:'Schap', calc: 1, t:'n',},
-
-    verzending: { h:'Verzending', },
-    ean: { h:'EAN', },
-    supplier: { h:'Leverancier', },
-    orderCode: { h:'OrderCode', },
-    minVoorraad: { h:'MV', t:'n',z:'0', },
-    stock: { h:'VR', t:'n',z:'0', },
-    minBestelAantal: { h:'MBA', t:'n', z:'0', },
-    bestelAantal: { h:'BA', t:'n',z:'0', },
-    storageLocation: { },
-  }
   async function artlist(title, colnames, filter, sortby){
     // ws_data = data;
     ws_title = title;
@@ -2232,7 +1818,6 @@ $().on('load', async e => {
       )
     );
   }
-
   async function prijslijst_xls(title,filter,cols) {
     const [rows] = await aimClient.api('/abis/prijslijst_xls')
     .query('select', cols.map(col => col.n).join(','))
@@ -2260,7 +1845,374 @@ $().on('load', async e => {
     // saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), ws_title + ' Proving.xlsx');
     $('a').download(`${title}.xlsx`).rel('noopener').href(URL.createObjectURL(new Blob([s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
   }
+  aim.config.components.schemas.company.app = {
+    nav: row => [
+      $('button').class('abtn print').title('Printen').on('click', e => {
+        const elem = $('article').parent('.lv').class('cover').append(
+          $('nav').append(
+            $('span'),
+            $('button').class('icn-close').on('click', e => elem.remove()),
+          ),
+          $('h1').text('Klant 1'),
+        )
+      }),
+      $('button').class('abtn view').title('Selecteren').on('click', e => {
+        selectClient(row.name);
+      }),
+      $('button').class('abtn').text('Prijslijst').on('click', e => {
+        prijslijst_xls(`proving-prijslijst-${row.name}-${new Date().toISOString().substr(0,10)}`, `KlantName = '${row.name}'`, colsPrijslijst);
+      }),
+    ],
+  }
+  aim.config.components.schemas.salesorder.app = {
+    nav: row => [
+      $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
+      // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
+      // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
+      row.invoiceNr ? [
+        $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNr)).printpdf()),
+        !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.invoiceNr), factuurData)),
+      ] : [
+        $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
+      ],
+    ],
+    navList: () => [
+      $('button').text('Bonnen').append(
+        $('div').append(
+          $('button').text('Paklijst').on('click', lijstPakken),
+          $('button').text('Gepakt').on('click', async e => {
+            await dmsClient.api('/abis/paklijst').post({
+              id: aim.listRows.map(row => row.nr).join(','),
+              set: 'pickDateTime = GETDATE()'
+            });
+            alert('Status gepakt');
+          }),
+          $('button').text('Verzonden').on('click', async e => {
+            await dmsClient.api('/abis/paklijst').post({
+              id: aim.listRows.map(row => row.nr).join(','),
+              set: 'sendDateTime = GETDATE()'
+            });
+            alert('Status verzonden');
+          }),
+          $('button').text('Geleverd').on('click', async e => {
+            await dmsClient.api('/abis/paklijst').post({
+              id: aim.listRows.map(row => row.nr).join(','),
+              set: 'deliverDateTime = GETDATE()'
+            });
+            alert('Status geleverd');
+          }),
+          $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
+        ),
+      ),
+    ]
+  }
+  aim.config.components.schemas.salesorderrow.app = {
+    nav: row => [
+      $('button').class('icn-print').title('Bon printen').on('click', async e => {
+        const title = [row.prodBrand, row.prodTitle].join(' ');
+        const extra = row.title.replace(title, '');
+        $('div').append(
+          $('link').href('assets/css/laklabel.css').rel('stylesheet'),
+          $('div').text(title),
+          $('div').style('font-weight:bold;').text([row.clientCompanyName].join(' / ')),
+          $('div').style('font-weight:bold;').text([extra, row.quant + row.unit].join(' / ')),
+          // $('div').text(extra),
+          // $('table').append(
+          //   $('tr').append(
+          //     // $('th').align('left').text('Kleur:'),
+          //     $('th').align('left').text('Kleur:'),
+          //     $('td').colspan(3).text(extra),
+          //   ),
+          //   $('tr').append(
+          //     // $('th').align('left').text('Kleur:'),
+          //     $('th').align('left').text('Klant:'),
+          //     $('td').colspan(3).text(row.clientCompanyName),
+          //   ),
+          //   $('tr').append(
+          //     // $('th').align('left').text('Kleur:'),
+          //     $('th').align('left').text('Inhoud:'),
+          //     $('td').text(row.quant, row.unit),
+          //     $('th').align('left').text('Datum:'),
+          //     $('td').text(new Date(row.orderDateTime).toLocaleDateString()),
+          //   ),
+          //   $('tr').append(
+          //     $('th').align('left').text('Opdrachtnr:'),
+          //     $('td').text(row.id),
+          //     $('th').align('left').text('Ordernr:'),
+          //     $('td').text(row.orderNr),
+          //   ),
+          // ),
+          $('div').class('small').text(`Verdunnen met acryl verdunner (4310/4320) +/- 75% tot 80%.`),
+          // $('div').class('small').text(`Alleen voor professioneel gebruik. Kleur voor gebruik controleren.`),
+          $('div').class('small').text([row.orderNr, row.id, new Date(row.orderDateTime).toISOString().substr(0,10).replace(/-/g,''), row.artNr].join('/').toLowerCase() ),
+        ).print().remove();
+      }),
+    ],
+    header(row){
+      const elem = $('div');
+      if (row.discount = row.clientDiscount || row.discount || 0) {
+        row.price = row.listPrice * (100 - row.discount) / 100;
+        elem.class('price discount').append(
+          $('span').attr('listprice', num(row.listPrice)),
+          $('span').attr('discount', num(-row.discount,1)),
+        );
+      }
+      elem.append(
+        $('span').attr('price', num(row.price)),
+        $('span').attr('fatprice', num(row.price * 1.21)),
+        $('span'),
+        elem.input = $('input').type('number').step(1).min(0).value(row.quant).on('change', e => {
+          row.quant = Number(e.target.value);
+          console.log(row.quant);
+        }).on('click', e => {
+          e.stopPropagation();
+        }),
+      );
+      return elem;
+    },
+    header: artHeader,
+  }
+  aim.config.components.schemas.invoice.app = {
+    nav: row => [
+      $('button').class('abtn print').title('Print').on('click', async e => {
+        console.log(333, row);
+        (await factuur(row.id)).printpdf();
+      }),
+      !row.clientOtherMailAddress && !row.clientBusinessMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
+    ],
+    navList: () => [
+      $('button').text('Facturen').append(
+        $('div').append(
+          $('button').text('Herinneren').on('click', lijstHerinneren),
+        ),
+      ),
+    ]
+  }
+  aim.config.components.schemas.art.app = {
+    header: artHeader,
+  }
+  aim.config.components.schemas.product.app = aim.config.components.schemas.productklant.app = {
+    header(row){
+      const elem = $('div').class('price');
+      var price;
+      const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
+      var listPrice = row.bruto || row.ppe;
+      var discount = row.k;
+      // console.log(clientart);
+      clientart.filter(a => a.artId === row.id).forEach(a => discount = a.clientDiscount);
+      if (discount) {
+        elem.append(
+          $('div').append(
+            $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
+            ' € ',
+            $('span').text(num(price = listPrice*(100-discount)/100)).style('color:var(--discountprice);font-size:1.2em;'),
+            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+            ' korting ',
+            $('span').text(num(discount).replace(/,00$|0$/g,'') + '%')
+          ),
+        );
+      } else {
+        elem.append(
+          $('div').append(
+            $('span').text('€ ' + num(price = listPrice)).style('color:var(--price);font-size:1.2em;'),
+            ' (€ ' + num(price * 1.21) + ' incl. btw) ',
+          ),
+        );
+      }
+      // console.log(mandregel,row.id,row.artId);
+      elem.append(
+        $('div').append(
+          $('span').style('font-size:0.8em;').append(
+            'Verzending in: ',
+            $('b').text(row.lt).style('color:var(--lt);'),
+            // row.stock ? [
+            //   ' (nog ',
+            //   $('b').text(row.stock).style('color:green;'),
+            //   ' beschikbaar)',
+            // ] : null,
+          ),
+          elem.input = $('input')
+          .tabindex(-1)
+          .type('number').step(1).min(0).value(row.aantal).on('change', e => {
+            const body = dmsClient.api('/abis/OrderModArt').query({
+              clientName: clientName,
+              artId: row.artId,
+              aantal: e.target.value,
+            }).then(res => res.json());
+            console.log(body);
+          }).on('click', e => e.stopPropagation()),
+        )
+      );
 
+      return elem;
+    },
+  }
+  aim.cols = {
+    catalogPrice(row, div) {
+      if ('catalogPrice' in row) {
+        // console.log(row);
+        // const elem = $('div').class('price');
+        const listPrice = row.catalogPrice;
+        var price = listPrice;
+        if (row.clientDiscount) {
+          div.append($('div').class('clientDiscount'));
+          var price = listPrice * (100 - row.clientDiscount) / 100;
+        } else if (row.clientNetPrice) {
+          div.append($('div').class('clientNetPrice'));
+          var price = row.clientNetPrice;
+        }
+        const discount = listPrice - price;
+        const discountPerc = (listPrice - price) / listPrice;
+        // const price = row.saleDiscount ? listPrice * (100 - Number(row.saleDiscount)) / 100 : listPrice;
+        const fatprice = price * 1.21;
+        // if (row.saleDiscount) div.class('discount');
+        const attr = {
+          listPrice: listPrice,
+          // clientNetPrice: row.clientNetPrice,
+          // clientDiscount: row.clientDiscount,
+          fatprice: num(fatprice),
+          discountperc: discountPerc ? discountPerc : null,//row.saleDiscount ? num(row.saleDiscount,0) : null,
+          discount: discount ? discount : null,//row.saleDiscount ? num(listPrice - price) : null,
+          // price: row.saleDiscount ? row.catalogPrice * (100 - Number(row.saleDiscount)) / 100 : row.catalogPrice;
+        }
+        // if (row.saleDiscount) {
+        //   div.append($('div').class('discount').attr('value', row.saleDiscount));
+        // }
+        return $('div').class('price').append(
+          $('div').attr(attr).append(
+            $('span').text(num(price)),
+          ),
+          $('input').type('number').min(0),
+        )
+        //   row.saleDiscount ? $('span').class('listPrice').text(row.catalogPrice) : null,
+        //   $('span').class('price').text(num(price)),
+        //   row.saleDiscount ? $('span').class('discount').text(num(listPrice - price)) : null,
+        //   row.saleDiscount ? $('span').class('discountperc').text(row.saleDiscount + '%') : null,
+        //   $('span').class('fatprice').text(num(fatprice)),
+        // );
+      }
+    },
+
+  }
+  aim.config.import = aim.config.import || [];
+  aim.config.import.forEach(imp => {
+    for (let tab of imp.tabs) {
+      tab.callback = async row => {
+        return await dmsClient.api('/abis/art_ink').body(row).post()
+      }
+    }
+  });
+  aim.config.import.push({
+    filename: 'Openstaande posten debiteuren.xlsx',
+    tabs: [{
+      tabname: 'Openstaande posten debiteuren',
+      cols: {
+        invoiceNr: 'Factuurnummer',
+        totaal: 'Totaal factuurbedrag',
+        saldo: 'Saldo',
+      },
+      callback(rows) {
+        rows.forEach(row => row.invoiceNr = row.invoiceNr.replace(/(\d+).*/, '$1'));
+        dmsClient.api('/abis/facturen_openstaand')
+        .body(rows)
+        .post()
+        .then(e => console.log(e.body));
+      },
+    }]
+  },{
+    filename: 'proving-openstaande-debiteuren.xlsx',
+    tabs: [{
+      tabname: 'Openstaande posten debiteuren',
+      cols: {
+        invoiceNr: 'Factuurnummer',
+        totaal: 'Totaal factuurbedrag',
+        saldo: 'Saldo',
+      },
+      callback(rows) {
+        dmsClient.api('/abis/facturen_openstaand')
+        .post({
+          invoiceNrs: rows.map(row => row.invoiceNr).join(','),
+        }).then(e => console.log(e.body));
+      },
+    }]
+  })
+  // console.log(aim.config.import);
+  $(window).on('popstate', async e => {
+    const documentSearchParams = new URLSearchParams(document.location.search);
+    const searchParams = new URLSearchParams(document.location.hash ? document.location.hash.substr(1) : document.location.search);
+    if (!documentSearchParams.get('l') && !searchParams.get('l') && searchParams.get('$search')) {
+      aim.search(searchParams.get('$search'));
+
+      // aim.api('/abis/data').query({request_type: 'article',$search: searchParams.get('$search')}).get().then(response => response.json().then(data => aim.listview(data.rows)));
+    }
+  })
+  $(window).on('dragover', e => e.preventDefault())
+  $(window).on('drop', async e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const data = e.dataTransfer || e.clipboardData;
+    if (data.types.includes('Files')) {
+      importFiles(data.files);
+      // const config = await fetch('https://aliconnect.nl/yaml.php', {
+      //   method: 'POST',
+      //   body: await fetch('config/import.yaml').then(res => res.text()),
+      // }).then(res => res.json());
+      // console.log(1, config, files);
+    }
+  });
+  const cols = {
+    title: {h:'Titel', t:'s', wch:80, },
+    // row.title.replace(/\r|\n/g,''),
+    inkPackPrice: { t:'n', z:'.00', wch:10, },
+    listPrice: {h:'Cat.Prijs' , t:'n', z:'.00', },
+    discount: {h:'Kort', t:'n', z:'.0', },
+    purchaseListPrice: {  },
+    purchaseDiscount: {  },
+    price: {calc:1, h:'Excl', t:'n', z:'.00', },
+    vatPrice: { h:'Incl', calc: row => row.price * 1.21, t:'n', z:'.00' },
+    partArtNr: { h:'Product ArtNr', },
+    partArtCode: { h:'Product ArtCode', },
+    artCode: { h:'Artikel code', },
+    id: { h:'Artikel NR', },
+    product: { h:'Product', },
+    categorie: { h:'Categorie', },
+    toepassing: { h:'Toepassing', },
+    partBrand: { h:'Merk', },
+    partSerie: { h:'Serie', },
+    partAfmeting: { h:'Afm', },
+    partDiameter: { h:'Diameter', },
+    partGaten: { h:'Gaten', },
+    partLengte: { h:'Lengte', },
+    partGrofte: { h:'Grofte', },
+    partMaat: { h:'Maat', },
+    partKleur: { h:'Kleur', },
+    partOpening: { h:'Opening', },
+
+    inkSds: { h:'Sds', },
+    inkTds: { h:'Tds', },
+
+    partCode: { h:'Code', },
+    partDescription: { h:'Oms', },
+
+    vosPerEenh: { h:'VOS', },
+
+    partContent: { h:'PI', },
+    partContentUnit: { h:'PIPE', },
+
+    stelling: { h:'Stel', calc: 1, t:'n',},
+    vak: { h:'Vak', calc: 1, t:'n',},
+    schap: { h:'Schap', calc: 1, t:'n',},
+
+    verzending: { h:'Verzending', },
+    ean: { h:'EAN', },
+    supplier: { h:'Leverancier', },
+    orderCode: { h:'OrderCode', },
+    minVoorraad: { h:'MV', t:'n',z:'0', },
+    stock: { h:'VR', t:'n',z:'0', },
+    minBestelAantal: { h:'MBA', t:'n', z:'0', },
+    bestelAantal: { h:'BA', t:'n',z:'0', },
+    storageLocation: { },
+  }
   const colsPrijslijst = [
     { n: 'nr', v: 'ArtikelNr', wch: 10, f:{t:'s'} },
     { n: 'bruto', v: 'Bruto', wch: 10, f:{t:'n', z:'.00'} },
@@ -2387,41 +2339,6 @@ $().on('load', async e => {
         $order: `nr DESC`,
         $search: '*',
       }),
-      // Nieuw: e => aim.list('salesorder',{
-      //   $filter: `isQuote NE 1 && isOrder EQ 1 && printDateTime EQ NULL`,
-      //   $order: `nr DESC`,
-      //   $search: '*',
-      // }),
-      // Actief: e => aim.list('salesorder',{
-      //   $filter: `isQuote NE 1 && printDateTime NE NULL && pickDateTime EQ NULL`,
-      //   $order: `nr DESC`,
-      //   $search: '*',
-      // }),
-      // Verzendgereed: e => aim.list('salesorder',{
-      //   $filter: `isQuote NE 1 && pickDateTime NE NULL && sendDateTime EQ NULL`,
-      //   $order: `nr DESC`,
-      //   $search: '*',
-      // }),
-      // Optransport: e => aim.list('salesorder',{
-      //   $filter: `isQuote NE 1 && sendDateTime NE NULL && deliverDateTime EQ NULL`,
-      //   $order: `nr DESC`,
-      //   $search: '*',
-      // }),
-      // Geleverd: e => aim.list('salesorder',{
-      //   $filter: `isQuote NE 1 && deliverDateTime NE NULL && invoiceNr EQ 0`,
-      //   $order: `nr DESC`,
-      //   $search: '*',
-      // }),
-      // OnHold: e => aim.list('salesorder',{
-      //   $filter: `isQuote NE 1 && onHold EQ 1`,
-      //   $order: `nr DESC`,
-      //   $search: '*',
-      // }),
-      // Overig: e => aim.list('salesorder',{
-      //   $filter: `ISNULL(invoiceNr,0) GT 0`,
-      //   $order: `nr DESC`,
-      //   $search: ``,
-      // }),
       Alles: e => aim.list('salesorder',{
         $order: `nr DESC`,
         $top: 100,
@@ -2432,6 +2349,72 @@ $().on('load', async e => {
         // $order: `nr DESC`,
         $top: `100`,
       }),
+      OrderInvoer() {
+        let tot = 0;
+        $('.pv').text('');
+        $('.lv').text('').append(
+          $('div').append(
+            $('div').class('col orderform').append(
+              $('form').on('submit', async e => {
+                e.preventDefault();
+                const [[row]] = await dmsClient.api('/abis/order_add_artikel').query('artnr', e.target.nr.value).then(res => res.json());
+                if (row) {
+                  tot += e.target.aantal.value * row.ppe;
+                  $('tr').parent('.orderlist tbody').append(
+                    $('td').text(row.id),
+                    $('td').text(e.target.aantal.value),
+                    $('td').text([row.titel, e.target.extra.value].filter(Boolean).join(', ')),
+                    $('td').text(num(row.ppe)),
+                  );
+                }
+                e.target.nr.value = e.target.extra.value = '';
+                e.target.aantal.value = 1;
+                e.target.tot.value = num(tot,2);
+                e.target.nr.focus();
+                e.target.nr.scrollIntoView();
+                return false;
+              }).class('aco orderlist').style('overflow:overlay;display:flex;flex-direction:columns;').append(
+                $('table').style('position:sticky;bottom:0;width:100%;margin-top:auto;').append(
+                  $('thead').append(
+                    $('tr').append(
+                      $('th').text('Art.nr.'),
+                      $('th').text('Aantal'),
+                      $('th').text('Omschrijving').style('width:100%;'),
+                      $('th').text('Prijs'),
+                    )
+                  ),
+                  $('tbody'),
+                  $('tfoot').append(
+                    $('tr').append(
+                      $('td').append(
+                        $('span').class('input').append(
+                          $('input').style('min-width:80px;').autocomplete('off').name('nr'),
+                        ),
+                      ),
+                      $('td').append(
+                        $('span').class('input').append(
+                          $('input').autocomplete('off').type('number').style('text-align:right;').name('aantal').value(1),
+                        ),
+                      ),
+                      $('td').append(
+                        $('span').class('input').append(
+                          $('input').autocomplete('off').name('extra'),
+                        ),
+                      ),
+                      $('td').append(
+                        $('span').class('input').append(
+                          $('input').style('text-align:right;min-width:100px;').name('tot').value(0),
+                        ),
+                      ),
+                      $('button').style('display:none;'),
+                    )
+                  ),
+                ),
+              ),
+            )
+          )
+        )
+      }
     },
     Administratie: {
       'Facturen Actueel': e => aim.list('invoice',{
@@ -3515,8 +3498,18 @@ $().on('load', async e => {
     },
   });
 
-  await selectClient(localStorage.getItem('clientName') || '');
+  const url = new URL(document.location);
+  const contact_id = url.searchParams.get('contact_id') || localStorage.getItem('contact_id');
 
+  if (contact_id) {
+    localStorage.setItem('contact_id', contact_id);
+    const [[contact]] = await dmsClient.api('/abis/contact').query('contact_id', contact_id).then(res => res.json());
+    console.log('C', contact);
+    $('.account>span>span.user').text(contact.weergaveNaam || contact.email);
+    clientName = contact.klantId;
+  }
+  // clientName = localStorage.getItem('clientName') || clientName;
+  await selectClient(clientName);
 
   // dmsClient.api('/me/children').select('name').get().then(console.log);
   // dmsClient.api('/Contact').select('CompanyName,name,FirstName,Surname').search('alicon.nl').get().then(console.log);

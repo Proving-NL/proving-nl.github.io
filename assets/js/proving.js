@@ -547,7 +547,7 @@ $().on('load', async e => {
           ),
         ),
         $('table').class('grid summary')
-        .style('font-size:0.8em;')
+        // .style('font-size:0.8em;')
         .append(
           $('thead').append(
             $('tr').append(
@@ -635,7 +635,7 @@ $().on('load', async e => {
           ),
         ),
         $('table').class('grid')
-        .style('font-size:0.9em;')
+        // .style('font-size:0.9em;')
         .append(
           $('thead').append(
             $('tr').append(

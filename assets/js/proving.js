@@ -473,7 +473,7 @@ $().on('load', async e => {
     const elem = printElem().append(
       $('div').class('brief').append(
         $('div').append(
-          $('span').text('PAKBON (alleen voor intern gebruik)').style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
+          $('span').text('PAKBON (alleen voor intern gebruik)').style('margin-top:10mm;font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
         ),
         $('table').append(
           $('tr').append(

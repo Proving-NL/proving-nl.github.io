@@ -13,7 +13,6 @@ $().on('load', async e => {
   // console.log('JA', aim);
   // console.log('JA', sessionStorage.getItem('access_token'));
   const {aimClient,dmsClient} = aim;
-
   console.log('AIM', aimClient, dmsClient, aim.config);
   // dmsClient.api('/salesorder', {
   //   filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
@@ -3500,7 +3499,6 @@ $().on('load', async e => {
 
   const url = new URL(document.location);
   const contact_id = url.searchParams.get('contact_id') || localStorage.getItem('contact_id');
-
   if (contact_id) {
     localStorage.setItem('contact_id', contact_id);
     const [[contact]] = await dmsClient.api('/abis/contact').query('contact_id', contact_id).then(res => res.json());

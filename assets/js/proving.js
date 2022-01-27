@@ -595,7 +595,7 @@ $().on('load', async e => {
                 $('td').colspan(9).append(
                   // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
                   $('div').text(String(row.omschrijving).replace(/\r|\n/g,'')).append(' ',$('b').append(row.extratekst)),
-                  $('div').text(String(row.artTitel).replace(/\r|\n/g,'')),
+                  $('div').style('white-space:normal;').text(String(row.artTitel).replace(/\r|\n/g,'')),
                   // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
                 ),
                 $('td'),

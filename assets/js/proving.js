@@ -1337,7 +1337,7 @@ $().on('load', async e => {
       $('span.main').text('import:', file.name);
       console.log(file.name, aim.config.import);
       for (fileConfig of aim.config.import.filter(fileConfig => file.name.toLowerCase().match(fileConfig.filename.toLowerCase()))) {
-        await dmsClient.api('/abis/art_ink_reset').post({importCode: fileConfig.importCode = fileConfig.importCode || fileConfig.filename});
+        // await dmsClient.api('/abis/art_ink_reset').post({importCode: file.name});
 
         const result = await readBinary(file);
         const workbook = XLSX.read(result, { type: 'binary' });
@@ -1407,7 +1407,7 @@ $().on('load', async e => {
               if (row) {
                 // console.log(row);
                 // return;
-                row.importCode = fileConfig.importCode;
+                row.importCode = file.name;
                 data.rows.push(row);
                 allrows.push([row, tab]);
               }
@@ -1425,9 +1425,13 @@ $().on('load', async e => {
     const progressElem = $('footer>progress').max(max).value(i);
     const importDateTime = new Date().toISOString();
     console.log('importDateTime', importDateTime);
+    const title = document.title;
     for (var [row,tab] of allrows) {
       // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
-      $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.leverancier, row.bestelCode);
+      const infoTekst = [max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.leverancier, row.bestelCode].join(', ');
+      $('span.main').text(infoTekst);
+      console.log(infoTekst);
+      document.title = [title,row.leverancier,Math.round(i/max*100) + '%'].join(' ');
       try {
         // console.log(row);
         // await tab.callback(row);
@@ -1441,6 +1445,7 @@ $().on('load', async e => {
       // return;
       progressElem.value(++i);
     }
+    document.title = title;
 
     // await dmsClient.api('/abis/artCleanUp').get();
 
@@ -2388,6 +2393,7 @@ $().on('load', async e => {
     // { n: 'inhoudEenheid', v: 'Eenh', wch: 10 },
     // { n: 'artGroep', v: 'Categorie', wch: 20 },
   ];
+  let arts,artvalues;
 
   aim.om.treeview({
     Inkoop: {
@@ -3449,8 +3455,17 @@ $().on('load', async e => {
         });
       },
       async cleanup(){
-        const [arts,names,values,words] = await dmsClient.api('/abis/cleanup').then(res => res.json());
-        console.log({arts,names,values,words});
+        const [names,values,words] = await dmsClient.api('/abis/cleanup_config').get();
+        if (!arts) {
+          // [arts,artvalues] = await dmsClient.api('/abis/cleanup_arts').get();
+          // for (let art of arts) {
+          //   art.props = {};// Merk: [ art.merk ], Code: [ art.code ], Inhoud: [ art.inhoud ], InhoudEenheid: [ art.inhoudEenheid ], Eenheid: [ art.eenheid ], };
+          //   artvalues.filter(v => v.a === art.artId).forEach(a => art.props[names.find(n => n.id === a.i).name] = [a.v]);
+          // }
+          [arts] = await dmsClient.api('/abis/cleanup_arts').get();
+        }
+        console.log({arts,names,values,words,artvalues});
+        // return;
         for (var value of values) {
           value.name = names.find(name => name.id === value.keyId);
           words.push({keyValueId:value.id,keyWord:value.keyValue});
@@ -3467,12 +3482,30 @@ $().on('load', async e => {
         //   name.values = values.filter(value => value.keyId === name.id);
         // }
         // console.log({arts,names,values,words});
-
+        // let allprops = [];
         for (let art of arts) {
           var {artId,tekst} = art;
           if (art.titel = tekst || '') {
-            tekst = tekst.replace(/\n|\r/g,'');
-            const props = art.props = {};
+            tekst = tekst
+            .replace(/\n|\r/g,'')
+            .replace(/znd gaten/,'0 gaten')
+            ;
+            const props = art.props || {};
+
+
+            function match(name, exp, exp2){
+              const match = tekst.match(exp);
+              if (match) {
+                tekst = tekst.replace(exp,'').replace(/\s-|\(\)|-$/,'').replace(/\s\s/,' ').trim();
+                (props[name] = props[name] || []).push(match[1].replace(/,/g, '.').replace(/\.$/, '').replace(exp2, '').trim().toLowerCase().replace(/\w/, s => s.toUpperCase()));
+              }
+            }
+            match('Inhoud', /(\d[\d|\.|,]*\s*?(ml|ltr|l|gr\.|gr|kg\.|kg|paar|g)\b)/i);
+            match('Diameter', /Ø((\s|)(\d[\d|\.|,]+)(\s|)(mm|))/i);
+            match('Lengte', /(\d+\s*(mtr\.|mtr|meter|mt|m)\b)/i);
+            match('Afmeting', /(\d[\sxmctrµe\d\.,]*(mm\.|mm|cm|mtr\.|mtr|meter|mt|µm|mµ|µ|m)\b)/i);
+            match('VerpaktPer', /(\d+\s*(stuks|stuk|stk|st|pcs|pc)\b)/i, /stuks|stuk|stk|st|pcs|pc/i);
+
 
             names.forEach(name => name.value = []);
             words.forEach(word => {
@@ -3481,59 +3514,67 @@ $().on('load', async e => {
                 word.value.name.value.push(word.value.keyValue);
                 // arr.push(word.value.keyValue);
                 // console.log(regexp,name.name,value.keyValue,word,tekst);
-                props[word.value.name.name] = word.value.keyValue;
+                (props[word.value.name.name] = props[word.value.name.name] || []).push(word.value.keyValue);
               }
             });
-            const arr = art.arr = names.map(name => name.value.join(', ')).filter(Boolean);
+            // const arr = art.arr = names.map(name => name.value.join(', ')).filter(Boolean);
 
-            function match(name, exp, exp2){
-              const match = tekst.match(exp);
-              if (match) {
-                tekst = tekst.replace(exp,'').replace(/\s-|\(\)|-$/,'').replace(/\s\s/,' ').trim();
-                arr.push(props[name] = match[1].replace(/,/g, '.').replace(/\.$/, '').replace(exp2, '').trim().toLowerCase().replace(/\w/, s => s.toUpperCase()));
-              }
-            }
-            match('Inhoud', /([\d|\.|,]+\s*?(ml|ltr|l|gr\.|gr|kg\.|kg|paar|g)\b)/i);
-            match('Maat', /(\b(mt\.:|mt:|maat:|maat)(\s+?)(\d+|[A-Z]+))/i, /mt\.:|mt:|maat:|maat|\s/);
+            match('Maat', /(\b(mt\.:|mt\.|mt:|mt|maat:|maat)\s*(\d+|[A-Z]+))/i, /mt\.:|mt\.|mt:|mt|maat:|maat|\s/);
             match('Spanning', /(\d+(V))\b/i);
             match('Vermogen', /(\d+(W))\b/i);
             match('Dichtheid', /(\d+\s*?(g\/m²))/i);
             match('Hittebestendig', /(\d+°c|\d+°)/i, /c|°/gi);
             match('Schroefdraad', /(M\d+\s*?x[\d|,]+)/i);
             match('Dikte', /(\d+\s*?(µm|mµ|µ))/i);
-            match('Diameter', /Ø((\s|)(\d[\d|\.|,]+)(\s|)(mm|))/i);
-            match('Afmeting', /(\d[\sxmctrµe\d\.,]*(mm\.|mm|cm|mtr\.|mtr|meter|mt|µm|mµ|µ|m))/i);
             match('Gaten', /(\d+)\s*?(gaten\s\d+mm|gaten|gat|gaat)/i);
             match('Maat', /\b(M|L|S|XL|XXL|Large|Medium|Small|XLarge|XXLarge)\b/);
-            match('Grofte', /(P\d+)/i);
+            match('Grofte', /\b(P\s*\d+)\b/i, /P|\s/i);
             match('Grofte', /((grofte|korrel)\s*?\d+)/i, /grofte|korrel|\s/);
             match('RAL', /ral\s*?(\d+)/i);
             match('Aantal', /([\d|\.|,|x|\s]+?(st\.|st\b))/i);
-            ['Aantal','Inhoud','Dikte','Diameter','Afmeting'].forEach(name => {
+            ['Aantal','Inhoud','Dikte','Diameter','Afmeting', 'Lengte'].forEach(name => {
               if (props[name]) {
-                props[name] = props[name].toLowerCase()
+                props[name] = props[name].map(n => String(props[name]).toLowerCase()
                 // .replace(/([\d|\.|\/]+)/g, ' $1 ')
                 .replace(/µm|mµ|µ/, 'µm')
                 .replace(/mtr|mt/g, 'm')
                 .replace(/\s/g, '')
+                .replace(/([\d\.]+)(\D)/g, '$1 $2')
+                .replace(/([^\d\.])([\d\.]+)/g, '$1 $2')
                 .replace(/x/, ' x ')
-                // .replace(/\s\s/g, ' ')
-                .trim()
+                .trim());
               }
             })
-            art.titel = arr.concat(tekst.trim().replace(/^-/,'').trim()).map(s=>s.trim()).filter(Boolean).join(', ');
+            art.titel = names.filter(n => props[n.name] && props[n.name].join(' ')).map(n => (n.prefix || '') + props[n.name].join(' ') + (n.unit || '') + ' ('+n.name.substr(0,13).toLowerCase()+')').concat(tekst.trim().replace(/^-/,'').trim()).filter(Boolean).map(s=>String(s).trim()).filter(Boolean).join(', ');
+            // allprops = allprops.concat(Object.keys(props)).unique();
           }
           // console.log(tekst);
           // return;
         }
+        // console.log(allprops);
         arts.sort((a,b)=>a.titel.localeCompare(b.titel));
         $('.pv').text('');
         $('.lv').text('').append(
           $('div').append(
-            $('div').style('font-size:0.8em;').append(
-              arts.filter(art=>art.titel).map(art => $('div').text(art.titel).append($('small').style('color:green;margin-left:30px;').text(art.tekst)))
-            )
-
+            // $('table').style('font-size:0.8em;font-family:consolas;').append(
+            //   $('tr').append(
+            //     $('th').text('Art.nr.'),
+            //     $('th').text('Titel'),
+            //     $('th').text('Tekst'),
+            //     // allprops.map(n => $('th').text(n)),
+            //   ),
+            //   arts.filter(art=>art.titel).map(art => $('tr').append(
+            //     $('td').text(art.artId),
+            //     $('td').text(art.titel),
+            //     $('td').text(art.tekst),
+            //     // allprops.map(n => $('td').text(art.props[n])),
+            //   ))
+            // ),
+            $('div').style('font-size:0.8em;font-family:consolas;overflow:auto;white-space:nowrap;').append(
+              arts.filter(art=>art.titel).map(art => [
+                $('div').text(Number(art.artId).pad(5),art.titel).append(' ',$('small').style('color:rgba(180,180,180,0.5)').text(art.tekst)),
+              ]),
+            ),
           )
         )
         console.log({arts,names,values,words});

@@ -135,6 +135,7 @@ $().on('load', async e => {
                 <th>Art.nr.</th>
                 <th width=100%>Omschrijving</th>
                 <th>Bruto</th>
+                <th>KC</th>
                 <th>Korting</th>
                 <th style='text-align:right;'>Netto</th>
                 </tr>`
@@ -165,10 +166,12 @@ $().on('load', async e => {
                       $('td').text(row.artNr),
                       $('td').text(row.titel),
                       row.bruto != row.netto ? [
-                        $('td').align('right').style('text-decoration:line-through;font-size:0.8em;color:#ccc;').text(aim.num(row.bruto)),
-                        $('td').align('right').style('font-size:0.8em;color:#ccc;').text(`-${aim.num(row.korting,0)}%`),
+                        $('td').align('right').style('text-decoration:line-through;font-size:0.8em;color:gray;').text(aim.num(row.bruto)),
+                        $('td').style('font-size:0.8em;color:gray;').text(row.kortingCode),
+                        $('td').align('right').style('font-size:0.8em;color:gray;').text(`${aim.num(row.korting,0)}%`),
                         $('td').align('right').text(aim.num(row.netto)),
                       ] : [
+                        $('td'),
                         $('td'),
                         $('td'),
                         $('td').align('right').text(aim.num(row.bruto)),

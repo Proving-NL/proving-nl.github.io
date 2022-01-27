@@ -830,7 +830,7 @@ $().on('load', async e => {
 
           ),
         ),
-        $('table').class('grid summary').style('position:absolute;bottom:25mm;width:100%;').append(
+        $('table').class('grid summary').style('position:absolute;bottom:15mm;width:100%;').append(
           $('thead').append(
             els.trh = $('tr'),
           ),

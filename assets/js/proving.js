@@ -526,7 +526,7 @@ $().on('load', async e => {
               $('th').align('right').style('width:10mm').text('KG'),
               $('th').align('right').style('width:10mm').text('VOS'),
               $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Opdracht'),
-              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Levering'),
+              $('th').align('left').style('width:10mm;white-space:nowrap;').class('datum').text('Verzending'),
             ),
           ),
           $('tbody').append(
@@ -640,7 +640,7 @@ $().on('load', async e => {
               $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Referentie'),
               $('th').style('text-align:right;').text('VOS'),
               $('th').style('text-align:left;white-space:nowrap;').text('Opdracht'),
-              $('th').style('text-align:left;white-space:nowrap;').text('Levering'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Verzending'),
             ),
           ),
           $('tbody').append(

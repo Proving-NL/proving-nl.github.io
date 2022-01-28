@@ -131,17 +131,16 @@ $().on('load', async e => {
                 Het Ambacht 42 - Westervoort - T: 026-312 09 47 - info@airo.nl - www.airo.nl<br>
                 <b>${contact.clientCompanyname}</b>
                 </td></tr>
-                <tr>
+                <tr style='font-size:8pt;'>
                 <th>Art.nr.</th>
                 <th width=100%>Omschrijving</th>
-                <th>KC</th>
-                <th>Korting</th>
+                <th style='text-align:right;'>KC</th>
+                <th style='text-align:right;'>Bruto</th>
+                <th style='text-align:right;'>Korting</th>
                 <th style='text-align:right;'>Netto</th>
-                <th>Bruto</th>
-                <th style='text-align:right;'>Prijs</th>
                 </tr>`
               ),
-              $('tbody'),
+              $('tbody').style('font-size:8pt;'),
             ),
           );
           var el1,el2,el3 = null;
@@ -152,36 +151,29 @@ $().on('load', async e => {
               for (let [h3,groep3] of Object.entries(groep2)){
                 const rowsgroep = rows.filter(row => row.artGroep === h3);
                 if (rowsgroep.length) {
-                  console.log(h3,el1,el2,el3);
+                  // console.log(h3,el1,el2,el3);
                   el1 = el1 || $('tr').parent('table>tbody').append(
-                    $('td').colspan(6).text(h1).style('background:#ccc;'),
+                    $('td').colspan(8).text(h1).style('background:#ccc;'),
                   );
                   el2 = el2 || $('tr').parent('table>tbody').append(
-                    $('td').colspan(6).text(h2).style('background:#ccc;'),
+                    $('td').colspan(8).text(h2).style('background:#ccc;'),
                   );
                   $('tr').parent('table>tbody').append(
-                    $('td').colspan(6).text(h3).style('background:#ccc;'),
+                    $('td').colspan(8).text(h3).style('background:#ccc;'),
                   );
                   $('table>tbody').append(
                     rowsgroep.map(row => $('tr').append(
                       $('td').text(row.artNr),
-                      $('td').text(row.titel),
-                      row.bruto != row.netto ? [
-                        $('td')
-                        // .style('font-size:0.8em;color:gray;')
-                        .text(row.kortingCode),
-                        $('td').align('right')
-                        // .style('font-size:0.8em;color:gray;')
-                        .text(`${aim.num(row.korting,0)}%`),
-                        $('td').align('right').style('text-decoration:line-through;').text(aim.num(row.bruto)),
+                      $('td').style('white-space:normal;').text(row.titel.replace(/\n|\r/g,'')),
+                      $('td').align('right').text(row.kortingCode),
+                      row.korting ? [
+                        $('td').align('right').text(aim.num(row.bruto)),
+                        $('td').align('right').text(`${aim.num(row.korting,0)}%`),
                         $('td').align('right').text(aim.num(row.netto)),
-                        $('td').align('right').text(aim.num(row.prijs)),
                       ] : [
                         $('td'),
                         $('td'),
-                        $('td'),
                         $('td').align('right').text(aim.num(row.bruto)),
-                        $('td').align('right').text(aim.num(row.prijs)),
                       ],
                     ))
                   )

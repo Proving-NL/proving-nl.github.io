@@ -2145,8 +2145,10 @@ $().on('load', async e => {
       const elem = $('div').class('price');
       var price;
       const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
-      var listPrice = row.bruto || row.ppe;
-      var discount = row.k;
+      var listPrice = row.cpe || row.bruto || row.ppe;
+      // console.log(row);
+
+      var discount = row.k || 0;
       // console.log(clientart);
       clientart.filter(a => a.artId === row.id).forEach(a => discount = a.clientDiscount);
       if (discount) {

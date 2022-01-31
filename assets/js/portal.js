@@ -99,7 +99,9 @@ $().on('load', async e => {
           const cols = [
             { n: 'aantal', v: 'Aantal', wch: 8, f:{t:'s'} },
             { n: 'artNr', v: 'ArtNr', wch: 8, f:{t:'s'} },
-            { n: 'artGroep', v: 'Categorie', wch: 25 },
+            { n: 'code', v: 'Code', wch: 8, f:{t:'s'} },
+            { n: 'bestelCode', v: 'Code 2', wch: 16, f:{t:'s'} },
+            // { n: 'artGroep', v: 'Categorie', wch: 25 },
             { n: 'titel', v: 'Omschrijving', wch: 100 },
             { n: 'kortingCode', v: 'KC', wch: 10 },
             { n: 'bruto', v: 'Bruto', wch: 10, f:{t:'n', z:'.00'} },

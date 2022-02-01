@@ -102,11 +102,24 @@ $().on('load', async e => {
             { n: 'code', v: 'Code', wch: 8, f:{t:'s'} },
             { n: 'bestelCode', v: 'Code 2', wch: 16, f:{t:'s'} },
             // { n: 'artGroep', v: 'Categorie', wch: 25 },
+            { n: 'merk', v: 'Merk', wch: 20 },
             { n: 'titel', v: 'Omschrijving', wch: 100 },
             { n: 'kortingCode', v: 'KC', wch: 10 },
-            { n: 'bruto', v: 'Bruto', wch: 10, f:{t:'n', z:'.00'} },
-            { n: 'korting', v: 'Korting', wch: 10, f:{t:'n'} },
-            { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'.00'} },
+
+            { n: 'inkBruto', v: 'Ink Bruto Oud', wch: 10, f:{t:'n', z:'#,##0.00'} },
+            { n: 'inkKorting', v: 'Ink Korting Oud', wch: 10, f:{t:'n', z:'0.0'} },
+            { n: 'inkNetto', v: 'Ink Netto Oud', wch: 10, f:{t:'n', z:'#,##0.00'} },
+            { n: 'inkVerkNetto', v: 'Verkoop Netto Oud', wch: 10, f:{t:'n', z:'#,##0.00'} },
+            { n: 'inkVerkKorting', v: 'Verkoop Korting Oud', wch: 10, f:{t:'n', z:'0.0'} },
+
+            { n: 'levBruto', v: 'Ink Bruto', wch: 10, f:{t:'n', z:'#,##0.00'} },
+            { n: 'levKorting', v: 'Ink Korting', wch: 10, f:{t:'n', z:'0.0'} },
+            { n: 'levNetto', v: 'Ink Netto', wch: 10, f:{t:'n', z:'#,##0.00'} },
+            { n: 'levVerkNetto', v: 'Verkoop Netto', wch: 10, f:{t:'n', z:'#,##0.00'} },
+            { n: 'levVerkKorting', v: 'Verkoop Korting', wch: 10, f:{t:'n', z:'0.0'} },
+
+            { n: 'leverancier', v: 'Leverancier', wch: 10 },
+
           ];
           const [rows] = await fetch('https://dms.aliconnect.nl/api/v1/abis/prijslijstklant?klant_id='+contact.clientId).then(res => res.json());
           excellijst('Prijslijst',cols,rows);

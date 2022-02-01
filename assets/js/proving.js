@@ -544,7 +544,7 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid summary')
+        $('table').class('grid summary').style('font-size:1.2em;')
         // .style('font-size:0.8em;')
         .append(
           $('thead').append(
@@ -589,10 +589,10 @@ $().on('load', async e => {
                 // $('td').text(Number(row.artId).pad(9)),
                 $('td'),
                 $('td'),
-                $('td').colspan(9).append(
+                $('td').style('white-space:normal;').colspan(9).append(
                   // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
                   $('div').text(String(row.omschrijving).replace(/\r|\n/g,'')).append(' ',$('b').append(row.extratekst)),
-                  $('div').style('white-space:normal;').text(String(row.artTitel).replace(/\r|\n/g,'')),
+                  // $('div').text(String(row.artTitel).replace(/\r|\n/g,'')),
                   // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
                 ),
                 $('td'),

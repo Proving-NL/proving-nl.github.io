@@ -544,7 +544,7 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid summary').style('font-size:1.2em;')
+        $('table').class('grid summary').style('font-size:1.1em;')
         // .style('font-size:0.8em;')
         .append(
           $('thead').append(
@@ -556,7 +556,7 @@ $().on('load', async e => {
               $('th').align('left').text('Code').style('white-space:nowrap;width:100%;'),
               $('th').align('left').text('Inhoud'),
               $('th').align('left').text('Art.nr.'),
-              $('th').align('left').text('Prod.nr.'),
+              // $('th').align('left').text('Prod.nr.'),
               $('th').align('left').text('EAN'),
               // $('th').align('left').style('width:100%;').text('Omschrijving'),
               $('th').align('right').text('KG/st.'),
@@ -577,7 +577,7 @@ $().on('load', async e => {
                 $('td').style('font-weight:bold;white-space:nowrap;').text(row.code),
                 $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
                 $('td').text(row.artNr),
-                $('td').text(row.prodNr),
+                // $('td').text(row.prodNr),
                 $('td').text(row.ean),
                 // $('td').text(row.omschrijving).style('white-space:normal;'),
                 $('td').align('right').text(!row.weight ? null : num(row.weight,1)),
@@ -589,10 +589,10 @@ $().on('load', async e => {
                 // $('td').text(Number(row.artId).pad(9)),
                 $('td'),
                 $('td'),
-                $('td').style('white-space:normal;').colspan(9).append(
+                $('td').style('white-space:normal;').colspan(8).append(
                   // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
-                  $('div').text(String(row.omschrijving).replace(/\r|\n/g,'')).append(' ',$('b').append(row.extratekst)),
-                  // $('div').text(String(row.artTitel).replace(/\r|\n/g,'')),
+                  $('div').text(String(row.artTitel).replace(/\r|\n/g,'')),
+                  $('div').style('font-size:0.7em').text(String(row.omschrijving).replace(/\r|\n/g,'')),
                   // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
                 ),
                 $('td'),
@@ -667,7 +667,8 @@ $().on('load', async e => {
             rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
               $('td').text(row.nr),
               $('td').align('right').text(row.quant),
-              $('td').text(row.title).style('white-space:normal;'),
+              $('td').style('white-space:normal;').text(row.artTitel.replace(/\r|\n/g,'')),
+              // $('td').text(row.title).style('white-space:normal;'),
               $('td').align('right').text(row.voc),
             )),
           ),

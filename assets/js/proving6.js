@@ -10,18 +10,50 @@ $().on('message', data => {
 })
 
 $().on('load', async e => {
+  // console.log('JA', aim);
+  // console.log('JA', sessionStorage.getItem('access_token'));
   const {aimClient,dmsClient} = aim;
   console.log('AIM', aimClient, dmsClient, aim.config);
+  // dmsClient.api('/salesorder', {
+  //   filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
+  //   order: `nr DESC`,
+  //   search: '*',
+  //   top: 10,
+  //   select: 'clientName,orderDateTime',
+  // }).get().then(body => console.log(5,body));
+  // return;
+  //
+  // return;
+  //
+  // localStorage.clear();
+  // sessionStorage.clear();
+  // console.log('aliconnect_token', sessionStorage.getItem('aliconnect_token'));
+  // if (!sessionStorage.getItem('aliconnect_token')){
+  //   return document.location.href = 'https://login.aliconnect.nl/silent_signin?redirect_uri='+encodeURI(document.location.href);
+  // } else {
+  //   // sessionStorage.removeItem('aliconnect_token');
+  // }
+
   let clientart = [];
   let clientName = '';
   let mandregels = [];
+  console.log(1111, aimClient);
+  // aimClient.ws().headers({'X-ApiKey': 'MY_KEY'}).method('subscribe').resource('zones').then(console.log);
+
   aim.listselector = 'product';
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
+    console.log(name);
+    // return;
     $('button.account span.company').text(clientName||'');
     [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientName=' + clientName).then(res => res.json());
     aim.idfilter = `clientName EQ '${clientName}'`;
+    console.log('JA', name, clientart, mandregels);
+    // clientart.length = 10;
+
   }
+
+  // let clientName = localStorage.getItem('clientName');
   Object.values(aim.config.artikelgroepen).forEach(obj =>
     Object.values(obj).forEach(obj =>
       Object.entries(obj).forEach(
@@ -657,7 +689,7 @@ $().on('load', async e => {
             ),
           ),
           $('tbody').append(
-            rows.sort((a,b) => (a.createdDateTime||'').localeCompare(b.createdDateTime||'')).map(row => $('tr').append(
+            rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime)).map(row => $('tr').append(
               $('td').text(row.nr),
               $('td').align('right').text(row.quant),
               $('td').style('white-space:normal;').text(row.artTitel.replace(/\r|\n/g,'')),

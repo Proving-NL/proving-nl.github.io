@@ -7,9 +7,8 @@ $().on('load', e => {
   const elem = $('div').parent($(document.body));
   async function load(){
     clearTimeout(to);
-    data = await $().url('https://aliconnect.nl/api/abis/data').post({
-      request_type: 'dashboard',
-    }).then(e => e.body);
+    [data] = await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/dashboard').get();
+    console.log(111, data);
     // Object.keys(names).forEach(name=>names[name]=0);
     // data[0].forEach(r=>names[r.status] = r.aantal)
     set();
@@ -17,7 +16,7 @@ $().on('load', e => {
   }
   load();
   function valcells(name){
-    const row = data[0].find(r=>r.status===name) || {};
+    const row = data.find(r=>r.status===name) || {};
     // console.log(name,row);
     //
     return [
@@ -53,7 +52,7 @@ $().on('load', e => {
   };
   set('Gepakt');
   let query = 'pickDateTime = GETDATE(), onholdDateTime = NULL';
-  $(window).on('keyup', e => {
+  $(window).on('keyup', async e => {
     if (keybuffer === null) {
       if (e.key === 'CapsLock') {
         keybuffer = 'CapsLock';
@@ -84,11 +83,11 @@ $().on('load', e => {
         } else {
           // console.log('PAKBON', keybuffer, setorderdate);
           ordernr = keybuffer;
-          $().url('https://aliconnect.nl/api/abis/data').post({
-            request_type: 'paklijst',
+          await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/paklijst').query({
             id: ordernr,
             set: query,
-          }).then(e => load());
+          }).get();
+          load();
         }
         keybuffer = null;
       } else {

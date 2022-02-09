@@ -2058,7 +2058,7 @@ $().on('load', async e => {
             });
             alert('Status geleverd');
           }),
-          $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
+          // $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
         ),
       ),
     ]
@@ -2500,7 +2500,7 @@ $().on('load', async e => {
         $search: '*',
       }),
       Alles: e => aim.list('salesorder',{
-        $order: `nr DESC`,
+        $order: `id DESC`,
         $top: 100,
         $search: '',
       }),

@@ -57,8 +57,21 @@ $().on('load', async e => {
     },
   });
 
-  console.log(aim.config.artikelgroepen);
-  aim.om.treeview(aim.config.artikelgroepen);
+  const [kop1,kop2,artikelgroep] = await dmsClient.api('/abis/productgroepen').get();
+  const kopmenu = Object.fromEntries(kop1.map(kop1 => [
+    kop1.title,
+    Object.fromEntries(kop2.filter(kop2 => kop2.parentId === kop1.id).map(kop2 => [
+      kop2.title,
+      Object.fromEntries(artikelgroep.filter(ag => ag.parentId === kop2.id).map(ag => [
+        ag.title,
+        e => aim.list('product', {
+          $filter: `artikelgroepid eq ${ag.id}`,
+        }),
+      ])),
+    ])),
+  ]));
+  console.log(kop1,kop2,artikelgroep,kopmenu);
+  aim.om.treeview(kopmenu);
 
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
@@ -595,7 +608,7 @@ $().on('load', async e => {
         ),
       ),
     );
-    const [backorder] = await dmsClient.api('/abis/backorder').query({id: salesorder.nr}).get();
+    const [backorder] = await dmsClient.api('/abis/backorder').query({id: salesorder.id}).get();
     console.log('backorder', backorder);
     elem.append(
       $('div').class('brief').append(
@@ -694,6 +707,7 @@ $().on('load', async e => {
     return elem;
   }
   async function order(orderNr) {
+    console.log(orderNr);
     const data = await dmsClient.api('/abis/paklijst').post({
       id: orderNr,
       set: 'printDateTime = GETDATE()'
@@ -2008,7 +2022,7 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.salesorder.app = {
     nav: row => [
-      $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.nr)).print()),
+      $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.id)).print()),
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
       row.invoiceNr ? [

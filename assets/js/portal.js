@@ -16,7 +16,19 @@ $().on('load', async e => {
     scopes: aimRequest.scopes,
   });
   const dmsClient = aim.Client.initWithMiddleware({authProvider}, dmsConfig);
-
+  const [kop1,kop2,artikelgroep] = await dmsClient.api('/abis/productgroepen').get();
+  config.artikelgroepen = Object.fromEntries(kop1.map(kop1 => [
+    kop1.title,
+    Object.fromEntries(kop2.filter(kop2 => kop2.parentId === kop1.id).map(kop2 => [
+      kop2.title,
+      Object.fromEntries(artikelgroep.filter(ag => ag.parentId === kop2.id).map(ag => [
+        ag.title,
+        e => aim.list('product', {
+          $filter: `artikelgroepid eq ${ag.id}`,
+        }),
+      ])),
+    ])),
+  ]));
 
   const url = new URL(document.location);
   const contact_id = url.searchParams.get('contact_id') || localStorage.getItem('contact_id');
@@ -33,7 +45,7 @@ $().on('load', async e => {
 
     // const [rows] = [[]];//await fetch('https://dms.aliconnect.nl/api/v1/abis/prijslijstklant?klant_id='+contact.clientId).then(res => res.json());
     // console.log(111,contact,rows);
-    async function excellijst(title,cols,rows) {
+    async function excellijst(rows,title,cols) {
       const ws_title = title.split(/\s|-/)[1];
       var wb = XLSX.utils.book_new();
       wb.Props = {
@@ -49,35 +61,40 @@ $().on('load', async e => {
       var ws = XLSX.utils.aoa_to_sheet([
         [
           {v: 'Klant Id'},
-          {v: 'Klant Nr'},
-          {v: 'Klant Code'},
-          {v: 'Klant Naam'},
-          {v: 'Contact Id'},
-          {v: 'Contact Nr'},
-          {v: 'Contact Weergavenaam'},
-          {v: 'Contact Email'},
-        ],[
           {v: contact.clientId},
+        ],[
+          {v: 'Klant Nr'},
           {v: contact.clientNr},
+        ],[
+          {v: 'Klant Code'},
           {v: contact.clientName},
+        ],[
+          {v: 'Klant Naam'},
           {v: contact.clientCompanyname},
-
+        ],[
+          {v: 'Contact Id'},
           {v: contact.contactId},
+        ],[
+          {v: 'Contact Nr'},
           {v: contact.contactNr},
+        ],[
+          {v: 'Contact Weergavenaam'},
           {v: contact.contactDisplayname},
+        ],[
+          {v: 'Contact Email'},
           {v: contact.contactEmail},
         ]
       ]);
       ws['!cols'] = [
         {wch: 36},
-        {wch: 8},
-        {wch: 36},
-        {wch: 36},
-
-        {wch: 36},
-        {wch: 8},
-        {wch: 36},
-        {wch: 36},
+        {wch: 60},
+        // {wch: 36},
+        // {wch: 36},
+        //
+        // {wch: 36},
+        // {wch: 8},
+        // {wch: 36},
+        // {wch: 36},
       ];
       wb.SheetNames.push('account');
       wb.Sheets['account'] = ws;
@@ -147,10 +164,10 @@ $().on('load', async e => {
             if (rowsgroep.length) {
               // console.log(h3,el1,el2,el3);
               el1 = el1 || $('tr').parent('table>tbody').append(
-                $('td').colspan(8).text(h1).style('background:#ccc;'),
+                $('td').colspan(8).text(h1).style('background:#ccc;font-size:1.2em;'),
               );
               el2 = el2 || $('tr').parent('table>tbody').append(
-                $('td').colspan(8).text(h2).style('background:#ccc;'),
+                $('td').colspan(8).text(h2).style('background:#ccc;font-size:1.1em;'),
               );
               $('tr').parent('table>tbody').append(
                 $('td').colspan(8).text(h3).style('background:#ccc;'),
@@ -188,6 +205,26 @@ $().on('load', async e => {
         $('li').append(`<i>Bruto</i>: Catalogus of lijst verkoop prijs opgegeven door de fabrikant of leverancier`),
         $('li').append(`<i>Korting</i>: Uw korting in procenten.`),
         $('li').append(`<i>Netto</i>: Uw prijs exclusief BTW.`),
+      ),
+      $('p').append(
+        'Het bestand ',
+        $('a').href('#').text('Bestellijst.XLS').on('click', async e => {
+        const [rows] = await dmsClient.api('/abis/prijslijst_xls').query({klant_id:contact.clientId}).get();
+        excellijst(rows, 'Bestellijst', [
+          { n: 'artNr', v: 'ArtNr', wch: 8, f:{t:'s'} },
+          { n: 'aantal', v: 'Aantal', wch: 8 },
+          { n: 'tekst', v: 'Omschrijving', wch: 100 },
+          // { n: 'bruto', v: 'Bruto', wch: 10, f:{t:'n', z:'0.00'} },
+          // { n: 'korting', v: 'Korting', wch: 10, f:{t:'n', z:'0.0'} },
+          { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'0.00'} },
+          // { n: 'artGroep', v: 'Productgroep', wch: 50 },
+        ]);
+      }),
+        ` bevat een overzicht van reeds bij ons bestelde artikelen.
+        Dit bestand kunt u gebruiken als uw bestelformulier.
+        Vul in de kolom Aantal uw  gewenste bestelaantal in
+        en stuur dit bestand naar <a href='verkoop@airo.nl'>verkoop@airo.nl</a>.
+        Uw bestelling wordt dan automatisch verwerkt waardoor wij zo snel mogelijk aan het verwerken van uw order kunnen starten.`
       ),
 
       // $('li').append($('a').href('#').text('Bestellijst.xlsx').on('click', async e => {
@@ -265,7 +302,22 @@ $().on('load', async e => {
             // const [rows] = await fetch('https://dms.aliconnect.nl/api/v1/abis/prijslijstklant?klant_id='+contact.clientId).then(res => res.json());
             // console.log(rows);
             printPrijslijst(rows, merk);
-          })
+          }),
+          ', ',
+          $('a').href('#').text('xls').on('click', async e => {
+            const [rows] = await dmsClient.api('/abis/prijslijstklant').query({klant_id:contact.clientId, merk:merk}).get();
+            // const [rows] = await fetch('https://dms.aliconnect.nl/api/v1/abis/prijslijstklant?klant_id='+contact.clientId).then(res => res.json());
+            // console.log(rows);
+            excellijst(rows, merk, [
+              { n: 'artNr', v: 'ArtNr', wch: 8, f:{t:'s'} },
+              { n: 'aantal', v: 'Aantal', wch: 8 },
+              { n: 'tekst', v: 'Omschrijving', wch: 100 },
+              { n: 'bruto', v: 'Bruto', wch: 10, f:{t:'n', z:'0.00'} },
+              { n: 'korting', v: 'Korting', wch: 10, f:{t:'n', z:'0.0'} },
+              { n: 'netto', v: 'Netto', wch: 10, f:{t:'n', z:'0.00'} },
+              { n: 'artGroep', v: 'Productgroep', wch: 50 },
+            ]);
+          }),
         ))
       ),
 

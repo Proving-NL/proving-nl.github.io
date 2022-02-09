@@ -795,13 +795,13 @@ $().on('load', async e => {
                 .colspan(5)
                 .align('left')
                 .text([
-                  `Leverbon: ${salesorder.nr}`,
+                  `Leverbon: ${salesorder.id}`,
                   `Order datum: ${new Date(salesorder.orderDateTime).toLocaleDateString()}`,
                   salesorder.ref ? `uw referentie: ${salesorder.ref}`: '',
                 ].filter(Boolean).join(', ')),
               )
             ].concat(
-              rows.filter(row => row.orderNr === salesorder.nr).map(row => $('tr').append(
+              rows.filter(row => row.orderId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artNr),
                 $('td').align('right').text(row.quant),
                 $('td').style('white-space:normal;').text(row.title),

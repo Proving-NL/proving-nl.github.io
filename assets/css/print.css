@@ -91,6 +91,14 @@ div.header {
 }
 @font-face {
   font-family: barcode;
+  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/Code39Azalea.ttf') format('truetype');
+  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/fre3of9x.ttf') format('truetype');
+  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/barcode39.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+/* @font-face {
+  font-family: barcode;
   src:
   url('https://aliconnect.nl/sdk/src/font/Code39Azalea.eot') format('embedded-opentype'),
   url('https://aliconnect.nl/sdk/src/font/Code39Azalea.woff') format('woff'),
@@ -99,13 +107,13 @@ div.header {
   font-weight: normal;
   font-style: normal;
 }
-
+ */
 .bc{
   font-family:barcode;
-  font-size:10mm;
+  font-size: 8mm;
   /* font-size:30mm; */
   display:inline-block;
-  height:8mm;
+  height:16mm;
   overflow:hidden;
 }
 

@@ -450,7 +450,7 @@ $().on('load', async e => {
     );
   }
   async function orderPage(salesorder, rows) {
-    console.log(rows);
+    console.log(salesorder,rows);
     // rows.forEach(row => row.storageLocation = row.newStorageLocation ? (row.newStorageLocation.match(/../g)||[]).splice(1).map(Number).join('-') : (row.prodStockLocation||'').substr(0,3));
     rows.forEach(row => row.loc = (row.magLokatie||'').split('.').filter(Boolean).join('.'));
     rows = rows.filter(row => row.orderNr === salesorder.nr || row.orderId === salesorder.id);
@@ -465,13 +465,14 @@ $().on('load', async e => {
         $('table').append(
           $('tr').append(
             $('td').append(
-              $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
-              $('div').text(salesorder.clientBusinessContactName),
-              $('div').text(salesorder.clientBusinessAddressStreet),
-              $('div').text(salesorder.clientBusinessAddressPostalCode, salesorder.clientBusinessAddressCity),
+              $('div').text(salesorder.afleverFirma || salesorder.clientCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.afleverContact || salesorder.clientBusinessContactName),
+              $('div').text(salesorder.afleverAdres || salesorder.clientBusinessAddressStreet),
+              $('div').text(salesorder.afleverPostcode || salesorder.clientBusinessAddressPostalCode, salesorder.afleverPlaats || salesorder.clientBusinessAddressCity),
+              $('div').text(salesorder.afleverLand),
             ),
             $('td').style('width:65mm;').append(
-              $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.afleverAdres ? salesorder.clientCompanyName : salesorder.accountCompanyName).style('font-weight:bold;'),
               $('span').class('bc').text(`*${salesorder.nr}*`),
             ),
           )
@@ -613,23 +614,33 @@ $().on('load', async e => {
     elem.append(
       $('div').class('brief').append(
         $('div').append(
-          $('img').src(`https://${salesorder.accountName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountName.toLowerCase()}.png`
+          salesorder.afleverFirma ? null : $('img').src(`https://${salesorder.accountName.toLowerCase()}-nl.aliconnect.nl/assets/img/letter-header-${salesorder.accountName.toLowerCase()}.png`
           ),
         ),
         $('table').style('margin-bottom:10mm;width:100%;').append(
           $('tr').append(
             $('td').style('padding-left:10mm;padding-top:25mm;').append(
-              $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
-              $('div').text(salesorder.clientBusinessContactName),
-              $('div').text(salesorder.clientBusinessAddressStreet),
-              $('div').text(salesorder.clientBusinessAddressPostalCode, salesorder.clientBusinessAddressCity),
+              $('div').text(salesorder.afleverFirma || salesorder.clientCompanyName).style('font-weight:bold;'),
+              $('div').text(salesorder.afleverContact || salesorder.clientBusinessContactName),
+              $('div').text(salesorder.afleverAdres || salesorder.clientBusinessAddressStreet),
+              $('div').text(salesorder.afleverPostcode || salesorder.clientBusinessAddressPostalCode, salesorder.afleverPlaats || salesorder.clientBusinessAddressCity),
+              $('div').text(salesorder.afleverLand),
             ),
             $('td').style('width:65mm;').append(
-              $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
-              $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;font-size:0.8em;'),
+              salesorder.afleverAdres ? [
+                $('div').text(salesorder.clientCompanyName).style('font-weight:bold;'),
+                $('div').text(salesorder.clientBusinessAddressStreet).style('word-wrap:pre;font-size:0.8em;'),
+                $('div').text(salesorder.clientBusinessAddressPostalCode, salesorder.clientBusinessAddressCity).style('word-wrap:pre;font-size:0.8em;'),
+              ]: [
+                $('div').text(salesorder.accountCompanyName).style('font-weight:bold;'),
+                $('div').text(salesorder.accountInvoiceText).style('word-wrap:pre;font-size:0.8em;'),
+              ]
             ),
           )
         ),
+        $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
+        $('div').text(`${salesorder.postVerzendCode}`),
+
         $('div').append(
           $('span').text('LEVERBON').style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
         ),
@@ -804,7 +815,7 @@ $().on('load', async e => {
               rows.filter(row => row.orderId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artNr),
                 $('td').align('right').text(row.quant),
-                $('td').style('white-space:normal;').text(row.title),
+                $('td').style('white-space:normal;').text(row.title.replace(/\r|\n/g,'')),
                 $('td').align('right').text(!row.netto ? '' : cur(row.netto)),
                 $('td').align('right').text(row.quant && row.netto ? cur(row.totnetto = row.quant * row.netto, totaal += row.totnetto) : ''),
               )),
@@ -919,19 +930,20 @@ $().on('load', async e => {
       // elem.remove();
     }
   async function factureren(salesorder, id){
-    const data = await dmsClient.api('/abis/createInvoice').post({
+    // return console.error(salesorder, id);
+    const [[{invoiceNr}]] = await dmsClient.api('/abis/createInvoice').post({
       accountName: salesorder.accountName,
       ordernummers: id,
     });
-    console.log(data);
-    const [bedrijven] = data;
-    const [accountCompany] = bedrijven;
-    const invoiceNr = accountCompany.invoiceNr;
+    console.log(invoiceNr);
+    // const [bedrijven] = data;
+    // const [accountCompany] = bedrijven;
+    // const invoiceNr = accountCompany.invoiceNr;
     const factuurElem = await factuur(invoiceNr);
     const [clientInvoices,clientOrders,rows] = factuurData;
     const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
-    if (invoice.clientOtherMailAddress) {
+    if (invoice.clientOtherMailAddress___) {
       await sendInvoice(factuurElem, factuurData);
     } else {
       facturenElem.append(factuurElem.style('page-break-after:always;'))
@@ -993,10 +1005,10 @@ $().on('load', async e => {
   }
   async function lijstFactureren(orders) {
     console.log(orders);
-    for (let clientName of orders.map(row => row.clientName).unique()) {
-      const clientOrders = orders.filter(row => row.clientName === clientName);
+    for (let organisatieId of orders.map(row => row.organisatieId).unique()) {
+      const clientOrders = orders.filter(row => row.organisatieId === organisatieId);
       const [salesorder] = clientOrders;
-      await factureren(salesorder, clientOrders.map(o => o.nr).join(','));
+      await factureren(salesorder, clientOrders.map(o => o.id).join(','));
     }
     if (facturenElem.elem.innerText) {
       facturenElem.printpdf();
@@ -1999,8 +2011,6 @@ $().on('load', async e => {
     rows.push(row = {quant:1});
     calc();
   }
-
-
   aim.config.components.schemas.company.app = {
     nav: row => [
       $('button').class('abtn print').title('Printen').on('click', e => {
@@ -2405,6 +2415,19 @@ $().on('load', async e => {
   ];
   let arts,artvalues;
 
+
+  if (window.localStorage.getItem('printService')) {
+    (async function checkprint(){
+      const [orders] = await dmsClient.api('/abis/orderstoprint').get();
+      for (let row of orders) {
+        (await order(row.id)).print();
+      }
+      // console.log('CHECKPRINT', orders);
+
+      setTimeout(checkprint, 5000);
+    })()
+  }
+
   aim.om.treeview({
     Inkoop: {
       Producten: e => aim.list('artink',{
@@ -2515,7 +2538,7 @@ $().on('load', async e => {
       'Facturen Actueel': e => aim.list('invoice',{
         $filter: `isbetaald EQ 0`,
         $order: `nr DESC`,
-        $search: '*',
+        $search: '',
       }),
       'Facturen Betaald': e => aim.list('invoice',{
         $filter: `isbetaald EQ 1`,
@@ -3374,6 +3397,33 @@ $().on('load', async e => {
       // },
     },
     Overig: {
+      async Factureren(){
+        const [orders] = await dmsClient.api('/abis/orderstefactureren').get();
+        // return console.log(orders);
+        lijstFactureren(orders);
+      },
+
+      printService(){
+        window.localStorage.setItem('printService', window.localStorage.getItem('printService') ? '' : 'on');
+      },
+      async postorder(){
+        const result = await dmsClient.api('/abis/neworder').body({
+          orgUId:'1be87951-75d6-4a92-a367-1331b4b3c44d',
+          afleverFirma: 'DECORATOR',
+          afleverContact: 'Mevrouw Susanne van der Steen',
+          afleverAdres: 'Dorshout 32',
+          afleverPostcode: '5462 GM',
+          afleverPlaats: 'VEGHEL',
+          afleverLand: 'Nederland',
+          ref: 22016,
+          postVerzendCode: '*3SMYPA034431305*',
+          rows:[
+            { aantal: 3, artId: 7520 },
+            { aantal: 2, artId: 7520 },
+          ],
+        }).post();
+        console.log(result);
+      },
       set_arguments(){
         aimClient.api('/abis/artikel').query('select', 'artId,merk,tekst').get().then(body => {
           const [rows] = body;

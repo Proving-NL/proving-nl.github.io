@@ -3,16 +3,16 @@ $().on('load', e => {
   let setstatus;
   let to;
   let ordernr = '';
-  let data = [[]];
+  let orders,geprint,verstuurd,geleverd,data = [[]];
   const elem = $('div').parent($(document.body));
   async function load(){
     clearTimeout(to);
-    [data] = await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/dashboard').get();
-    console.log(111, data);
+    [[{orders,geprint,verstuurd,geleverd}]] = await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/dashboard').get();
+    console.log(112, orders,geprint,verstuurd,geleverd);
     // Object.keys(names).forEach(name=>names[name]=0);
     // data[0].forEach(r=>names[r.status] = r.aantal)
     set();
-    to = setTimeout(e => load(), 5000);
+    to = setTimeout(e => load(), 10000);
   }
   load();
   function valcells(name){
@@ -29,24 +29,36 @@ $().on('load', e => {
       $('div').text(new Date().toLocaleTimeString().substr(0,5), setstatus = value || setstatus, ordernr),
       $('table').append(
         $('tr').append(
-          valcells('Opdracht'),
-          valcells('Ingepland'),
+          $('td').text('Orders'),
+          $('td').text(orders),
+          $('td').text('Geprint'),
+          $('td').text(geprint),
         ),
         $('tr').append(
-          valcells('Geprint'),
-          valcells('Gepakt'),
+          $('td').text('Verstuurd'),
+          $('td').text(verstuurd),
+          $('td').text('Geleverd'),
+          $('td').text(geleverd),
         ),
-        $('tr').append(
-          valcells('Verzonden'),
-          valcells('On Hold'),
-        ),
-        $('tr').append(
-          valcells('Geleverd'),
-          valcells('Verzonden>2d'),
-        ),
-        $('tr').append(
-          valcells('ReadyMix'),
-        ),
+        // $('tr').append(
+        //   valcells('Opdracht'),
+        //   valcells('Ingepland'),
+        // ),
+        // $('tr').append(
+        //   valcells('Geprint'),
+        //   valcells('Gepakt'),
+        // ),
+        // $('tr').append(
+        //   valcells('Verzonden'),
+        //   valcells('On Hold'),
+        // ),
+        // $('tr').append(
+        //   valcells('Geleverd'),
+        //   valcells('Verzonden>2d'),
+        // ),
+        // $('tr').append(
+        //   valcells('ReadyMix'),
+        // ),
       ),
     )
   };
@@ -83,11 +95,14 @@ $().on('load', e => {
         } else {
           // console.log('PAKBON', keybuffer, setorderdate);
           ordernr = keybuffer;
-          await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/paklijst').query({
+          await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/setorder').query({
             id: ordernr,
             set: query,
           }).get();
-          load();
+          console.log('done', ordernr);
+          $('body>div>div').text(new Date().toLocaleTimeString().substr(0,5), setstatus, ordernr);
+
+          // load();
         }
         keybuffer = null;
       } else {

@@ -638,9 +638,10 @@ $().on('load', async e => {
             ),
           )
         ),
-        $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
-        $('div').text(`${salesorder.postVerzendCode}`),
-
+        salesorder.postVerzendCode ? [
+          $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
+          $('div').text(`${salesorder.postVerzendCode}`),
+        } : null,
         $('div').append(
           $('span').text('LEVERBON').style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
         ),

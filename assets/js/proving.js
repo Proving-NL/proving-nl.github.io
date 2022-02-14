@@ -602,7 +602,7 @@ $().on('load', async e => {
               $('td'),
               $('td').style('white-space:normal;').colspan(8).append(
                 // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
-                $('div').text(String(row.omschrijving).replace(/\r|\n/g,'')),
+                $('div').text(String(row.bonomschrijving).replace(/\r|\n/g,'')),
                 // $('div').style('font-size:0.7em').text(String(row.omschrijving).replace(/\r|\n/g,'')),
                 // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
               ),
@@ -681,7 +681,7 @@ $().on('load', async e => {
             rows.sort((a,b) => a.id - b.id).map(row => $('tr').append(
               $('td').text(row.artId),
               $('td').align('right').text(row.aantal),
-              $('td').style('white-space:normal;').text(row.omschrijving.replace(/\r|\n/g,'')),
+              $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
               // $('td').text(row.title).style('white-space:normal;'),
               $('td').align('right').text(row.voswaarde),
             )),
@@ -716,17 +716,17 @@ $().on('load', async e => {
   }
   async function order(orderNr) {
     console.log(orderNr);
-    const data = await dmsClient.api('/abis/paklijst').post({
+    const data = await dmsClient.api('/abis/bon').post({
       id: orderNr,
-      set: 'printDateTime = GETDATE()'
+      set: 'printDatumTijd = GETDATE()'
     })
     var [salesorders,rows] = data;
     var [salesorder] = salesorders;
     if (!rows.length) alert('Order bevat geen regels');
     return await orderPage(salesorder,rows);
   }
-  async function factuur(factuurNr) {
-    const [[factuur], orders, rows] = await dmsClient.api('/abis/factuur').post({id: factuurNr});
+  async function factuur(factuurId) {
+    const [[factuur], orders, rows] = await dmsClient.api('/abis/factuur').post({id: factuurId});
     console.log('done',factuur, orders, rows);
     const [order] = orders;
     if (!order) return alert('FACTUUR HEEFT GEEN PAKBONNEN');
@@ -808,7 +808,7 @@ $().on('load', async e => {
               rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artId),
                 $('td').align('right').text(row.aantal),
-                $('td').style('white-space:normal;').text(row.omschrijving.replace(/\r|\n/g,'')),
+                $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
                 $('td').align('right').text(row.netto ? cur(row.netto) : ''),
                 $('td').align('right').text(row.totaal ? cur(row.totaal) : ''),
               )),
@@ -922,22 +922,23 @@ $().on('load', async e => {
       await dmsClient.api('/abis/sendInvoice').body(maildata).post().then(e => console.log(e));
       // elem.remove();
     }
-  async function factureren(salesorder, id){
+  async function factureren(orders){
     // return console.error(salesorder, id);
-    const [[{invoiceNr}]] = await dmsClient.api('/abis/createInvoice').post({
-      accountName: salesorder.accountName,
-      ordernummers: id,
+    console.log(ids);
+    const [[{id}]] = await dmsClient.api('/abis/factuurNieuw').post({
+      ordernummers: orders,
     });
-    console.log(invoiceNr);
+    console.log(id, orders);
     // const [bedrijven] = data;
     // const [accountCompany] = bedrijven;
     // const invoiceNr = accountCompany.invoiceNr;
-    const factuurElem = await factuur(invoiceNr);
-    const [clientInvoices,clientOrders,rows] = factuurData;
-    const [invoice] = clientInvoices;
+    const factuurElem = await factuur(id);
+
+    // const [clientInvoices,clientOrders,rows] = factuurData;
+    // const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
     if (invoice.clientOtherMailAddress___) {
-      await sendInvoice(factuurElem, factuurData);
+      // await sendInvoice(factuurElem, factuurData);
     } else {
       facturenElem.append(factuurElem.style('page-break-after:always;'))
     }
@@ -1001,7 +1002,7 @@ $().on('load', async e => {
     for (let organisatieId of orders.map(row => row.organisatieId).unique()) {
       const clientOrders = orders.filter(row => row.organisatieId === organisatieId);
       const [salesorder] = clientOrders;
-      await factureren(salesorder, clientOrders.map(o => o.id).join(','));
+      await factureren(clientOrders.map(o => o.id).join(','));
     }
     if (facturenElem.elem.innerText) {
       facturenElem.printpdf();
@@ -2028,7 +2029,7 @@ $().on('load', async e => {
       $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.id)).print()),
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
-      row.invoiceNr ? [
+      row.factuurId ? [
         $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNr)).printpdf()),
         !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.invoiceNr), factuurData)),
       ] : [
@@ -2501,21 +2502,26 @@ $().on('load', async e => {
     },
     Orders: {
       Actief: e => aim.list('salesorder',{
-        $filter: `isQuote NE 1 && isOrder NE 0 && invoiceNr EQ 0`,
+        $filter: `aanbieding NE 1 && verwerkt NE 0 && factuurnr EQ 0`,
         $order: `id DESC`,
         $search: '*',
       }),
       Mandje: e => aim.list('salesorder',{
-        $filter: `isOrder NE 1`,
+        $filter: `verwerkt NE 1`,
         $order: `id DESC`,
         $search: '*',
       }),
       Aanbieding: e => aim.list('salesorder',{
-        $filter: `isQuote NE 0`,
+        $filter: `aanbieding NE 0`,
         $order: `nr DESC`,
         $search: '*',
       }),
       Alles: e => aim.list('salesorder',{
+        $order: `id DESC`,
+        $top: 100,
+        $search: '',
+      }),
+      Alles2: e => aim.list('bon',{
         $order: `id DESC`,
         $top: 100,
         $search: '',

@@ -542,18 +542,18 @@ $().on('load', async e => {
     );
 
 
-    if (!salesorder.routeNr) {
-      $(elem.elem.querySelector('.brief')).append(
-        $('div').style('border:solid 1px red;padding:20px;color:red;').append('Transport/Route nr. niet ingevuld')
-      );
-      return elem;
-    }
-    if (!salesorder.volgNr) {
-      $(elem.elem.querySelector('.brief')).append(
-        $('div').style('border:solid 1px red;padding:20px;color:red;').append('Bestelwijze/Volg nr. niet ingevuld')
-      );
-      return elem;
-    }
+    // if (!salesorder.routeNr) {
+    //   $(elem.elem.querySelector('.brief')).append(
+    //     $('div').style('border:solid 1px red;padding:20px;color:red;').append('Transport/Route nr. niet ingevuld')
+    //   );
+    //   return elem;
+    // }
+    // if (!salesorder.volgNr) {
+    //   $(elem.elem.querySelector('.brief')).append(
+    //     $('div').style('border:solid 1px red;padding:20px;color:red;').append('Bestelwijze/Volg nr. niet ingevuld')
+    //   );
+    //   return elem;
+    // }
     $(elem.elem.querySelector('.brief')).append(
       $('table').class('grid summary').style('font-size:1.1em;')
       // .style('font-size:0.8em;')
@@ -656,7 +656,7 @@ $().on('load', async e => {
           ),
           $('tbody').append(
             $('tr').append(
-              $('td').text(salesorder.klantId.pad(5)),
+              $('td').text((salesorder.klantId||0).pad(5)),
               $('td').text(salesorder.id),
               // $('td').text(salesorder.clientDebNr),
               $('td').text(salesorder.uwRef),
@@ -757,7 +757,7 @@ $().on('load', async e => {
           )
         ),
         $('div').append(
-          $('span').text('FACTUUR', factuurNr).style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
+          $('span').text('FACTUUR', factuur.factuurNr).style('font-weight:bold;font-size:1.2em;width:12cm;display:inline-block;'),
         ),
       ).append(
         $('table').class('grid summary').style('margin-bottom:2mm;').append(
@@ -877,24 +877,24 @@ $().on('load', async e => {
     // }
     return elem;
   }
-  async function sendInvoice(elem, factuurData) {
-    const [clientInvoices,clientOrders,rows] = factuurData;
-    const [invoice] = clientInvoices;
-    const invoiceNr = invoice.nr;
-    console.log(invoice);
-    const from = `invoice@${invoice.accountName.toLowerCase()}.nl`;
+  async function sendInvoice(factuurElem, factuur) {
+    // const [clientInvoices,clientOrders,rows] = factuurData;
+    // const [invoice] = clientInvoices;
+    // const invoiceNr = invoice.nr;
+    // console.log(invoice);
+    const from = `invoice@${factuur.bedrijfCode.toLowerCase()}.nl`;
     const maildata = {
       from: from,
       bcc: from,
+      to: factuur.postadresMailadres,
       to: 'max.van.kampen@alicon.nl',
-      to: invoice.clientOtherMailAddress || invoice.clientBusinessMailAddress,
-      invoiceNr: invoiceNr,
+      factuurId: factuur.id,
       chapters: [{
-        title: `${invoice.accountCompanyName} factuur ${invoiceNr} voor ${invoice.clientCompanyName}`,
+        title: `${factuur.afzenderNaam} factuur ${factuur.factuurNr} voor ${factuur.organisatieNaam}`,
         content: aim.markdown().render(`
           Geachte heer / mevrouw,
 
-          Hierbij ontvangt ${invoice.clientCompanyName} een factuur aangaande de door ${invoice.accountCompanyName} geleverde goederen.
+          Hierbij ontvangt ${factuur.organisatieNaam} een factuur aangaande de door ${factuur.afzenderOrganisatieNaam} geleverde goederen.
 
           Voor automatische verwerking van uw digitale facturen is uw factuur bijgevoegd als bijlage.
           Wij willen u graag erop attenderen dat digitale factuurbestanden gedurende zeven jaar bewaard dienen te worden.
@@ -903,32 +903,33 @@ $().on('load', async e => {
             U dient uw digitale factuur ook digitaal te bewaren.
 
             Voor eventuele vragen over de factuur kunt u zich richten tot onze financiële administratie
-            via e-mail: [administratie@${invoice.accountCompanyName}.nl](mailto:administratie@${invoice.accountCompanyName}.nl?SUBJECT=Vraag over factuur ${invoiceNr}&BODY=Beste administratie,%0A%0ANamens ${invoice.clientCompanyName} heb ik een vraag aangaande factuur ${invoiceNr}: ... ?%0A%0AMet vriendelijke groet,%0A${invoice.clientCompanyName})
-            of telefonisch: ${invoice.accountPhone}
+            via e-mail: [administratie@${factuur.afzenderNaam}.nl](mailto:administratie@${factuur.afzenderNaam}.nl?SUBJECT=Vraag over factuur ${factuur.factuurNr}&BODY=Beste administratie,%0A%0ANamens ${factuur.organisatieNaam} heb ik een vraag aangaande factuur ${factuur.factuurNr}: ... ?%0A%0AMet vriendelijke groet,%0A${factuur.organisatieNaam})
+            of telefonisch: ${factuur.afzenderTelefoon}
 
             Indien U vragen heeft over de geleverde artikelen kunt u contact opnemen
-            via e-mail: [verkoop@${invoice.accountCompanyName}.nl](mailto:verkoop@${invoice.accountCompanyName}.nl?SUBJECT=Inhoudelijke vragen over factuur ${invoiceNr}&BODY=Beste administratie,%0A%0ANamens ${invoice.clientCompanyName} heb ik een vraag aangaande factuur ${invoiceNr}: ... ?%0A%0AMet vriendelijke groet,%0A${invoice.clientCompanyName})
+            via e-mail: [verkoop@${factuur.afzenderNaam}.nl](mailto:verkoop@${factuur.afzenderNaam}.nl?SUBJECT=Inhoudelijke vragen over factuur ${factuur.factuurNr}&BODY=Beste administratie,%0A%0ANamens ${factuur.organisatieNaam} heb ik een vraag aangaande factuur ${factuur.factuurNr}: ... ?%0A%0AMet vriendelijke groet,%0A${factuur.organisatieNaam})
 
-            Met vriendelijke groet,  \nAdministratie  \n${invoice.accountCompanyName}
+            Met vriendelijke groet,  \nAdministratie  \n${factuur.afzenderOrganisatieNaam}
             `
           ),
         }],
         attachements: [{
-          content: elem.elem.innerHTML,
-          name: `${invoice.accountCompanyName}-factuur-${invoiceNr}-${invoice.clientName}.pdf`.toLowerCase()
+          content: factuurElem.elem.innerHTML,
+          name: `${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.organisatieNaam}.pdf`.toLowerCase()
         }]
       };
-      console.log(maildata);
-      await dmsClient.api('/abis/sendInvoice').body(maildata).post().then(e => console.log(e));
+      console.log(factuur);
+      await dmsClient.api('/abis/factuurVerzenden').body(maildata).post().then(e => console.log(e));
       // elem.remove();
     }
   async function factureren(orders){
     // return console.error(salesorder, id);
-    console.log(ids);
-    const [[{id}]] = await dmsClient.api('/abis/factuurNieuw').post({
+    console.log(orders);
+    const [[rowfactuur]] = await dmsClient.api('/abis/factuurNieuw').post({
       ordernummers: orders,
     });
-    console.log(id, orders);
+    const {id} = rowfactuur;
+    console.log(id, rowfactuur, orders);
     // const [bedrijven] = data;
     // const [accountCompany] = bedrijven;
     // const invoiceNr = accountCompany.invoiceNr;
@@ -937,8 +938,8 @@ $().on('load', async e => {
     // const [clientInvoices,clientOrders,rows] = factuurData;
     // const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
-    if (invoice.clientOtherMailAddress___) {
-      // await sendInvoice(factuurElem, factuurData);
+    if (rowfactuur.postadresMailadres) {
+      await sendInvoice(factuurElem, rowfactuur);
     } else {
       facturenElem.append(factuurElem.style('page-break-after:always;'))
     }
@@ -999,6 +1000,7 @@ $().on('load', async e => {
   }
   async function lijstFactureren(orders) {
     console.log(orders);
+    // return;
     for (let organisatieId of orders.map(row => row.organisatieId).unique()) {
       const clientOrders = orders.filter(row => row.organisatieId === organisatieId);
       const [salesorder] = clientOrders;
@@ -1885,34 +1887,34 @@ $().on('load', async e => {
   async function orderInvoer(order) {
     console.log(order);
     let row;
-    const [rows] = await dmsClient.api('/abis/orderrow').query('id', order.nr).get();
+    const [rows] = await dmsClient.api('/abis/bonrgls').query('id', order.id).get();
     function calc(){
       form.nr.value = row.artId || '';
-      form.aantal.value = row.quant;
+      form.aantal.value = row.aantal;
       form.omschrijving.value = row.omschrijving || '';
       form.bruto.value = num(row.bruto || '',2);
       form.netto.value = num(row.netto || '',2);
       form.korting.value = num(row.korting || '',1);
-      form.tot.value = num(row.quant * (row.netto || 0),2);
-      $('.tot').text(num(rows.map(row =>(row.quant||0) * (row.netto||0)).reduce((tot,val)=>tot += val),2));
+      form.tot.value = num(row.totaal,2);
+      $('.tot').text(num(rows.map(row =>row.totaal||0).reduce((tot,val)=>tot += val),2));
     }
     function addrow(row){
       $('tr').parent('.orderlist tbody').append(
         $('td').append(row.artId),
-        $('td').append(row.quant),
+        $('td').append(row.aantal),
         $('td').append(row.omschrijving),
         $('td').append(row.extratekst),
         $('td').align('right').append(num(row.bruto,2)),
         $('td').align('right').append(num(row.netto,2)),
-        $('td').align('right').append(num((row.bruto-row.netto)/row.bruto*100,1)),
-        $('td').align('right').append(num(row.quant * row.netto,2)),
+        $('td').align('right').append(num(row.korting,1)),
+        $('td').align('right').append(num(row.totaal,2)),
       );
       form.nr.focus();
       form.nr.scrollIntoView();
     }
     // $('.pv').text('');
-    $('.lv').text('').append(
-      $('div').append(
+    $('.lv').append(
+      $('div').style('position:absolute;margin:auto;top:0;left:0;right:0;bottom:0;background:black;height:auto;').append(
         $('div').class('col orderform').append(
           $('form').on('submit', async e => {
             e.preventDefault();
@@ -2029,12 +2031,12 @@ $().on('load', async e => {
       $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.id)).print()),
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
+      $('button').text('Regels').on('click', e => orderInvoer(row)),
       row.factuurId ? [
-        $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.invoiceNr)).printpdf()),
+        $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.factuurId)).printpdf()),
         !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.invoiceNr), factuurData)),
       ] : [
         $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
-        $('button').text('Regels').on('click', e => orderInvoer(row)),
       ],
     ],
     navList: () => [
@@ -2062,7 +2064,7 @@ $().on('load', async e => {
             });
             alert('Status geleverd');
           }),
-          // $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
+          $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
         ),
       ),
     ]
@@ -2139,7 +2141,7 @@ $().on('load', async e => {
         console.log(333, row);
         (await factuur(row.id)).printpdf();
       }),
-      !row.clientOtherMailAddress && !row.clientBusinessMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.nr), factuurData)),
+      !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.id), row)),
     ],
     navList: () => [
       $('button').text('Facturen').append(
@@ -2503,29 +2505,31 @@ $().on('load', async e => {
     Orders: {
       Actief: e => aim.list('salesorder',{
         $filter: `aanbieding NE 1 && verwerkt NE 0 && factuurnr EQ 0`,
+        $filter: `factuurid EQ NULL`,
         $order: `id DESC`,
         $search: '*',
       }),
-      Mandje: e => aim.list('salesorder',{
-        $filter: `verwerkt NE 1`,
-        $order: `id DESC`,
-        $search: '*',
-      }),
-      Aanbieding: e => aim.list('salesorder',{
-        $filter: `aanbieding NE 0`,
-        $order: `nr DESC`,
-        $search: '*',
-      }),
+      // Mandje: e => aim.list('salesorder',{
+      //   $filter: `verwerkt NE 1`,
+      //   $order: `id DESC`,
+      //   $search: '*',
+      // }),
+      // Aanbieding: e => aim.list('salesorder',{
+      //   $filter: `aanbieding NE 0`,
+      //   $order: `nr DESC`,
+      //   $search: '*',
+      // }),
       Alles: e => aim.list('salesorder',{
         $order: `id DESC`,
         $top: 100,
         $search: '',
       }),
-      Alles2: e => aim.list('bon',{
-        $order: `id DESC`,
-        $top: 100,
-        $search: '',
-      }),
+      // Factureren: e => aim.list('salesorder',{
+      //   $filter: `(DATEDIFF(day,verstuurdDatumTijd,GETDATE())>2 OR leverDatumTijd IS NOT NULL) AND factuurId IS NULL AND aanbieding=0`,
+      //   $order: `organisatieId,id`,
+      //   $top: 100,
+      //   $search: '*',
+      // }),
       ReadyMix: e => aim.list('salesorderrow',{
         $filter: `prodStockLocation EQ 'k-m' && sendDateTime EQ NULL && isQuote <> 1 && isOrder = 1`,
         // $order: `nr DESC`,
@@ -2543,6 +2547,11 @@ $().on('load', async e => {
         $order: `id DESC`,
         $search: '',
       }),
+      async Factureren(){
+        const [orders] = await dmsClient.api('/abis/orderstefactureren').get();
+        // return console.log(orders);
+        lijstFactureren(orders);
+      },
       Afas: {
         'Export Facturen Airo': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
         'Export Facturen Proving': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=proving',
@@ -3391,11 +3400,6 @@ $().on('load', async e => {
       // },
     },
     Overig: {
-      async Factureren(){
-        const [orders] = await dmsClient.api('/abis/orderstefactureren').get();
-        // return console.log(orders);
-        lijstFactureren(orders);
-      },
 
       printService(){
         window.localStorage.setItem('printService', window.localStorage.getItem('printService') ? '' : 'on');

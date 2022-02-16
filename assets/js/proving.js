@@ -587,7 +587,7 @@ $().on('load', async e => {
               $('td').style('font-weight:bold;').text(String(row.eenheid||'').toUpperCase()),
               $('td').style('font-weight:bold;white-space:nowrap;').text(row.code),
               $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
-              $('td').text(row.artId),
+              $('td').text(row.artId ? row.artId.pad(5) : ''),
               // $('td').text(row.prodNr),
               $('td').text(row.barcode),
               // $('td').text(row.omschrijving).style('white-space:normal;'),
@@ -679,7 +679,7 @@ $().on('load', async e => {
           ),
           $('tbody').append(
             rows.sort((a,b) => a.id - b.id).map(row => $('tr').append(
-              $('td').text(row.artId),
+              $('td').text(row.artId ? row.artId.pad(5) : ''),
               $('td').align('right').text(row.aantal),
               $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
               // $('td').text(row.title).style('white-space:normal;'),
@@ -726,6 +726,7 @@ $().on('load', async e => {
     return await orderPage(salesorder,rows);
   }
   async function factuur(factuurId) {
+    console.log('FACTUUR',factuurId);
     const [[factuur], orders, rows] = await dmsClient.api('/abis/factuur').post({id: factuurId});
     console.log('done',factuur, orders, rows);
     const [order] = orders;
@@ -780,7 +781,7 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid')
+        $('table').class('grid').style('margin-bottom:25mm;')
         // .style('font-size:0.9em;')
         .append(
           $('thead').append(
@@ -806,7 +807,7 @@ $().on('load', async e => {
               )
             ].concat(
               rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
-                $('td').text(row.artId),
+                $('td').text(row.artId ? row.artId.pad(5) : ''),
                 $('td').align('right').text(row.aantal),
                 $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
                 $('td').align('right').text(row.netto ? cur(row.netto) : ''),
@@ -842,7 +843,7 @@ $().on('load', async e => {
 
           ),
         ),
-        $('table').class('grid summary').style('position:absolute;bottom:25mm;width:100%;').append(
+        $('table').class('grid summary').style('position:absolute;bottom:0;width:100%;').append(
           $('thead').append(
             els.trh = $('tr'),
           ),
@@ -881,13 +882,13 @@ $().on('load', async e => {
     // const [clientInvoices,clientOrders,rows] = factuurData;
     // const [invoice] = clientInvoices;
     // const invoiceNr = invoice.nr;
-    // console.log(invoice);
-    const from = `invoice@${factuur.bedrijfCode.toLowerCase()}.nl`;
+    console.log(factuur);
+    const from = `invoice@${factuur.afzenderNaam.toLowerCase()}.nl`;
     const maildata = {
       from: from,
       bcc: from,
-      to: factuur.postadresMailadres,
       to: 'max.van.kampen@alicon.nl',
+      to: factuur.postadresMailadres,
       factuurId: factuur.id,
       chapters: [{
         title: `${factuur.afzenderNaam} factuur ${factuur.factuurNr} voor ${factuur.organisatieNaam}`,

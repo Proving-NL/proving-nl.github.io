@@ -113,10 +113,15 @@ div.header {
   font-size: 8mm;
   /* font-size:30mm; */
   display:inline-block;
-  height:16mm;
+  height:12mm;
   overflow:hidden;
 }
 
+th,td{
+  vertical-align: top;
+  text-align: left;
+}
 .datum,.facnr,.nr,.debnr {
   width: 26mm;
+  text-align: right;
 }

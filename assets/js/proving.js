@@ -11,6 +11,7 @@ $().on('message', data => {
 
 $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
+  const cssPrintUrl = 'https://proving-nl.aliconnect.nl/assets/css/print.css';
   console.log('AIM', aimClient, dmsClient, aim.config);
   let clientart = [];
   let clientName = '';
@@ -445,7 +446,7 @@ $().on('load', async e => {
   }
   function printElem(){
     return $('div').append(
-      $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
+      $('link').rel('stylesheet').href(cssPrintUrl),
       // $('link').rel('stylesheet').href('https://aliconnect.nl/sdk/src/css/web.css'),
     );
   }
@@ -666,9 +667,7 @@ $().on('load', async e => {
             ),
           ),
         ),
-        $('table').class('grid')
-        // .style('font-size:0.9em;')
-        .append(
+        $('table').class('grid').append(
           $('thead').append(
             $('tr').append(
               $('th').align('left').text('Art.nr.'),
@@ -914,15 +913,15 @@ $().on('load', async e => {
             `
           ),
         }],
-        attachements: [{
-          content: factuurElem.elem.innerHTML,
-          name: `${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.organisatieNaam}.pdf`.toLowerCase()
-        }]
-      };
-      console.log(factuur);
-      await dmsClient.api('/abis/factuurVerzenden').body(maildata).post().then(e => console.log(e));
-      // elem.remove();
-    }
+      attachements: [{
+        content: factuurElem.elem.innerHTML,
+        name: `${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.organisatieNaam}.pdf`.toLowerCase()
+      }]
+    };
+    console.log(factuur);
+    await dmsClient.api('/abis/factuurVerzenden').body(maildata).post().then(e => console.log(e));
+    // elem.remove();
+  }
   async function factureren(orders){
     // return console.error(salesorder, id);
     console.log(orders);
@@ -2008,6 +2007,62 @@ $().on('load', async e => {
     rows.push(row = {quant:1});
     calc();
   }
+
+  function inkooporder(bon,rows){
+    return $('div').class('brief order').append(
+      $('link').rel('stylesheet').href(cssPrintUrl),
+      $('table').append(
+        $('tr').append(
+          $('td').append(
+            $('div').text('Inkoop order').style('font-weight:bold;'),
+            $('div').class('bc').text(`*${bon.Id.pad(6)}*`),
+            $('div').text(bon.OrganisatieNaam).style('margin-top:10mm;font-weight:bold;'),
+            $('div').text(bon.BezoekAdres),
+          ),
+          $('td').style('width:65mm;').append(
+            $('div').text(bon.BedrijfOrganisatieNaam).style('font-weight:bold;'),
+            $('div').text(bon.BedrijfVoetTekst),
+          ),
+        )
+      ),
+      $('table').class('grid').append(
+        $('thead').append(
+          $('tr').append(
+            $('th').text('Ref. nr.'),
+            $('th').text('Cred. nr.'),
+            $('th').text('Datum'),
+          ),
+        ),
+        $('tbody').append(
+          $('tr').append(
+            $('td').text(bon.Id.pad(6)),
+            $('td').text(bon.LeverancierId),
+            $('td').text(new Date(bon.GeprintDatumTijd).toLocaleDateString()),
+          ),
+        ),
+      ),
+      $('table').class('grid').append(
+        $('thead').append(
+          $('tr').append(
+            $('th').class('nr').text('Aantal'),
+            $('th').text('Art.nr.'),
+            $('th').style('width:100%;').text('Omschrijving'),
+            $('th').text('MagLokatie'),
+          ),
+        ),
+        $('tbody').append(
+          rows.map(row => $('tr').append(
+            $('td').class('nr').text(row.Besteld),
+            $('td').text(row.LevCode),
+            $('td').style('white-space:normal;').text(row.Titel.replace(/\r|\n/g,'')),
+            $('td').text(row.MagLokatie),
+          )),
+        ),
+      ),
+    )
+
+  }
+
   aim.config.components.schemas.company.app = {
     nav: row => [
       $('button').class('abtn print').title('Printen').on('click', e => {
@@ -2069,6 +2124,124 @@ $().on('load', async e => {
         ),
       ),
     ]
+  }
+  aim.config.components.schemas.inkbon.app = {
+    nav: row => [
+      $('button').class('icn-print').title('Printen').on('click', async e => {
+        const [[bon],rows] = await dmsClient.api('/abis/inkbon').post({
+          id: row.id,
+          set: 'geprintDatumTijd = GETDATE()',
+        });
+        inkooporder(bon,rows).print().remove();
+      }),
+      $('button').class('icn-msexcel').title('Printen').on('click', async e => {
+        const [[bon],rows] = await dmsClient.api('/abis/inkbon').post({
+          id: row.id,
+        });
+        aim.downloadExcel({
+          Title: "Proving",
+          Subject: `Inkoop Opdracht ${bon.Id}`,
+          Author: "Proving Inkoop",
+          CreatedDate: new Date(),
+          sheets: [{
+            name: 'InkoopOpdracht',
+            cols: [
+              // {t:'n', wch:80, z:'0.0'},
+              {t:'n', wch:8, },
+              {t:'s', wch:8, },
+              {t:'s', wch:80, },
+            ],
+            rows: [
+              [{v:'Aantal'},{v:'Artikel'},{v:'Omschrijving'}],
+            ].concat(rows.map(row => [
+              {v: row.Besteld},
+              {v: row.LevCode},
+              {v: row.Titel},
+            ])),
+          }],
+        });
+      }),
+      $('button').class('icn-mail-send').title('Printen').on('click', async e => {
+        const [[bon],rows] = await dmsClient.api('/abis/inkbon').post({
+          id: row.id,
+        });
+        const elem = inkooporder(bon,rows);
+        const from = `invoice@proving.nl`;
+        const props = {
+          Title: "Proving",
+          Subject: `Inkoop Opdracht ${bon.Id}`,
+          Author: "Proving Inkoop",
+          CreatedDate: new Date(),
+          sheets: [{
+            name: 'InkoopOpdracht',
+            cols: [
+              // {t:'n', wch:80, z:'0.0'},
+              {t:'n', wch:8, },
+              {t:'s', wch:8, },
+              {t:'s', wch:80, },
+            ],
+            rows: [
+              [{v:'Aantal'},{v:'Artikel'},{v:'Omschrijving'}],
+            ].concat(rows.map(row => [
+              {v: row.Besteld},
+              {v: row.LevCode},
+              {v: row.Titel},
+            ])),
+          }],
+        };
+
+        // const wb = XLSX.utils.book_new();
+        // const {Title,Subject,Author,sheets} = props;
+        // wb.Props = {Title,Subject,Author,CreatedDate: new Date()};
+        // for (let sheet of sheets) {
+        //   wb.SheetNames.push(sheet.name);
+        //   const ws = XLSX.utils.aoa_to_sheet(sheet.rows);
+        //   ws['!cols'] = sheet.cols;
+        //   wb.Sheets[sheet.name] = ws;
+        // }
+        // const binary = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+        // // const base64 = btoa(unescape(encodeURIComponent(binary)));
+        const base64 = btoa(aim.createExcel(props));
+        // console.log(btoa(unescape(encodeURIComponent(binary))));
+        // var buf = new ArrayBuffer(binary.length); //convert s to arrayBuffer
+        // var view = new Uint8Array(buf);  //create uint8array as viewer
+        // for (var i=0; i<binary.length; i++) view[i] = binary.charCodeAt(i) & 0xFF; //convert to octet
+
+        // let buff = new Buffer(binary);
+        // let base64data = buff.toString('base64');
+        // console.log(String(view));
+        // return;
+
+        const maildata = {
+          // blob: base64,
+          from: from,
+          bcc: from,
+          to: 'max.van.kampen@alicon.nl',
+          chapters: [{
+            title: `Onze factuur`,
+            content: aim.markdown().render(
+              `Geachte heer / mevrouw,
+              `
+            ),
+          }],
+          attachements: [
+            {
+              content: elem.elem.innerHTML,
+              name: `inkoop-order.pdf`.toLowerCase(),
+              filename: `inkoop-order.pdf`.toLowerCase(),
+            },
+            {
+              base64: base64,
+              name: `inkoop-order.xlsx`.toLowerCase(),
+            },
+          ]
+        };
+        // console.log(excelBlob);
+        await dmsClient.api('/abis/mailVerzenden').body(maildata).post().then(e => console.log(e));
+
+        elem.remove();
+      }),
+    ],
   }
   aim.config.components.schemas.salesorderrow.app = {
     nav: row => [
@@ -2537,6 +2710,11 @@ $().on('load', async e => {
         $top: `100`,
       }),
       orderInvoer,
+      Inkoop: e => aim.list('inkbon',{
+        $filter: `gereedDatumTijd EQ NULL`,
+        $search: '',
+      }),
+
     },
     Administratie: {
       'Facturen Actueel': e => aim.list('invoice',{
@@ -2554,8 +2732,8 @@ $().on('load', async e => {
         lijstFactureren(orders);
       },
       Afas: {
-        'Export Facturen Airo': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=airo',
-        'Export Facturen Proving': e => document.location.href = 'https://aliconnect.nl/api/abis/data?request_type=afas_boek_export&bedrijf=proving',
+        'Export Facturen Airo': e => document.location.href = 'https://dms.aliconnect.nl/api/v1/abis/getAfasFactuurExport?bedrijf=airo',
+        'Export Facturen Proving': e => document.location.href = 'https://dms.aliconnect.nl/api/v1/abis/getAfasFactuurExport?bedrijf=proving',
         'Import'() {
           $('input').type('file').multiple(false).accept('.xlsx').on('change', e => importFiles(e.target.files)).click().remove()
         },

@@ -765,6 +765,7 @@ $().on('load', async e => {
             els.trh = $('tr').append(
               $('th').style('text-align:left;white-space:nowrap;').text('Klant nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Factuur nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Document nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Deb.nr.'),
               $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Deb. BTW nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Datum'),
@@ -773,6 +774,7 @@ $().on('load', async e => {
           $('tbody').append(
             els.trb = $('tr').append(
               $('td').text(factuur.klantId),
+              $('td').text(factuur.factuurNr),
               $('td').text(factuur.id),
               $('td').text(factuur.klantDebNr),
               $('td').text(factuur.klantBtwNr),

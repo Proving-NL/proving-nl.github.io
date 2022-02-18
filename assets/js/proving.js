@@ -899,22 +899,38 @@ $().on('load', async e => {
           Hierbij ontvangt ${factuur.organisatieNaam} een factuur aangaande de door ${factuur.afzenderOrganisatieNaam} geleverde goederen.
 
           Voor automatische verwerking van uw digitale facturen is uw factuur bijgevoegd als bijlage.
-          Wij willen u graag erop attenderen dat digitale factuurbestanden gedurende zeven jaar bewaard dienen te worden.
+          Wij willen u erop attenderen dat digitale factuurbestanden gedurende zeven jaar bewaard dienen te worden.
           Meer informatie vindt u op [belastingdienst.nl](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/administratie_bijhouden/administratie_bewaren/administratie_bewaren).
-            Het bewaren van (alleen) een afdruk van de digitaal ontvangen facturen op papier is niet voldoende,
-            U dient uw digitale factuur ook digitaal te bewaren.
+          Het bewaren van (alleen) een afdruk van de digitaal ontvangen facturen op papier is niet voldoende,
+          U dient uw digitale factuur ook digitaal te bewaren.
 
-            Voor eventuele vragen over de factuur kunt u zich richten tot onze financiële administratie
-            via e-mail: [administratie@${factuur.afzenderNaam}.nl](mailto:administratie@${factuur.afzenderNaam}.nl?SUBJECT=Vraag over factuur ${factuur.factuurNr}&BODY=Beste administratie,%0A%0ANamens ${factuur.organisatieNaam} heb ik een vraag aangaande factuur ${factuur.factuurNr}: ... ?%0A%0AMet vriendelijke groet,%0A${factuur.organisatieNaam})
-            of telefonisch: ${factuur.afzenderTelefoon}
+          Voor eventuele vragen over de factuur kunt u zich richten tot onze financiële administratie
+          via e-mail: [administratie@${factuur.afzenderNaam}.nl](mailto:administratie@${factuur.afzenderNaam}.nl?SUBJECT=Vraag over factuur ${factuur.factuurNr}&BODY=Beste administratie,%0A%0ANamens ${factuur.organisatieNaam} heb ik een vraag aangaande factuur ${factuur.factuurNr}: ... ?%0A%0AMet vriendelijke groet,%0A${factuur.organisatieNaam})
+          of telefonisch: ${factuur.afzenderTelefoon}
 
-            Indien U vragen heeft over de geleverde artikelen kunt u contact opnemen
-            via e-mail: [verkoop@${factuur.afzenderNaam}.nl](mailto:verkoop@${factuur.afzenderNaam}.nl?SUBJECT=Inhoudelijke vragen over factuur ${factuur.factuurNr}&BODY=Beste administratie,%0A%0ANamens ${factuur.organisatieNaam} heb ik een vraag aangaande factuur ${factuur.factuurNr}: ... ?%0A%0AMet vriendelijke groet,%0A${factuur.organisatieNaam})
+          Indien U vragen heeft over de geleverde artikelen kunt u contact opnemen
+          via e-mail: [verkoop@${factuur.afzenderNaam}.nl](mailto:verkoop@${factuur.afzenderNaam}.nl?SUBJECT=Inhoudelijke vragen over factuur ${factuur.factuurNr}&BODY=Beste administratie,%0A%0ANamens ${factuur.organisatieNaam} heb ik een vraag aangaande factuur ${factuur.factuurNr}: ... ?%0A%0AMet vriendelijke groet,%0A${factuur.organisatieNaam})
 
-            Met vriendelijke groet,  \nAdministratie  \n${factuur.afzenderOrganisatieNaam}
-            `
-          ),
-        }],
+          Met vriendelijke groet,  \nAdministratie  \n${factuur.afzenderOrganisatieNaam}
+          `
+        ),
+        // content: aim.markdown().render(`
+        //   Geachte heer / mevrouw,
+        //
+        //   Tot onze spijt is op de laatste factuur een verkeerd factuur nummer afgedrukt.
+        //   Het betreft de factuur met de vermelding Factuur nr. <b>${factuur.id}</b>. Dit is echter ons interne document nr.
+        //   Hierbij ontvangt u nogmaals de factuur maar dan met het juiste factuur nr. <b>${factuur.factuurNr}</b>.
+        //   Gelieve dit document in uw boekhouding te verwerken.
+        //
+        //   Wij willen u erop attenderen dat digitale factuurbestanden gedurende zeven jaar bewaard dienen te worden.
+        //   Meer informatie vindt u op [belastingdienst.nl](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/administratie_bijhouden/administratie_bewaren/administratie_bewaren).
+        //   Het bewaren van (alleen) een afdruk van de digitaal ontvangen facturen op papier is niet voldoende,
+        //   U dient uw digitale factuur ook digitaal te bewaren.
+        //
+        //   Met vriendelijke groet,  \nAdministratie  \n${factuur.afzenderOrganisatieNaam}
+        //   `
+        // ),
+      }],
       attachements: [{
         content: factuurElem.elem.innerHTML,
         name: `${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.organisatieNaam}.pdf`.toLowerCase()
@@ -1436,7 +1452,7 @@ $().on('load', async e => {
     }
     // return;
     // console.log(allrows);
-    allrows = allrows.filter(entry => entry[0].leverancier && entry[0].bestelCode);
+    allrows = allrows.filter(entry => entry[0].leverancierId && entry[0].bestelCode);
     // console.log(allrows);
     var max = allrows.length;
     var i = 0;
@@ -1446,7 +1462,7 @@ $().on('load', async e => {
     const title = document.title;
     for (var [row,tab] of allrows) {
       // $('span.main').text(max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.code, row.description);
-      const infoTekst = [max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.leverancier, row.bestelCode].join(', ');
+      const infoTekst = [max + ':' + i, Math.round(i/max*100) + '%', tab.tabname, row.leverancierId, row.bestelCode].join(', ');
       $('span.main').text(infoTekst);
       console.log(infoTekst);
       document.title = [title,row.leverancier,Math.round(i/max*100) + '%'].join(' ');

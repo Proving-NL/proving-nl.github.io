@@ -122,6 +122,6 @@ th,td{
   text-align: left;
 }
 .datum,.facnr,.nr,.debnr {
-  width: 26mm;
+  /* width: 26mm; */
   text-align: right;
 }

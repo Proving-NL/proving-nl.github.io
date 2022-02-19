@@ -787,11 +787,11 @@ $().on('load', async e => {
         .append(
           $('thead').append(
             $('tr').append(
-              $('th').align('left').text('Art.nr.'),
-              $('th').align('right').text('Aantal'),
-              $('th').align('left').style('width:100%;').text('Omschrijving'),
-              $('th').align('right').text('Prijs'),
-              $('th').align('right').text('Totaal'),
+              $('th').text('Art.nr.'),
+              $('th').class('nr').text('Aantal'),
+              $('th').style('width:100%;').text('Omschrijving'),
+              $('th').class('nr').text('Prijs'),
+              $('th').class('nr').text('Totaal'),
             ),
           ),
           $('tbody').append(
@@ -809,10 +809,10 @@ $().on('load', async e => {
             ].concat(
               rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artId ? row.artId.pad(5) : ''),
-                $('td').align('right').text(row.aantal),
+                $('td').class('nr').text(row.aantal),
                 $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
-                $('td').align('right').text(row.netto ? cur(row.netto) : ''),
-                $('td').align('right').text(row.totaal ? cur(row.totaal) : ''),
+                $('td').class('nr').text(row.netto ? cur(row.netto) : ''),
+                $('td').class('nr').text(row.totaal ? cur(row.totaal) : ''),
               )),
 
               // !Number(invoice.vrachtKost) ? null : $('tr').append(
@@ -864,13 +864,13 @@ $().on('load', async e => {
     //   els.trh.append($('th').align('right').style('width:20mm;').text(`Korting ${invoice.kortContantProc}%`));
     //   els.trb.append($('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)));
     // }
-    els.trh.append($('th').align('right').style('width:20mm;').text(`Excl`));
-    els.trb.append($('td').align('right').style('width:20mm;').text(cur(factuur.totExcl)));
+    els.trh.append($('th').class('nr').style('width:20mm;').text(`Excl`));
+    els.trb.append($('td').class('nr').style('width:20mm;').text(cur(factuur.totExcl)));
 
-    els.trh.append($('th').align('right').style('width:20mm;').text(`Btw ${factuur.btw}%`));
-    els.trb.append($('td').align('right').text(cur(factuur.totBtw)));
-    els.trh.append($('th').align('right').style('width:20mm;').text(`TE BETALEN`));
-    els.trb.append($('td').align('right').append($('b').text(cur(factuur.totIncl))));
+    els.trh.append($('th').class('nr').style('width:20mm;').text(`Btw ${factuur.btw}%`));
+    els.trb.append($('td').class('nr').text(cur(factuur.totBtw)));
+    els.trh.append($('th').class('nr').style('width:20mm;').text(`TE BETALEN`));
+    els.trb.append($('td').class('nr').append($('b').text(cur(factuur.totIncl))));
     // if (betaald) {
     //   els.trh.append($('th').align('right').text(`Voldaan`));
     //   els.trb.append($('td').align('right').text(cur(betaald)));

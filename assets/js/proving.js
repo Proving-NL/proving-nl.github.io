@@ -2713,7 +2713,7 @@ $().on('load', async e => {
       // }),
       Alles: e => aim.list('salesorder',{
         $order: `id DESC`,
-        $top: 100,
+        $top: 1000,
         $search: '',
       }),
       // Factureren: e => aim.list('salesorder',{
@@ -2742,6 +2742,7 @@ $().on('load', async e => {
       }),
       'Facturen Alles': e => aim.list('invoice',{
         $order: `id DESC`,
+        $top: 1000,
         $search: '',
       }),
       async Factureren(){

@@ -603,7 +603,9 @@ $().on('load', async e => {
               $('td'),
               $('td').style('white-space:normal;').colspan(8).append(
                 // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
-                $('div').text(String(row.bonomschrijving).replace(/\r|\n/g,'')),
+                $('div').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
+                $('div').text(String(row.extratekstIntern||'')).style('background:yellow;'),
+                // $('div').style('font-style:italic;color:red;').text(String(row.rglomschrijving||'').replace(/\r|\n/g,'')),
                 // $('div').style('font-size:0.7em').text(String(row.omschrijving).replace(/\r|\n/g,'')),
                 // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
               ),
@@ -810,7 +812,10 @@ $().on('load', async e => {
               rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artId ? row.artId.pad(5) : ''),
                 $('td').class('nr').text(row.aantal),
-                $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
+                $('td').style('white-space:normal;').append(
+                  row.rglomschrijving.replace(/\r|\n/g,''),
+                  // $('div').style('font-style:italic;').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
+                ),
                 $('td').class('nr').text(row.netto ? cur(row.netto) : ''),
                 $('td').class('nr').text(row.totaal ? cur(row.totaal) : ''),
               )),

@@ -2990,122 +2990,126 @@ $().on('load', async e => {
         });
       },
       Opslag() {
+        let locatie='';
         $(document.body).text('').append(
           $('style').text('input{text-align:right;font:inherit;}'),
           $('div').style('font-size:20px;').append(
             $('div').append(
-              $('input').style('font-size:20px;').on('keyup', e => {
+              $('input').style('font-size:20px;').on('keyup', async e => {
                 if (e.code === 'Enter') {
                   e.target.select();
-                  dmsClient.api('/abis/storage').query({search:e.target.value}).get().then(data => {
-                    console.log(data);
-                    const [arts] = data;
-                    arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
-                    arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
-                    // arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
-                    // arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
-                    var k='';
-                    var to;
-                    $('.data').text('').append(
-                      arts.map((a,i) => [
-                        $('div').text(a.prodTitle),
-                        $('div').append(
-                          $('input')
-                          .style('width: 120px;')
-                          .value(a.loc)
-                          .type('number')
-                          .step(1)
-                          .placeholder('locatie')
-                          .on('change', e => {
-                            dmsClient.api('/abis/storage').post({
-                              id: a.id,
-                              name: name,
-                              value: e.target.value,
-                            });
-                          }),
-                          $('input').value(a.ean)
-                          .type('number')
-                          .placeholder('ean')
-                          .step(1)
-                          .on('change', e => {
-                            dmsClient.api('/abis/storage')
-                            .post({
-                              id: a.id,
-                              name: 'ean',
-                              value: e.target.value,
-                            });
-                          }),
-                          $('input')
-                          .style('width: 80px;')
-                          .value(a.stock)
-                          .type('number')
-                          .placeholder('aantal')
-                          .on('change', e => {
-                            dmsClient.api('/abis/storage')
-                            .post({
-                              id: a.id,
-                              name: 'stock',
-                              value: e.target.value,
-                            });
-                          }),
-                          $('input')
-                          .style('width: 80px;')
-                          .value(a.inh)
-                          .type('number')
-                          .placeholder('inh')
-                          .on('change', e => {
-                            dmsClient.api('/abis/storage')
-                            .post({
-                              id: a.id,
-                              name: 'inh',
-                              value: e.target.value,
-                            })
-                          }),
-                          $('input')
-                          .style('width: 80px;')
-                          .value(a.voc)
-                          .type('number')
-                          .placeholder('voc')
-                          .on('change', e => {
-                            dmsClient.api('/abis/storage')
-                            .post({
-                              id: a.id,
-                              name: 'voc',
-                              value: e.target.value,
-                            })
-                          }),
-                          $('input')
-                          .style('width: 80px;')
-                          .value(a.gewicht)
-                          .type('number')
-                          .placeholder('gewicht')
-                          .on('change', e => {
-                            dmsClient.api('/abis/storage')
-                            .post({
-                              id: a.id,
-                              name: 'gewicht',
-                              value: e.target.value,
-                            })
-                          }),
-                          // $('input')
-                          // .style('width: 80px;')
-                          // .value(a.vosPerEenh)
-                          // .type('number')
-                          // .placeholder('VOS/Eenheid')
-                          // .on('change', e => {
-                          //   dmsClient.api('/abis/storageSave')
-                          //   .post({
-                          //     id: a.id,
-                          //     name: 'vosPerEenh',
-                          //     value: e.target.value,
-                          //   })
-                          // }),
-                        )
-                      ]),
-                    )
-                  });
+                  if (e.target.value.length===8) {
+                    $('div.locatie').text(locatie = e.target.value);
+                  }
+                  const data = await dmsClient.api('/abis/storage').query({search:e.target.value,locatie:locatie}).get();
+                  console.log (data);
+                  const [arts] = data;
+                  // arts.forEach(a=>a.artNr = a.artNr||a.prodArtNr||a.orderCode);
+                  // arts.forEach(a=>a.locCode = locCode(a.prodStorageLocation||a.storageLocation||''));
+                  // arts.sort((a,b)=>a.artNr.localeCompare(b.artNr));
+                  // arts.sort((a,b)=>a.locCode.localeCompare(b.locCode));
+                  var k='';
+                  var to;
+                  $('.data').text('').append(
+                    arts.map((a,i) => [
+                      $('div').text(a.Id, a.Eenheid, a.AantalStuks, a.Titel),
+                      $('div').append(
+                        $('input')
+                        .style('width: 120px;')
+                        .value(String(a.MagLokatie,'').replace(/\./g,''))
+                        .type('number')
+                        .step(1)
+                        .placeholder('MagLokatie')
+                        .on('change', e => {
+                          dmsClient.api('/abis/storage').post({
+                            id: a.id,
+                            name: name,
+                            value: e.target.value,
+                          });
+                        }),
+                        $('input').value(a.Barcode)
+                        .type('number')
+                        .placeholder('ean')
+                        .step(1)
+                        .on('change', e => {
+                          dmsClient.api('/abis/storage')
+                          .post({
+                            id: a.id,
+                            name: 'Barcode',
+                            value: e.target.value,
+                          });
+                        }),
+                        $('input')
+                        .style('width: 80px;')
+                        .value(a.Inhoud)
+                        .type('number')
+                        .placeholder('inh')
+                        .on('change', e => {
+                          dmsClient.api('/abis/storage')
+                          .post({
+                            id: a.id,
+                            name: 'Inhoud',
+                            value: e.target.value,
+                          })
+                        }),
+                        $('input')
+                        .style('width: 80px;')
+                        .value(a.Voorraad)
+                        .type('number')
+                        .placeholder('aantal')
+                        .on('change', e => {
+                          dmsClient.api('/abis/storage')
+                          .post({
+                            id: a.id,
+                            name: 'Voorraad',
+                            value: e.target.value,
+                          });
+                        }),
+                        // $('input')
+                        // .style('width: 80px;')
+                        // .value(a.voc)
+                        // .type('number')
+                        // .placeholder('voc')
+                        // .on('change', e => {
+                        //   dmsClient.api('/abis/storage')
+                        //   .post({
+                        //     id: a.id,
+                        //     name: 'voc',
+                        //     value: e.target.value,
+                        //   })
+                        // }),
+                        // $('input')
+                        // .style('width: 80px;')
+                        // .value(a.gewicht)
+                        // .type('number')
+                        // .placeholder('gewicht')
+                        // .on('change', e => {
+                        //   dmsClient.api('/abis/storage')
+                        //   .post({
+                        //     id: a.id,
+                        //     name: 'gewicht',
+                        //     value: e.target.value,
+                        //   })
+                        // }),
+                        // $('input')
+                        // .style('width: 80px;')
+                        // .value(a.vosPerEenh)
+                        // .type('number')
+                        // .placeholder('VOS/Eenheid')
+                        // .on('change', e => {
+                        //   dmsClient.api('/abis/storageSave')
+                        //   .post({
+                        //     id: a.id,
+                        //     name: 'vosPerEenh',
+                        //     value: e.target.value,
+                        //   })
+                        // }),
+                      )
+                    ]),
+                  )
                 }
               }),
+              $('div').class('locatie'),
               $('div').class('data'),
             ),
           )
@@ -3577,6 +3581,18 @@ $().on('load', async e => {
       },
     },
     Abis: {
+      async HernoemProducten() {
+        const [keywords,products] = await dmsClient.api('/abis/keywords').get();
+        // for (product of products) {
+        //   console.log(product.Product);
+        //   // await dmsClient.api('/abis/keywords').post({product:product.product});
+        // }
+        for (keyword of keywords) {
+          console.log(keyword.Keyword);
+          await dmsClient.api('/abis/keywords').post({keyword:keyword.Keyword});
+          // return
+        }
+      },
       Producten() {
         aim.list('prod');
       },

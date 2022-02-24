@@ -674,6 +674,7 @@ $().on('load', async e => {
             $('tr').append(
               $('th').align('left').text('Art.nr.'),
               $('th').align('right').text('Aantal'),
+              $('th').align('right').text('Verpakking'),
               $('th').align('left').style('width:100%;').text('Omschrijving'),
               $('th').align('right').text('VOS/st.'),
             ),
@@ -682,7 +683,8 @@ $().on('load', async e => {
             rows.sort((a,b) => a.id - b.id).map(row => $('tr').append(
               $('td').text(row.artId ? row.artId.pad(5) : ''),
               $('td').align('right').text(row.aantal),
-              $('td').style('white-space:normal;').text(row.bonomschrijving.replace(/\r|\n/g,'')),
+              $('td').align('right').text(row.eenheid),
+              $('td').style('white-space:normal;').text(row.rglomschrijving.replace(/\r|\n/g,'')),
               // $('td').text(row.title).style('white-space:normal;'),
               $('td').align('right').text(row.voswaarde),
             )),
@@ -791,6 +793,7 @@ $().on('load', async e => {
             $('tr').append(
               $('th').text('Art.nr.'),
               $('th').class('nr').text('Aantal'),
+              $('th').class('nr').text('Verpakking'),
               $('th').style('width:100%;').text('Omschrijving'),
               $('th').class('nr').text('Prijs'),
               $('th').class('nr').text('Totaal'),
@@ -800,7 +803,7 @@ $().on('load', async e => {
             ...orders.map(salesorder => [
               $('tr').append(
                 $('td')
-                .colspan(5)
+                .colspan(6)
                 .align('left')
                 .text([
                   `Leverbon: ${salesorder.id}`,
@@ -812,6 +815,7 @@ $().on('load', async e => {
               rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artId ? row.artId.pad(5) : ''),
                 $('td').class('nr').text(row.aantal),
+                $('td').text(row.eenheid),
                 $('td').style('white-space:normal;').append(
                   row.rglomschrijving.replace(/\r|\n/g,''),
                   // $('div').style('font-style:italic;').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
@@ -893,8 +897,8 @@ $().on('load', async e => {
     const maildata = {
       from: from,
       bcc: from,
-      to: 'max.van.kampen@alicon.nl',
       to: factuur.postadresMailadres,
+      to: 'max.van.kampen@alicon.nl',
       factuurId: factuur.id,
       chapters: [{
         title: `${factuur.afzenderNaam} factuur ${factuur.factuurNr} voor ${factuur.organisatieNaam}`,

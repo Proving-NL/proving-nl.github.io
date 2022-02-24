@@ -1,3 +1,6 @@
+# Training
+1. Kolom namen
+2. Bruto korting geen netto in orderregels, netto read only
 
 
 

@@ -124,13 +124,13 @@ $().on('load', async e => {
             <b>${contact.clientCompanyname}</b>
             </td></tr>
             <tr style='font-size:8pt;'>
-            <th>Art.nr.</th>
+            <th>Bestelnr.</th>
+            <th>Code</th>
+            <th>Artikel</th>
             <th width=100%>Omschrijving</th>
+            <th>Inhoud</th>
 
-            <th style='text-align:right;'>VA</th>
             <th style='text-align:right;'>Bruto</th>
-            <th style='text-align:right;'>Korting</th>
-            <th style='text-align:right;'>Netto</th>
             </tr>`
           ),
           $('tbody').style('font-size:8pt;'),
@@ -140,17 +140,21 @@ $().on('load', async e => {
       function printRow(row) {
         $('table>tbody').append(
           $('tr').append(
-            $('td').text(row.artNr),
+            $('td').append('<b>'+row.artNr+'</b>'),
+            $('td').text(row.code),
+            $('td').text(row.bestelcode),
+            // $('td').text(row.code),
             // $('td').text(row.merk),
             // $('td').text(row.code),
             $('td').style('white-space:normal;').text(row.tekst.replace(/\n|\r/g,'')),
 
             // $('td').align('right').text(row.kortingCode),
+            $('td').align('right').text(row.inhoud),
 
-            $('td').align('right').text(row.verpaktPer),
+            // $('td').align('right').text(row.verpaktPer),
             $('td').align('right').text(aim.num(row.bruto)),
-            $('td').align('right').text(`${aim.num(row.korting,0)}%`),
-            $('td').align('right').text(aim.num(row.netto)),
+            // $('td').align('right').text(`${aim.num(row.korting,0)}%`),
+            // $('td').align('right').text(aim.num(row.netto)),
           )
         )
       }

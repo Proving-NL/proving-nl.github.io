@@ -734,6 +734,7 @@ $().on('load', async e => {
     console.log('done',factuur, orders, rows);
     const [order] = orders;
     if (!order) return alert('FACTUUR HEEFT GEEN PAKBONNEN');
+    if (rows.some(row => row.aantal !== null && !row.bruto)) return alert('FACTUUR HEEFT LEGE REGELS');
 
     // rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     const mailtext = ''; // Exta tekst op mail naar klant
@@ -951,12 +952,12 @@ $().on('load', async e => {
   }
   async function factureren(orders){
     // return console.error(salesorder, id);
-    console.log(orders);
+    // console.log(orders);
     const [[rowfactuur]] = await dmsClient.api('/abis/factuurNieuw').post({
       ordernummers: orders,
     });
     const {id} = rowfactuur;
-    console.log(id, rowfactuur, orders);
+    // console.log(id, rowfactuur, orders);
     // const [bedrijven] = data;
     // const [accountCompany] = bedrijven;
     // const invoiceNr = accountCompany.invoiceNr;
@@ -965,7 +966,7 @@ $().on('load', async e => {
     // const [clientInvoices,clientOrders,rows] = factuurData;
     // const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
-    if (rowfactuur.postadresMailadres) {
+    if (false && rowfactuur.postadresMailadres) {
       await sendInvoice(factuurElem, rowfactuur);
     } else {
       facturenElem.append(factuurElem.style('page-break-after:always;'))

@@ -36,6 +36,9 @@ $().on('load', async e => {
   if (contact_id) {
     localStorage.setItem('contact_id', contact_id);
     const [[contact],organisatieMerk] = await dmsClient.api('/abis/contact').query('contact_id', contact_id).get();
+    const prijslijsten = [
+      { id: 3, titel: 'Airo', },
+    ];
     console.log('C', contact, organisatieMerk);
     clientName = contact.klantId;
 
@@ -103,7 +106,7 @@ $().on('load', async e => {
       $('a').download(`${contact.clientName.toLowerCase()}-${title.toLowerCase()}.xlsx`).rel('noopener').href(URL.createObjectURL(new Blob([aim.s2ab(wbout)],{type:"application/octet-stream"}))).click().remove();
     }
 
-    function printPrijslijst(rows,merk) {
+    function printPrijslijst(rows,prijslijstId) {
       console.log(555,rows);
       const elem = $('div').parent(document.body).append(
         // $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
@@ -118,17 +121,19 @@ $().on('load', async e => {
           $('thead').append(
             `<tr><td colspan=6 style='height:20mm;'>
             <span style='float:left;display:inline-block;width:50mm;height:20mm;margin-right:5mm;background:url(https://airo-nl.aliconnect.nl/assets/img/letter-header-airo.png) no-repeat'></span>
-            <b>AIRO Nederland - PRIJSLIJST ${merk} ${new Date().toLocaleDateString()}</b><br>
+            <b>AIRO Nederland - PRIJSLIJST ${new Date().toLocaleDateString()}</b><br>
             Prijzen in EURO excl BTW<br>
             Het Ambacht 42 - Westervoort - T: 026-312 09 47 - info@airo.nl - www.airo.nl<br>
             <b>${contact.clientCompanyname}</b>
             </td></tr>
             <tr style='font-size:8pt;'>
             <th>Bestelnr.</th>
+            <th>Merk</th>
             <th>Code</th>
             <th>Artikel</th>
             <th width=100%>Omschrijving</th>
-            <th>Inhoud</th>
+            <th alig=right>Inh.</th>
+            <th>Eenh.</th>
 
             <th style='text-align:right;'>Bruto</th>
             </tr>`
@@ -140,16 +145,18 @@ $().on('load', async e => {
       function printRow(row) {
         $('table>tbody').append(
           $('tr').append(
-            $('td').append('<b>'+row.artNr+'</b>'),
+            $('td').append('<b>'+row.nr+'</b>'),
+            $('td').text(row.merk),
             $('td').text(row.code),
-            $('td').text(row.bestelcode),
+            $('td').text(row.levcode),
             // $('td').text(row.code),
             // $('td').text(row.merk),
             // $('td').text(row.code),
-            $('td').style('white-space:normal;').text(row.tekst.replace(/\n|\r/g,'')),
+            $('td').style('white-space:normal;').text(row.proptekst),
 
             // $('td').align('right').text(row.kortingCode),
             $('td').align('right').text(row.inhoud),
+            $('td').text(row.inhoudEenheid),
 
             // $('td').align('right').text(row.verpaktPer),
             $('td').align('right').text(aim.num(row.bruto)),
@@ -300,19 +307,17 @@ $().on('load', async e => {
       // ),
 
       $('ul').append(
-        organisatieMerk.map(om => om.merk).unique().map(merk => $('li').text('Prijslijst', merk, '').append(
+        prijslijsten.map(prijslijst => $('li').text('Prijslijst', prijslijst.titel, '').append(
           $('a').href('#').text('printen').on('click', async e => {
-            const [rows] = await dmsClient.api('/abis/prijslijstklant').query({klant_id:contact.clientId, merk:merk}).get();
+            const [rows] = await dmsClient.api('/abis/prijslijstklant').query({klant_id:contact.clientId, prijslijstId:prijslijst.id}).get();
             // const [rows] = await fetch('https://dms.aliconnect.nl/api/v1/abis/prijslijstklant?klant_id='+contact.clientId).then(res => res.json());
             // console.log(rows);
-            printPrijslijst(rows, merk);
+            printPrijslijst(rows, prijslijst.id);
           }),
           ', ',
           $('a').href('#').text('xls').on('click', async e => {
-            const [rows] = await dmsClient.api('/abis/prijslijstklant').query({klant_id:contact.clientId, merk:merk}).get();
-            // const [rows] = await fetch('https://dms.aliconnect.nl/api/v1/abis/prijslijstklant?klant_id='+contact.clientId).then(res => res.json());
-            // console.log(rows);
-            excellijst(rows, merk, [
+            const [rows] = await dmsClient.api('/abis/prijslijstklant').query({klant_id:contact.clientId, prijslijstId:prijslijst.id}).get();
+            excellijst(rows, prijslijst.id, [
               { n: 'artNr', v: 'ArtNr', wch: 8, f:{t:'s'} },
               { n: 'aantal', v: 'Aantal', wch: 8 },
               { n: 'tekst', v: 'Omschrijving', wch: 100 },

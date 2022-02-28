@@ -874,9 +874,17 @@ $().on('load', async e => {
     //   els.trh.append($('th').align('right').style('width:20mm;').text(`Korting ${invoice.kortContantProc}%`));
     //   els.trb.append($('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)));
     // }
-    els.trh.append($('th').class('nr').style('width:20mm;').text(`Excl`));
-    els.trb.append($('td').class('nr').style('width:20mm;').text(cur(factuur.totExcl)));
 
+    if (factuur.totKortingContant) {
+      els.trh.append($('th').class('nr').style('width:20mm;').text(`Totaal`));
+      els.trb.append($('td').class('nr').style('width:20mm;').text(cur(factuur.tot)));
+
+      els.trh.append($('th').class('nr').style('width:30mm;').text(`Korting Contant ${factuur.kortContant}%`));
+      els.trb.append($('td').class('nr').text(cur(factuur.totKortingContant)));
+    }
+
+    els.trh.append($('th').class('nr').style('width:20mm;').text(`Totaal Excl.`));
+    els.trb.append($('td').class('nr').style('width:20mm;').text(cur(factuur.totExcl)));
     els.trh.append($('th').class('nr').style('width:20mm;').text(`Btw ${factuur.btw}%`));
     els.trb.append($('td').class('nr').text(cur(factuur.totBtw)));
     els.trh.append($('th').class('nr').style('width:20mm;').text(`TE BETALEN`));

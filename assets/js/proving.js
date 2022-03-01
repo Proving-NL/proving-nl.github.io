@@ -733,7 +733,7 @@ $().on('load', async e => {
     const [[factuur], orders, rows] = await dmsClient.api('/abis/factuur').post({id: factuurId});
     console.log('done',factuur, orders, rows);
     const [order] = orders;
-    if (!order) return alert('FACTUUR HEEFT GEEN PAKBONNEN');
+    if (!order) alert('FACTUUR HEEFT GEEN PAKBONNEN');
     if (rows.some(row => row.aantal !== null && !row.bruto)) alert('FACTUUR HEEFT LEGE REGELS');
 
     // rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));

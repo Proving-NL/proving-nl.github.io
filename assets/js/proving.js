@@ -734,7 +734,7 @@ $().on('load', async e => {
     console.log('done',factuur, orders, rows);
     const [order] = orders;
     if (!order) return alert('FACTUUR HEEFT GEEN PAKBONNEN');
-    if (rows.some(row => row.aantal !== null && !row.bruto)) return alert('FACTUUR HEEFT LEGE REGELS');
+    if (rows.some(row => row.aantal !== null && !row.bruto)) alert('FACTUUR HEEFT LEGE REGELS');
 
     // rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     const mailtext = ''; // Exta tekst op mail naar klant

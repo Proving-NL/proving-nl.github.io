@@ -906,8 +906,8 @@ $().on('load', async e => {
     const maildata = {
       from: from,
       bcc: from,
-      to: factuur.postadresMailadres,
       to: 'max.van.kampen@alicon.nl',
+      to: factuur.postadresMailadres,
       factuurId: factuur.id,
       chapters: [{
         title: `${factuur.afzenderNaam} factuur ${factuur.factuurNr} voor ${factuur.organisatieNaam}`,

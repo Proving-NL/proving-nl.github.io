@@ -875,7 +875,7 @@ $().on('load', async e => {
     //   els.trb.append($('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)));
     // }
 
-    if (factuur.totKortingContant) {
+    if (Number(factuur.totKortingContant)) {
       els.trh.append($('th').class('nr').style('width:20mm;').text(`Totaal`));
       els.trb.append($('td').class('nr').style('width:20mm;').text(cur(factuur.tot)));
 

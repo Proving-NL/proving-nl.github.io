@@ -2776,7 +2776,7 @@ $().on('load', async e => {
     },
     Administratie: {
       'Facturen Actueel': e => aim.list('invoice',{
-        $filter: `saldo NE 0`,
+        $filter: `saldo NE 0 OR geboektDatumTijd EQ NULL`,
         $order: `id DESC`,
         $search: '*',
       }),

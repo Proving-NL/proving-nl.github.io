@@ -2374,7 +2374,7 @@ $().on('load', async e => {
   aim.config.components.schemas.invoice.app = {
     nav: row => [
       $('button').class('abtn print').title('Print').on('click', e => toonFactuur(row)),
-      row.verstuurdDatumTijd ? null : $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
+      row.verstuurdDatumTijd || row.printDatumTijd ? null : $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
 
       !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.id), row)),
     ],

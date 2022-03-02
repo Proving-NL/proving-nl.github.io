@@ -13,9 +13,14 @@ $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
   const cssPrintUrl = 'https://proving-nl.aliconnect.nl/assets/css/print.css';
   console.log('AIM', aimClient, dmsClient, aim.config);
+
   let clientart = [];
   let clientName = '';
   let mandregels = [];
+  let factuurData;
+  let facturenElem;
+  let factuur,orders,row;
+
   aim.listselector = 'product';
   async function selectClient(name){
     localStorage.setItem('clientName', clientName = name);
@@ -76,8 +81,6 @@ $().on('load', async e => {
 
   if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
   // localStorage.clear();
-  let factuurData;
-  let facturenElem;
   const transportOptions = [
     { title: 'Niet ingevuld', style: 'color:red;', },
     { title: 'Post', style: 'background-color:orange;', },
@@ -728,13 +731,13 @@ $().on('load', async e => {
     if (!rows.length) alert('Order bevat geen regels');
     return await orderPage(salesorder,rows);
   }
-  async function factuur(factuurId) {
+  async function getfactuur(factuurId) {
     console.log('FACTUUR',factuurId);
-    const [[factuur], orders, rows] = await dmsClient.api('/abis/factuur').post({id: factuurId});
+    [[factuur], orders, rows] = await dmsClient.api('/abis/factuur').post({id: factuurId});
     console.log('done',factuur, orders, rows);
     const [order] = orders;
-    if (!order) alert('FACTUUR HEEFT GEEN PAKBONNEN');
-    if (rows.some(row => row.aantal !== null && !row.bruto)) alert('FACTUUR HEEFT LEGE REGELS');
+    // if (!order) alert('FACTUUR HEEFT GEEN PAKBONNEN');
+    // if (rows.some(row => row.aantal !== null && !row.bruto)) alert('FACTUUR HEEFT LEGE REGELS');
 
     // rows.sort((a,b) => a.createdDateTime.localeCompare(b.createdDateTime));
     const mailtext = ''; // Exta tekst op mail naar klant
@@ -969,7 +972,12 @@ $().on('load', async e => {
     // const [bedrijven] = data;
     // const [accountCompany] = bedrijven;
     // const invoiceNr = accountCompany.invoiceNr;
-    const factuurElem = await factuur(id);
+    const factuurElem = await getfactuur(id);
+    await dmsClient.api('/abis/factuurOpslaan').body({
+      id: row.id,
+      content: factuurElem.elem.innerHTML,
+      name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
+    }).post().then(e => console.log(e));
 
     // const [clientInvoices,clientOrders,rows] = factuurData;
     // const [invoice] = clientInvoices;
@@ -1060,7 +1068,7 @@ $().on('load', async e => {
         invoiceNr: invoiceNr,
       }));
       for (let attachement of attachements) {
-        attachement.iframe = await factuur(attachement.invoiceNr);
+        attachement.iframe = await getfactuur(attachement.invoiceNr);
       }
       // console.log(salesorder.clientOtherMailAddress, salesorder.clientCompanyName, salesorder);
       let totVervallen = 0;
@@ -2099,6 +2107,15 @@ $().on('load', async e => {
 
   }
 
+  function toonFactuur(factuur) {
+    console.log(factuur);
+    const href = `https://aliconnect.nl/shared/${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase();
+    const elem = $('div').parent('body>main').style('position:absolute;width:100%;height:100%;').append(
+      $('iframe').src(href).style('position:absolute;width:100%;height:100%;border:none;'),
+      $('button').style('position:absolute;width:20px;height:20px;border:none;right:0px;top:0px;background:red;').text('X').on('click', e => elem.remove()),
+    )
+  }
+
   aim.config.components.schemas.company.app = {
     nav: row => [
       $('button').class('abtn print').title('Printen').on('click', e => {
@@ -2125,8 +2142,14 @@ $().on('load', async e => {
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
       $('button').text('Regels').on('click', e => orderInvoer(row)),
       row.factuurId ? [
-        $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await factuur(row.factuurId)).printpdf()),
-        !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.invoiceNr), factuurData)),
+        // $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await getfactuur(row.factuurId)).printpdf()),
+        $('button').class('abtn invoice').title('Factuur printen').on('click', e => toonFactuur({
+          afzenderNaam: row.afzenderNaam,
+          factuurNr: row.factuurNr,
+          uid: row.factuurUId,
+          jaar: row.jaar,
+        })),
+        // !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.invoiceNr), factuurData)),
       ] : [
         $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
       ],
@@ -2347,11 +2370,8 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.invoice.app = {
     nav: row => [
-      $('button').class('abtn print').title('Print').on('click', async e => {
-        console.log(333, row);
-        (await factuur(row.id)).printpdf();
-      }),
-      !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await factuur(row.id), row)),
+      $('button').class('abtn print').title('Print').on('click', e => toonFactuur(row)),
+      !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.id), row)),
     ],
     navList: () => [
       $('button').text('Facturen').append(
@@ -3594,12 +3614,27 @@ $().on('load', async e => {
       },
     },
     Abis: {
+      async facturen_opslaan() {
+        const [rows] = await dmsClient.api('/abis/factuurOpslaanLijst').get();
+        var i = 0;
+        const progressElem = $('footer>progress').max(rows.length).value(i);
+        for (let row of rows) {
+          progressElem.value(++i);
+          console.log(row.id);
+          const factuurElem = await getfactuur(row.id);
+          console.log(factuur);
+          const data = {
+            id: row.id,
+            content: factuurElem.elem.innerHTML,
+            name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
+          }
+          await dmsClient.api('/abis/factuurOpslaan').body(data).post().then(e => console.log(e));
+          factuurElem.remove();
+        }
+        // const factuur = {};
+      },
       async HernoemProducten() {
-        const [keywords,products] = await dmsClient.api('/abis/keywords').get();
-        // for (product of products) {
-        //   console.log(product.Product);
-        //   // await dmsClient.api('/abis/keywords').post({product:product.product});
-        // }
+        const [keywords] = await dmsClient.api('/abis/keywords').get();
         for (keyword of keywords) {
           console.log(keyword.Keyword);
           await dmsClient.api('/abis/keywords').post({keyword:keyword.Keyword});

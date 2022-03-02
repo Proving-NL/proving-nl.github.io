@@ -2109,6 +2109,9 @@ $().on('load', async e => {
 
   function toonFactuur(factuur) {
     console.log(factuur);
+
+    dmsClient.api('/abis/factuurGeprint').query({id: factuur.id}).get().then(e => console.log(e));
+
     const href = `https://aliconnect.nl/shared/${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase();
     const elem = $('div').parent('body>main').style('position:absolute;width:100%;height:100%;').append(
       $('iframe').src(href).style('position:absolute;width:100%;height:100%;border:none;'),

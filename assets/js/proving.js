@@ -898,6 +898,11 @@ $().on('load', async e => {
     //   els.trh.append($('th').align('right').text(`Te betalen`));
     //   els.trb.append($('td').align('right').text(cur(totaal - betaald)));
     // }
+    await dmsClient.api('/abis/factuurOpslaan').body({
+      id: factuur.id,
+      content: elem.elem.innerHTML,
+      name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
+    }).post().then(e => console.log(e));
     return elem;
   }
   async function sendInvoice(factuurElem, factuur) {
@@ -953,8 +958,8 @@ $().on('load', async e => {
         // ),
       }],
       attachements: [{
-        content: factuurElem.elem.innerHTML,
-        name: `${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.organisatieNaam}.pdf`.toLowerCase()
+        // name: `${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.organisatieNaam}.pdf`.toLowerCase(),
+        filename: `/aliconnect/public/shared/${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase(),
       }]
     };
     console.log(factuur);
@@ -973,11 +978,6 @@ $().on('load', async e => {
     // const [accountCompany] = bedrijven;
     // const invoiceNr = accountCompany.invoiceNr;
     const factuurElem = await getfactuur(id);
-    await dmsClient.api('/abis/factuurOpslaan').body({
-      id: row.id,
-      content: factuurElem.elem.innerHTML,
-      name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
-    }).post().then(e => console.log(e));
 
     // const [clientInvoices,clientOrders,rows] = factuurData;
     // const [invoice] = clientInvoices;
@@ -2371,6 +2371,8 @@ $().on('load', async e => {
   aim.config.components.schemas.invoice.app = {
     nav: row => [
       $('button').class('abtn print').title('Print').on('click', e => toonFactuur(row)),
+      $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
+
       !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.id), row)),
     ],
     navList: () => [

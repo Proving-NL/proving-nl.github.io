@@ -914,7 +914,7 @@ $().on('load', async e => {
     const maildata = {
       from: from,
       bcc: from,
-      to: 'max.van.kampen@alicon.nl',
+      // to: 'max.van.kampen@alicon.nl',
       to: factuur.postadresMailadres,
       factuurId: factuur.id,
       chapters: [{
@@ -2371,7 +2371,7 @@ $().on('load', async e => {
   aim.config.components.schemas.invoice.app = {
     nav: row => [
       $('button').class('abtn print').title('Print').on('click', e => toonFactuur(row)),
-      $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
+      row.verstuurdDatumTijd ? null : $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
 
       !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.id), row)),
     ],

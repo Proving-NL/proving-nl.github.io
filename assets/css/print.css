@@ -70,9 +70,9 @@ table.grid td {
   white-space: nowrap;
 }
 table.grid th {
-  font-style: italic;
+  /* font-style: italic; */
   font-size: 0.8em;
-  color: gray;
+  /* color: gray; */
 }
 
 h1 {
@@ -91,11 +91,21 @@ div.header {
 }
 @font-face {
   font-family: barcode;
-  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/Code39Azalea.ttf') format('truetype');
-  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/fre3of9x.ttf') format('truetype');
+  /* src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/Code39Azalea.ttf') format('truetype');
+  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/fre3of9x.ttf') format('truetype'); */
   src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/barcode39.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+}
+@font-face {
+  font-family: 'mono';
+  font-weight: normal;
+  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/consola.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'mono';
+  font-weight: bold;
+  src: url('https://aliconnect.nl/sdk@0.0.8/dist/font/consolab.ttf') format('truetype');
 }
 /* @font-face {
   font-family: barcode;
@@ -124,4 +134,8 @@ th,td{
 .datum,.facnr,.nr,.debnr {
   /* width: 26mm; */
   text-align: right;
+}
+table.noborder td {
+  border: none;
+  padding: 0 10px 0 0;
 }

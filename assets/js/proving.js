@@ -43,7 +43,6 @@ $().on('load', async e => {
     )
   );
 
-
   aim.om.treeview({
     'Shop': {
       Producten: e => aim.list('product', {
@@ -755,9 +754,14 @@ $().on('load', async e => {
           $('tr').append(
             $('td').style('padding-left:10mm;padding-top:25mm;').append(
               $('div').text(factuur.organisatieNaam).style('font-weight:bold;'),
-              $('div').text(factuur.postadresStraat),
+              $('div').text(factuur.postadres1),
               $('div').text(factuur.postadres2),
             ),
+            // $('td').style('padding-left:10mm;padding-top:25mm;').append(
+            //   $('div').text(factuur.organisatieNaam).style('font-weight:bold;'),
+            //   $('div').text(factuur.afleveradres1),
+            //   $('div').text(factuur.afleveradres2),
+            // ),
             $('td').style('width:65mm;').append(
               $('div').text(factuur.bedrijfOrganisatieNaam).style('font-weight:bold;'),
               $('div').text(factuur.bedrijfKoptekst).style('word-wrap:pre;font-size:0.8em;'),
@@ -775,7 +779,8 @@ $().on('load', async e => {
               $('th').style('text-align:left;white-space:nowrap;').text('Factuur nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Document nr.'),
               $('th').style('text-align:left;white-space:nowrap;').text('Deb.nr.'),
-              $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Deb. BTW nr.'),
+              $('th').style('text-align:left;white-space:nowrap;').text('Deb. BTW nr.'),
+              $('th').style('text-align:left;white-space:nowrap;width:100%;').text('Afleveradres'),
               $('th').style('text-align:left;white-space:nowrap;').text('Datum'),
             )
           ),
@@ -786,6 +791,7 @@ $().on('load', async e => {
               $('td').text(factuur.id),
               $('td').text(factuur.klantDebNr),
               $('td').text(factuur.klantBtwNr),
+              $('td').text(factuur.afleveradres),
               $('td').text(new Date(factuur.factuurDatumTijd).toLocaleDateString()),
             ),
           ),
@@ -2374,7 +2380,9 @@ $().on('load', async e => {
   aim.config.components.schemas.invoice.app = {
     nav: row => [
       $('button').class('abtn print').title('Print').on('click', e => toonFactuur(row)),
-      row.verstuurdDatumTijd || row.printDatumTijd ? null : $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
+      0//row.verstuurdDatumTijd || row.printDatumTijd
+      ? null
+      : $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
 
       !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.id), row)),
     ],
@@ -3649,6 +3657,23 @@ $().on('load', async e => {
       Producten() {
         aim.list('prod');
       },
+      async Aandacht1() {
+        const [rows] = await dmsClient.api('/abis/aandacht1').get();
+        $('.lv').text('').append(
+          $('div').append(
+            $('table').append(
+              $('thead').append(
+                $('tr').append(
+                  rows[0].map()
+                )
+              )
+            )
+          )
+        )
+      },
+
+
+
       // Klanten() {
       //   aim.list('client');
       // },

@@ -470,82 +470,6 @@ $().on('load', async e => {
     // }
 
     const elem = printElem().append(
-      rows.filter(row => row.loc==='K-M').map(row => $('div').class('brief order').style('page-break-before:always;').append(
-        $('table').style('width:100%;').append(
-          $('tr').append(
-            $('td').append(
-              $('div').text('WERKOPDRACHT KLEURMENGERIJ').style('font-weight:bold;font-size:1.2em;'),
-              $('div').class('bc').text(`*R${row.id}*`).style('height:10mm;'),
-              $('div').text(`R${row.id}`).style('margin-bottom:10mm;'),
-              $('table').style('margin-bottom:10mm;width:100%;').append(
-                $('tr').append(
-                  $('td').style('padding-left:10mm;').append(
-                    $('div').text('Afleveradres:').style('font-weight:bold;'),
-                    $('div').text(salesorder.bonOrganisatieNaam),
-                    $('div').text(salesorder.bonContact),
-                    $('div').text(salesorder.bonAdres1),
-                    $('div').text(salesorder.bonAdres2),
-                  ),
-                  $('td').append(
-                    $('div').text('Factuuradres:').style('font-weight:bold;'),
-                    $('div').text(salesorder.postOrganisatieNaam),
-                    $('div').text(salesorder.postAdres1),
-                    $('div').text(salesorder.postAdres2),
-                  ),
-                )
-              ),
-            ),
-            $('td').style('width:50mm;').append(
-              $('div').text(salesorder.bedrijfOrganisatieNaam).style('font-weight:bold;'),
-              $('div').text(salesorder.bedrijfVoettekst).style('word-wrap:pre;font-size:0.8em;'),
-            ),
-          )
-        ),
-        $('table').class('grid summary').append(
-          $('thead').append(
-            $('tr').append(
-              $('td').colspan(6).append(
-                $('table').class('noborder').append(
-                  $('tr').append(
-                    $('td').text('Ordernummer'),
-                    $('td').text(':', salesorder.id),
-                    $('td').text('Klantnummer'),
-                    $('td').text(':', salesorder.klantId).style('width:100%;'),
-                  ),
-                  $('tr').append(
-                    $('td').text('Orderdatum'),
-                    $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
-                    $('td').text('Uw referentie'),
-                    $('td').text(':', salesorder.uwRef),
-                  ),
-                  $('tr').append(
-                    $('td').text('Opdrachtnummer'),
-                    $('td').text(':', row.id),
-                  ),
-                ),
-              )
-            ),
-          ),
-        ),
-        $('table').append(
-          $('tr').append(
-            $('td').text('Art.nr.'),
-            $('td').text(':', row.artId),
-          ),
-          $('tr').append(
-            $('td').text('Code'),
-            $('td').text(':', row.code),
-          ),
-          $('tr').append(
-            $('td').text('Product'),
-            $('td').text(':', row.omschrijving),
-          ),
-          $('tr').append(
-            $('td').text('Omschrijving'),
-            $('td').text(':', row.extraTekst).style('font-weight:bold;width:100%;'),
-          ),
-        ),
-      )),
       $('div').class('brief order').style('page-break-before:always;').append(
         $('table').style('width:100%;').append(
           $('tr').append(
@@ -672,6 +596,82 @@ $().on('load', async e => {
           ),
         ),
       ),
+      rows.filter(row => row.loc==='K-M').map(row => $('div').class('brief order').style('page-break-before:always;').append(
+        $('table').style('width:100%;').append(
+          $('tr').append(
+            $('td').append(
+              $('div').text('WERKOPDRACHT KLEURMENGERIJ').style('font-weight:bold;font-size:1.2em;'),
+              $('div').class('bc').text(`*R${row.id}*`).style('height:10mm;'),
+              $('div').text(`R${row.id}`).style('margin-bottom:10mm;'),
+              $('table').style('margin-bottom:10mm;width:100%;').append(
+                $('tr').append(
+                  $('td').style('padding-left:10mm;').append(
+                    $('div').text('Afleveradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.bonOrganisatieNaam),
+                    $('div').text(salesorder.bonContact),
+                    $('div').text(salesorder.bonAdres1),
+                    $('div').text(salesorder.bonAdres2),
+                  ),
+                  $('td').append(
+                    $('div').text('Factuuradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.postOrganisatieNaam),
+                    $('div').text(salesorder.postAdres1),
+                    $('div').text(salesorder.postAdres2),
+                  ),
+                )
+              ),
+            ),
+            $('td').style('width:50mm;').append(
+              $('div').text(salesorder.bedrijfOrganisatieNaam).style('font-weight:bold;'),
+              $('div').text(salesorder.bedrijfVoettekst).style('word-wrap:pre;font-size:0.8em;'),
+            ),
+          )
+        ),
+        $('table').class('grid summary').append(
+          $('thead').append(
+            $('tr').append(
+              $('td').colspan(6).append(
+                $('table').class('noborder').append(
+                  $('tr').append(
+                    $('td').text('Ordernummer'),
+                    $('td').text(':', salesorder.id),
+                    $('td').text('Klantnummer'),
+                    $('td').text(':', salesorder.klantId).style('width:100%;'),
+                  ),
+                  $('tr').append(
+                    $('td').text('Orderdatum'),
+                    $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                    $('td').text('Uw referentie'),
+                    $('td').text(':', salesorder.uwRef),
+                  ),
+                  $('tr').append(
+                    $('td').text('Opdrachtnummer'),
+                    $('td').text(':', row.id),
+                  ),
+                ),
+              )
+            ),
+          ),
+        ),
+        $('table').append(
+          $('tr').append(
+            $('td').text('Art.nr.'),
+            $('td').text(':', row.artId),
+          ),
+          $('tr').append(
+            $('td').text('Code'),
+            $('td').text(':', row.code),
+          ),
+          $('tr').append(
+            $('td').text('Product'),
+            $('td').text(':', row.omschrijving),
+          ),
+          $('tr').append(
+            $('td').text('Omschrijving'),
+            $('td').text(':', row.extraTekst).style('font-weight:bold;width:100%;'),
+          ),
+        ),
+      )),
       $('div').class('brief').style('page-break-before:always;').append(
         $('div').append(
           !salesorder.afzenderCode ? null : $('img').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + salesorder.afzenderCode + '.png'),

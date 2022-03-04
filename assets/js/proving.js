@@ -11,8 +11,18 @@ $().on('message', data => {
 
 $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
+
+  const accountId = new URLSearchParams(document.location.search).get('accountId') || localStorage.getItem('accountId');
+  var account = {};
+  if (accountId) {
+    localStorage.setItem('accountId', accountId);
+    account = await dmsClient.api('/abis/account?account_id=' + accountId).get();
+    sessionStorage.setItem('access_token', account.access_token);
+    console.log(account);
+  }
+
   const cssPrintUrl = 'https://proving-nl.aliconnect.nl/assets/css/print.css';
-  console.log('AIM', aimClient, dmsClient, aim.config);
+  console.log('AIM', account, accountId, aimClient, dmsClient, aim.config);
 
   let clientart = [];
   let clientName = '';
@@ -78,7 +88,10 @@ $().on('load', async e => {
   console.log(kop1,kop2,artikelgroep,kopmenu);
   aim.om.treeview(kopmenu);
 
-  if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
+  if (!account.scopes.includes('abisingen.medewerker')) return;
+
+  // if (!aim.config.whitelist.includes(aim.config.client.ip)) return;
+
   // localStorage.clear();
   const transportOptions = [
     { title: 'Niet ingevuld', style: 'color:red;', },
@@ -468,8 +481,124 @@ $().on('load', async e => {
     //   );
     //   return elem;
     // }
+    const rowsArt = [];//rows.filter(row => row.artId);
+    rowsArt.filter(row => row.productId==1).forEach(row => row.err = (row.err||[]).concat('Product ID niet ingevuld'));
+    rowsArt.filter(row => row.loc && !row.loc.match(/\d+\.\d+\.\d+/)).forEach(row => row.err = (row.err||[]).concat('MagLokatie niet goed, moet zijn nn.nn.nn'));
+    rowsArt.filter(row => row.voswaarde===null).forEach(row => row.err = (row.err||[]).concat('VOS waarde niet ingevuld'));
+    rowsArt.filter(row => row.gewicht===null).forEach(row => row.err = (row.err||[]).concat('Gewicht niet ingevuld'));
+    rowsArt.filter(row => row.barcode===null).forEach(row => row.err = (row.err||[]).concat('EAN niet ingevuld'));
+
+    const rowserr = rows.filter(row => row.err);
+    console.log(rowserr);
 
     const elem = printElem().append(
+      !rowserr.length ? null : $('div').class('brief order').style('page-break-before:always;').append(
+        $('table').style('width:100%;').append(
+          $('tr').append(
+            $('td').append(
+              $('div').text('CORRECTIE OPDRACHT voor intern gebruik').style('font-weight:bold;font-size:1.2em;'),
+              $('table').style('margin-bottom:10mm;width:100%;').append(
+                $('tr').append(
+                  $('td').style('padding-left:10mm;').append(
+                    $('div').text('Afleveradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.bonOrganisatieNaam),
+                    $('div').text(salesorder.bonContact),
+                    $('div').text(salesorder.bonAdres1),
+                    $('div').text(salesorder.bonAdres2),
+                  ),
+                  $('td').append(
+                    $('div').text('Factuuradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.postOrganisatieNaam),
+                    $('div').text(salesorder.postAdres1),
+                    $('div').text(salesorder.postAdres2),
+                  ),
+                )
+              ),
+            ),
+            $('td').style('width:50mm;').append(
+              $('div').text(salesorder.bedrijfOrganisatieNaam).style('font-weight:bold;'),
+              $('div').text(salesorder.bedrijfVoettekst).style('word-wrap:pre;font-size:0.8em;'),
+            ),
+          )
+        ),
+        $('style').text('tr.bbn>td{border-bottom:none;}tr.bbn+tr>td{border-top:none;}'),
+        $('table').class('grid summary').append(
+          $('thead').append(
+            $('tr').append(
+              $('td').colspan(6).append(
+                $('table').class('noborder').append(
+                  $('tr').append(
+                    $('td').text('Ordernummer'),
+                    $('td').text(':', salesorder.id),
+                    $('td').text('Klantnummer'),
+                    $('td').text(':', salesorder.klantId),
+                    $('td').text('VOS totaal'),
+                    $('td').text(':', vosTotaal).style('width:100%;'),
+                  ),
+                  $('tr').append(
+                    $('td').text('Orderdatum'),
+                    $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                    $('td').text('Uw referentie'),
+                    $('td').text(':', salesorder.uwRef),
+                    $('td').text('Gewicht totaal'),
+                    $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
+                  ),
+                  $('tr').append(
+                    $('td').text('Verzenddatum'),
+                    $('td').text(':', new Date(salesorder.planDatumTijd).toLocaleDateString()),
+                    $('td').text('Bestelwijze'),
+                    $('td').text(':', bestelOptions[salesorder.volgNr] ? bestelOptions[salesorder.volgNr].title : 'Onbekend'),
+                    $('td').text('Transport'),
+                    $('td').text(':', transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend'),
+                  ),
+                ),
+              )
+            ),
+            $('tr').append(
+              // $('th').align('left').text('Artikelnummer'),
+              $('th').align('left').text('Art.nr.'),
+              $('th').align('left').text('Vak'),
+              $('th').align('right').text('Aantal'),
+              $('th').align('left').text('Eenheid'),
+              $('th').align('left').text('Code'),
+              $('th').align('left').text('Omschrijving').style('width:100%;'),
+              // $('th').align('left').text('Inhoud'),
+              // $('th').align('left').text('Prod.nr.'),
+              // $('th').align('left').text('EAN'),
+              // $('th').align('left').style('width:100%;').text('Omschrijving'),
+              // $('th').align('right').text('KG/st.'),
+              // $('th').align('right').text('VOS/st.'),
+              // $('th').align('right').text('Aanw.'),
+              // $('th').align('right').text('Bruto'),
+            ),
+          ),
+          $('tbody').append(
+            rowserr.map(row => [
+              $('tr').append(
+                // $('td').text(Number(row.artId).pad(9)),
+                $('td').text(row.artId||''),
+                $('td').text(row.loc),
+                $('td').text(row.aantal),
+                $('td').text(row.eenheid),
+                $('td').text(row.code),
+                $('td').style('white-space:normal;').append(row.omschrijving),
+                // $('td').style('font-weight:bold;font-size:1.1em;white-space:nowrap;').text(row.code),
+                // $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
+                // $('td').text(row.prodNr),
+                // $('td').text(row.barcode),
+                // $('td').text(row.omschrijving).style('white-space:normal;'),
+                // $('td').align('right').text(!row.gewicht ? null : num(row.gewicht,1)),
+                // $('td').align('right').text(row.voswaarde),
+                // $('td').align('right').text(row.voorraad),
+                // $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
+              ),
+              $('tr').append(
+                $('td').colspan(10).text(row.err.join(', ')).style('color:red;'),
+              ),
+            ])
+          ),
+        ),
+      ),
       $('div').class('brief order').style('page-break-before:always;').append(
         $('table').style('width:100%;').append(
           $('tr').append(
@@ -596,7 +725,7 @@ $().on('load', async e => {
           ),
         ),
       ),
-      rows.filter(row => row.loc==='K-M').map(row => $('div').class('brief order').style('page-break-before:always;').append(
+      rows.filter(row => row.loc==='30.00.00').map(row => $('div').class('brief order').style('page-break-before:always;').append(
         $('table').style('width:100%;').append(
           $('tr').append(
             $('td').append(
@@ -779,7 +908,7 @@ $().on('load', async e => {
         // ) : null,
 
         // $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
-      )
+      ),
     );
 
     return elem;
@@ -2241,10 +2370,6 @@ $().on('load', async e => {
       // }),
       $('button').class('abtn').text('Prijslijst').on('click', async e => {
         const [rows] = await dmsClient.api('/abis/klantartikelen').query({organisatieId: row.id}).get();
-
-        console.log(row);
-
-        // function printPrijslijst(rows,prijslijstId) {
         $('div').parent(document.body).append(
           // $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
           `<style>
@@ -2268,6 +2393,7 @@ $().on('load', async e => {
               </td></tr>
               <tr>
               <th>Art.nr.</th>
+              <th>Art.code</th>
               <th>Eenheid</th>
               <th width=100%>Omschrijving</th>
               <th style='text-align:right;'>Bruto</th>
@@ -2279,12 +2405,12 @@ $().on('load', async e => {
               ...rows.map(row => row.productGroep)
               .unique()
               .map(productGroep => [$('tr').append(
-                $('td').colspan(3).text(productGroep).style('font-weight:bold;font-size:1.1em;padding:5px 0;'),
+                $('td').colspan(6).text(productGroep).style('font-weight:bold;font-size:1.1em;padding:5px 0;'),
               )].concat(
                 rows.filter(row => row.productGroep === productGroep).map(row => $('tr').append(
                   $('td').append(row.id.pad(5)),
                   // $('td').text(row.merk),
-                  // $('td').text(row.code),
+                  $('td').text(row.code).style('font-family: consolas;'),
                   // $('td').text(row.levcode),
                   // $('td').text(row.code),
                   // $('td').text(row.merk),
@@ -2297,11 +2423,17 @@ $().on('load', async e => {
                   // $('td').text(row.merk),
                   $('td').text(row.eenheid),
                   $('td').text(row.titel),
+                  // $('td').text(row.merk+',',row.propTekst),
+                  // $('td').align('right').text(row.inhoud,row.inhoudEenheid).style('white-space:nowrap;'),
+                  // $('td').text(row.inhoudEenheid),
+
+
 
                   // $('td').align('right').text(row.verpaktPer),
                   $('td').align('right').text(aim.num(row.brutoNieuw)),
                   $('td').text(row.korting||''),
                   $('td').align('right').text(aim.num(row.nettoNieuw)),
+
                   // $('td').align('right').text(row.verhoging||''),
                   // $('td').align('right').text(`${aim.num(row.korting,0)}%`),
                   // $('td').align('right').text(aim.num(row.netto)),
@@ -2310,7 +2442,6 @@ $().on('load', async e => {
             )
           )
         ).print().remove();
-          // }
       }),
     ],
   }
@@ -3827,44 +3958,36 @@ $().on('load', async e => {
       Producten() {
         aim.list('prod');
       },
+
+      'Geen product ID': e => aim.list('product', {
+        $filter: `ProductId=1`,
+        $search: `*`,
+        $top: 100,
+        $order: `LaatstVerkochtDatumTijd DESC`,
+      }),
+
+
       async Aandacht1() {
         const [rows] = await dmsClient.api('/abis/aandacht1').get();
+        rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+        console.log(rows);
         $('.lv').text('').append(
           $('div').append(
             $('table').append(
               $('thead').append(
                 $('tr').append(
-                  rows[0].map()
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
                 )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
               )
             )
           )
         )
       },
-
-
-
-      // Klanten() {
-      //   aim.list('client');
-      // },
-      // Pakbonnen() {
-      //   aim.list('salesorder');
-      // },
-      // Pakbon_regels() {
-      //   aim.list('salesorderrow');
-      // },
-      // Fakturen() {
-      //   aim.list('invoice');
-      // },
-      // Artikelen() {
-      //   aim.list('art');
-      // },
-      // Klant_artikelen() {
-      //   aim.list('clientart');
-      // },
-      // Bedrijven() {
-      //   aim.list('account');
-      // },
     },
     Overig: {
 

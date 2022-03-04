@@ -13,7 +13,7 @@ $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
 
   const accountId = new URLSearchParams(document.location.search).get('accountId') || localStorage.getItem('accountId');
-  var account = {};
+  var account = {scopes};
   if (accountId) {
     localStorage.setItem('accountId', accountId);
     account = await dmsClient.api('/abis/account?account_id=' + accountId).get();

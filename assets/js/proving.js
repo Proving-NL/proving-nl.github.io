@@ -11,15 +11,13 @@ $().on('message', data => {
 
 $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
+  console.log('AIM', aim.config);
+  sessionStorage.clear();
 
-  const accountId = new URLSearchParams(document.location.search).get('accountId') || localStorage.getItem('accountId');
-  var account = {scopes:[]};
-  if (accountId) {
-    localStorage.setItem('accountId', accountId);
-    account = await dmsClient.api('/abis/account?account_id=' + accountId).get();
-    sessionStorage.setItem('access_token', account.access_token);
-    console.log(account);
-  }
+  const accountId = new URLSearchParams(document.location.search).get('accountId') || localStorage.getItem('accountId') || '';
+  localStorage.setItem('accountId', accountId);
+  const account = await aimClient.api('/abis/account').query({client_id: aim.config.client_id, account_id: accountId}).get();
+  sessionStorage.setItem('access_token', account.access_token);
 
   const cssPrintUrl = 'https://proving-nl.aliconnect.nl/assets/css/print.css';
   console.log('AIM', account, accountId, aimClient, dmsClient, aim.config);

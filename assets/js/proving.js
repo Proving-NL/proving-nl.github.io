@@ -1016,7 +1016,7 @@ $().on('load', async e => {
                       $('td').text('Klantnummer'),
                       $('td').text(':', salesorder.klantId),
                       $('td').text('Afleveradres'),
-                      $('td').text(':', salesorder.afleverOrganisatieNaam || factuur.organisatieNaam, salesorder.afleverContactNaam || '').style('width:100%;'),
+                      $('td').text(':', salesorder.afleverOrganisatieNaam || factuur.organisatieNaam || salesorder.afleverContactNaam || '').style('width:100%;'),
                     ),
                     $('tr').append(
                       $('td').text('Orderdatum'),
@@ -1732,7 +1732,7 @@ $().on('load', async e => {
       } catch (err) {
         console.error(row);
       }
-      // return;
+      return;
       progressElem.value(++i);
     }
     document.title = title;
@@ -2363,6 +2363,11 @@ $().on('load', async e => {
       $('button').class('abtn view').title('Selecteren').on('click', e => {
         selectClient(row.name);
       }),
+      $('button').class('abtn').text('Artikelen').on('click', e => aim.list('product', {
+        $filter: `leverancierId = ${row.id}`,
+        $search: `*`,
+      })),
+
       // $('button').class('abtn').text('Prijslijst').on('click', e => {
       //   prijslijst_xls(`proving-prijslijst-${row.name}-${new Date().toISOString().substr(0,10)}`, `KlantName = '${row.name}'`, colsPrijslijst);
       // }),
@@ -2974,7 +2979,6 @@ $().on('load', async e => {
     },
     CRM: {
       Organisaties: e => aim.list('company',{
-        $filter: `archivedDateTime EQ NULL`,
         $search: ``,
       }),
       Archief: e => aim.list('company',{

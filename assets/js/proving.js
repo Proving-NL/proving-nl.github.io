@@ -1663,46 +1663,47 @@ $().on('load', async e => {
           // const progressElem = $('footer>progress').max(rowEnd).value(tab.colRow);
           // const infoElem = $('footer>.main');
           const rowStart = tab.colRow;
-          for (let cols of tab.cols) {
+          const cols = tab.cols;
+          for (var name in cols) {
+            if (typeof cols[name] !== 'function' && String(cols[name]).match(/return /)) {
+              cols[name] = new Function('row', cols[name]);
+            }
+          }
+        // console.log(tab.cols);
+          for (var r = tab.colRow+1; r<=rowEnd; r++) {
+            let row;
             for (var name in cols) {
-              if (typeof cols[name] !== 'function' && String(cols[name]).match(/return /)) {
-                cols[name] = new Function('row', cols[name]);
+              var value;
+              if (cols[name].length===1 || cols[name].length===2) {
+                value = rowvalue(r, XLSX.utils.decode_col(cols[name]));
+              } else if (Array.isArray(cols[name])) {
+                value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+                // console.log(name, tab.cols[name]);
+              } else if (typeof cols[name] === 'function') {
+                try {
+                  value = cols[name](row) || '';
+                } catch(err) {
+
+                }
+              } else if (toprow.includes(name)) {
+                value = rowvalue(r, toprow.indexOf(name));
+              } else if (toprow.includes(cols[name])) {
+                value = rowvalue(r, toprow.indexOf(cols[name]));
+              } else {
+                value = cols[name];
+              }
+              if (value !== undefined) {
+                (row = row || {})[name] = value;
               }
             }
-          // console.log(tab.cols);
-            for (var r = tab.colRow+1; r<=rowEnd; r++) {
-              let row;
-              for (var name in cols) {
-                var value;
-                if (Array.isArray(cols[name])) {
-                  value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
-                  // console.log(name, tab.cols[name]);
-                } else if (typeof cols[name] === 'function') {
-                  try {
-                    value = cols[name](row) || '';
-                  } catch(err) {
-
-                  }
-                } else if (toprow.includes(name)) {
-                  value = rowvalue(r, toprow.indexOf(name));
-                } else if (toprow.includes(cols[name])) {
-                  value = rowvalue(r, toprow.indexOf(cols[name]));
-                } else {
-                  value = cols[name];
-                }
-                if (value !== undefined) {
-                  (row = row || {})[name] = value;
-                }
-              }
-              if (row) {
-                // console.log(row);
-                // return;
-                row.importCode = file.name;
-                data.rows.push(row);
-                allrows.push([row, tab]);
-              }
-            };
-          }
+            if (row) {
+              // console.log(row);
+              // return;
+              row.importCode = file.name;
+              data.rows.push(row);
+              allrows.push([row, tab]);
+            }
+          };
         }
       }
     }
@@ -1723,7 +1724,7 @@ $().on('load', async e => {
       console.log(infoTekst);
       document.title = [title,row.leverancier,Math.round(i/max*100) + '%'].join(' ');
       try {
-        // console.log(row);
+        console.log(row);
         // await tab.callback(row);
         if (row.levKortingFaktor) row.levKorting = row.levKortingFaktor*100;
         row.importDateTime = importDateTime;
@@ -1732,7 +1733,7 @@ $().on('load', async e => {
       } catch (err) {
         console.error(row);
       }
-      return;
+      // return;
       progressElem.value(++i);
     }
     document.title = title;
@@ -2385,12 +2386,12 @@ $().on('load', async e => {
             $('thead').append(
               `<tr><td colspan=6 style='height:20mm;'>
                 <table><tr>
-                  <td style="width:50mm;height:15mm;background:url(https://proving-nl.aliconnect.nl/assets/img/logo-${row.accountName}.png) no-repeat;background-size:auto 15mm;">
+                  <td style="width:50mm;height:15mm;background:url(https://proving-nl.aliconnect.nl/assets/img/logo-${row.bedrijfNaam}.png) no-repeat;background-size:auto 15mm;">
                   </td>
                   <td style="padding-left:10px;">
-                    <b>${row.accountCompanyName} - PRIJSLIJST ${new Date().toLocaleDateString()}</b><br>
+                    <b>${row.bedrijfOrganisatieNaam} - PRIJSLIJST ${new Date().toLocaleDateString()}</b><br>
                     Prijzen in EURO excl BTW<br>
-                    <b>${row.companyName}</b>
+                    <b>${row.organisatieNaam}</b>
                   </td>
                 </tr></table>
               </td></tr>
@@ -3962,7 +3963,7 @@ $().on('load', async e => {
       },
 
       'Geen product ID': e => aim.list('product', {
-        $filter: `ProductId=1`,
+        $filter: `Id IN (SELECT ArtId FROM abisingen.dbo.dvArtKl WHERE OrganisatieId IN (SELECT Id FROM abisingen.dbo.tblOrganisatie WHERE BedrijfId = 6135) AND LastModifiedDateTime > '01-01-2020') AND ProductId = 1`,
         $search: `*`,
         $top: 100,
         $order: `LaatstVerkochtDatumTijd DESC`,

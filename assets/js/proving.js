@@ -1674,17 +1674,18 @@ $().on('load', async e => {
             let row;
             for (var name in cols) {
               var value;
-              if (cols[name].length===1 || cols[name].length===2) {
-                value = rowvalue(r, XLSX.utils.decode_col(cols[name]));
-              } else if (Array.isArray(cols[name])) {
-                value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
-                // console.log(name, tab.cols[name]);
-              } else if (typeof cols[name] === 'function') {
+              if (typeof cols[name] === 'function') {
                 try {
                   value = cols[name](row) || '';
                 } catch(err) {
 
                 }
+              } else if (String(cols[name]).match(/[A-Z]+/) && cols[name].length<=2 ) {
+                // console.log(name);
+                value = rowvalue(r, XLSX.utils.decode_col(cols[name]));
+              } else if (Array.isArray(cols[name])) {
+                value = cols[name].map(c => rowvalue(r, XLSX.utils.decode_col(c))).join(' ');
+                // console.log(name, tab.cols[name]);
               } else if (toprow.includes(name)) {
                 value = rowvalue(r, toprow.indexOf(name));
               } else if (toprow.includes(cols[name])) {
@@ -3931,6 +3932,9 @@ $().on('load', async e => {
       },
     },
     Abis: {
+      ArtikelInkoop: e => aim.list('artikelinkoop', {
+        $search: ``,
+      }),
       async facturen_opslaan() {
         const [rows] = await dmsClient.api('/abis/factuurOpslaanLijst').get();
         var i = 0;

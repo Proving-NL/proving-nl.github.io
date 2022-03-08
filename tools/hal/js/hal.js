@@ -421,7 +421,12 @@ aim.Elem.prototype.threejs = function(data) {
 
 console.log(paths);
 
-(function(){
+(async function(){
+  const body = await aim.fetch('mag.yaml').then(res => res.text());
+  const body
+  return console.log(body);
+
+  aim.fetch('https://dms.aliconnect.nl/api/v1/abis/yaml',{method:post,body:body});
   // $(document.body).append(
   //   $('div').threejs({}),
   // );

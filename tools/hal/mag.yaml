@@ -1,0 +1,27 @@
+locaties:
+  - stelling: 01
+    posX: 2000
+    posY: 23000
+    kleur: blauw
+    rijen:
+      - rij: 01
+        schappen:
+          - schap: 01
+          - schap: 02
+          - schap: 03
+          - schap: 04
+          - schap: 05
+          - schap: 06
+      - rij: 02
+        schappen:
+          - schap: 01
+          - schap: 02
+          - schap: 03
+          - schap: 04
+          - schap: 05
+          - schap: 06
+  - stelling: 02
+  - stelling: 03
+  - stelling: 04
+  - stelling: 05
+  - stelling: 06

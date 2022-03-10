@@ -908,7 +908,6 @@ $().on('load', async e => {
         // $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
       ),
     );
-
     return elem;
   }
   async function order(orderNr) {
@@ -2452,7 +2451,7 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.salesorder.app = {
     nav: row => [
-      $('button').class('icn-print').title('Bon printen').on('click', async e => (await order(row.id)).print()),
+      $('button').class('icn-print').title('Bon printen').on('click', async e => await (await order(row.id)).printp()),
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
       $('button').text('Regels').on('click', e => orderInvoer(row)),
@@ -2691,6 +2690,12 @@ $().on('load', async e => {
       : $('button').class('abtn maak').text('Maak').on('click', async e => {(await getfactuur(row.id)).printpdf();}),
 
       !row.postadresMailadres ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.id), row)),
+
+      $('button').class('abtn').text('PPG Opdracht').on('click', async e => {
+        const body = await dmsClient.api('/abis/ppgexport').query({id:row.id}).get();
+        console.log(body);
+      }),
+
     ],
     navList: () => [
       $('button').text('Facturen').append(
@@ -2960,12 +2965,11 @@ $().on('load', async e => {
   ];
   let arts,artvalues;
 
-
   if (window.localStorage.getItem('printService')) {
     (async function checkprint(){
       const [orders] = await dmsClient.api('/abis/orderstoprint').get();
       for (let row of orders) {
-        (await order(row.id)).print();
+        await (await order(row.id)).printp();
       }
       // console.log('CHECKPRINT', orders);
 

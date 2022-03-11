@@ -55,6 +55,7 @@ $().on('load', async e => {
     'Shop': {
       Producten: e => aim.list('product', {
         // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
+        $order: 'laatstVerkochtDatumTijd DESC',
         $search: ``,
       }),
       Bestellijst: e => aim.list('productklant', {
@@ -83,7 +84,7 @@ $().on('load', async e => {
       ])),
     ])),
   ]));
-  console.log(kop1,kop2,artikelgroep,kopmenu);
+  // console.log(kop1,kop2,artikelgroep,kopmenu);
   aim.om.treeview(kopmenu);
 
   if (!account.scopes.includes('abisingen.medewerker')) return;

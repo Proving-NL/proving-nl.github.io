@@ -554,11 +554,11 @@ $().on('load', async e => {
             ),
             $('tr').append(
               // $('th').align('left').text('Artikelnummer'),
-              $('th').align('left').text('Art.nr.'),
+              $('th').align('left').text('Code', 'Art.nr.'),
               $('th').align('left').text('Vak'),
-              $('th').align('right').text('Aantal'),
-              $('th').align('left').text('Eenheid'),
-              $('th').align('left').text('Code'),
+              $('th').align('right').text('Aantal', 'Eenheid'),
+              // $('th').align('left').text('Eenheid'),
+              // $('th').align('left').text('Code'),
               $('th').align('left').text('Omschrijving').style('width:100%;'),
               // $('th').align('left').text('Inhoud'),
               // $('th').align('left').text('Prod.nr.'),
@@ -567,14 +567,16 @@ $().on('load', async e => {
               // $('th').align('right').text('KG/st.'),
               // $('th').align('right').text('VOS/st.'),
               // $('th').align('right').text('Aanw.'),
-              // $('th').align('right').text('Bruto'),
+              $('th').align('right').text('Bruto'),
+              $('th').align('right').text('Kort.'),
+              $('th').align('right').text('Netto'),
             ),
           ),
           $('tbody').append(
             rowserr.map(row => [
               $('tr').append(
                 // $('td').text(Number(row.artId).pad(9)),
-                $('td').text(row.artId||''),
+                $('td').append(row.code, row.artId||''),
                 $('td').text(row.loc),
                 $('td').text(row.aantal),
                 $('td').text(row.eenheid),
@@ -663,12 +665,20 @@ $().on('load', async e => {
             ),
             $('tr').append(
               // $('th').align('left').text('Artikelnummer'),
-              $('th').align('left').text('Art.nr.'),
-              $('th').align('left').text('Vak'),
-              $('th').align('right').text('Aantal'),
-              $('th').align('left').text('Eenheid'),
-              $('th').align('left').text('Code'),
-              $('th').align('left').text('Omschrijving').style('width:100%;'),
+              $('th').append(
+                $('div').text('Vak'),
+              ),
+              $('th').append(
+                $('div').text('Code'),
+                $('div').text('Art.nr.'),
+              ),
+              $('th').append(
+                $('div').text('Aantal'),
+                $('div').text('Eenheid'),
+              ),
+              $('th').style('width:100%;').append(
+                $('div').text('Omschrijving'),
+              ),
               // $('th').align('left').text('Inhoud'),
               // $('th').align('left').text('Prod.nr.'),
               // $('th').align('left').text('EAN'),
@@ -676,7 +686,13 @@ $().on('load', async e => {
               // $('th').align('right').text('KG/st.'),
               // $('th').align('right').text('VOS/st.'),
               // $('th').align('right').text('Aanw.'),
-              // $('th').align('right').text('Bruto'),
+              $('th').append(
+                $('div').text('Bruto'),
+                $('div').text('Kort.'),
+              ),
+              $('th').append(
+                $('div').text('Netto'),
+              ),
             ),
           ),
           $('tbody').append(
@@ -685,16 +701,28 @@ $().on('load', async e => {
             .filter(row => row.aantal && row.bruto)
             .map(row => [
               $('tr').append(
-                // $('td').text(Number(row.artId).pad(9)),
-                $('td').text(row.artId||''),
-                $('td').text(row.loc),
-                $('td').style('font-weight:bold;font-size:1.1em;').align('right').text(row.aantal),
-                $('td').style('font-weight:bold;font-size:1.1em;').text(row.eenheid),
-                $('td').style('font-weight:bold;font-size:1.1em;').text(row.code),
+                $('td').append(
+                  $('div').text(row.loc||''),
+                ),
+                $('td').append(
+                  $('div').text(row.code).style('font-weight:bold;'),
+                  $('div').text(row.artId||''),
+                ),
+                $('td').append(
+                  $('div').text(row.aantal).style('font-weight:bold;'),
+                  $('div').text(row.eenheid).style('font-weight:bold;'),
+                ),
                 $('td').style('white-space:normal;').append(
                   String(row.omschrijving||'').replace(/\r|\n/g,''),
                   $('div').text(row.extraTekst||'').style('font-weight:bold;font-size:1.1em;'),
                   $('div').text(String(row.extraTekstIntern||'')).style('font-weight:bold;background:yellow;font-size:1.1em;'),
+                ),
+                $('td').append(
+                  $('div').text(num(row.bruto)),
+                  $('div').text(num(row.korting,1)),
+                ),
+                $('td').append(
+                  $('div').text(num(row.netto)),
                 ),
                 // $('td').style('font-weight:bold;font-size:1.1em;white-space:nowrap;').text(row.code),
                 // $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
@@ -971,7 +999,7 @@ $().on('load', async e => {
           $('thead').append(
 
             $('tr').append(
-              $('td').colspan(6).append(
+              $('td').colspan(8).append(
                 $('table').class('noborder').append(
                   $('tr').append(
                     $('td').text('Factuurnummer'),
@@ -1000,14 +1028,16 @@ $().on('load', async e => {
               $('th').class('nr').text('Aantal'),
               $('th').class('nr').text('Eenheid'),
               $('th').style('width:100%;').text('Omschrijving'),
-              $('th').class('nr').text('Prijs per eenheid').style('width:15mm;'),
+              $('th').class('nr').text('Bruto'),
+              $('th').class('nr').text('Kort.'),
+              $('th').class('nr').text('Netto'),
               $('th').class('nr').text('Totaal'),
             ),
           ),
           $('tbody').append(
             ...orders.map(salesorder => [
               $('tr').append(
-                $('td').colspan(6).append(
+                $('td').colspan(8).append(
                   $('table').class('noborder').append(
                     $('tr').append(
                       $('td').text('Ordernummer'),
@@ -1034,14 +1064,24 @@ $().on('load', async e => {
                       $('td').text(':', salesorder.afleverAdres2),
                     ),
                   ),
-                )
+                ),
                 // .align('left')
                 // .text([
                 //   `Leverbon: ${salesorder.id}`,
                 //   `Order datum: ${new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()}`,
                 //   salesorder.uwRef ? `uw referentie: ${salesorder.uwRef}`: '',
                 // ].filter(Boolean).join(', ')),
-              )
+              ),
+              $('tr').append(
+                $('th').text('Art.nr.'),
+                $('th').class('nr').text('Aantal'),
+                $('th').class('nr').text('Eenheid'),
+                $('th').style('width:100%;').text('Omschrijving'),
+                $('th').class('nr').text('Bruto'),
+                $('th').class('nr').text('Kort.'),
+                $('th').class('nr').text('Netto'),
+                $('th').class('nr').text('Totaal'),
+              ),
             ].concat(
               rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
                 $('td').text(row.artId ? row.artId.pad(5) : ''),
@@ -1051,8 +1091,10 @@ $().on('load', async e => {
                   row.rglomschrijving.replace(/\r|\n/g,''),
                   // $('div').style('font-style:italic;').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
                 ),
-                $('td').class('nr').text(row.netto ? cur(row.netto) : ''),
-                $('td').class('nr').text(row.totaal ? cur(row.totaal) : ''),
+                $('td').class('nr').text(row.bruto ? num(row.bruto) : ''),
+                $('td').class('nr').text(row.korting ? num(row.korting,1) : ''),
+                $('td').class('nr').text(row.netto ? num(row.netto) : ''),
+                $('td').class('nr').text(row.totaal ? num(row.totaal) : ''),
               )),
 
               // !Number(invoice.vrachtKost) ? null : $('tr').append(
@@ -1086,7 +1128,7 @@ $().on('load', async e => {
         ),
         $('table').class('grid summary').style('position:absolute;bottom:0;width:100%;').append(
           $('thead').append(
-            els.trh = $('tr'),
+            els.trh = $('tr').style('background:#ddd;'),
           ),
           $('tbody').append(
             els.trb = $('tr'),
@@ -2174,8 +2216,11 @@ $().on('load', async e => {
       $('.tot').text(num(rows.map(row =>row.totaal||0).reduce((tot,val)=>tot += val),2));
     }
     function addrow(row){
+
       $('tr').parent('.orderlist tbody').append(
-        $('td').append(row.artId),
+        $('td').append(
+          $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.artId}`)}`).text(row.artId)
+        ),
         $('td').append(row.aantal),
         $('td').append(row.omschrijving),
         $('td').append(row.extratekst),
@@ -2713,7 +2758,8 @@ $().on('load', async e => {
       const elem = $('div').class('price');
       var price;
       const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
-      var listPrice = row.cpe || row.bruto || row.ppe;
+      var listPrice = row.cpe || row.bruto || row.ppe || 0;
+      if (!listPrice) return elem;
       // console.log(row);
 
       var discount = row.k || 0;

@@ -131,6 +131,9 @@ th,td{
   vertical-align: top;
   text-align: left;
 }
+th{
+  background:#ddd;
+}
 .datum,.facnr,.nr,.debnr {
   /* width: 26mm; */
   text-align: right;

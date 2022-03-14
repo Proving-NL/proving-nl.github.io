@@ -23,18 +23,18 @@ $().on('load', async e => {
   const cssPrintUrl = 'https://proving-nl.aliconnect.nl/assets/css/print.css';
 
   let clientart = [];
-  let clientName = '';
+  let clientId = sessionStorage.getItem('clientId');
   let mandregels = [];
   let factuurData;
   let facturenElem;
   let factuur,orders,row;
 
   aim.listselector = 'product';
-  async function selectClient(name){
-    localStorage.setItem('clientName', clientName = name);
-    $('button.account span.company').text(clientName||'');
-    [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientName=' + clientName).then(res => res.json());
-    aim.idfilter = `clientName EQ '${clientName}'`;
+  async function selectClient(id){
+    sessionStorage.setItem('clientId', clientId = id);
+    $('button.account span.company').text(clientId||'');
+    [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientId=' + clientId).then(res => res.json());
+    // aim.idfilter = `clientName EQ '${clientName}'`;
   }
   Object.values(aim.config.artikelgroepen).forEach(obj =>
     Object.values(obj).forEach(obj =>
@@ -57,9 +57,16 @@ $().on('load', async e => {
         // $filter: clientName ? `klantnaam eq '${clientName}'` : 'klantnaam eq null',
         $order: 'laatstVerkochtDatumTijd DESC',
         $search: ``,
+        $top: 1000,
       }),
       Bestellijst: e => aim.list('productklant', {
-        $filter: `ClientName EQ '${clientName}'`,
+        $filter: `organisatieId EQ '${clientId}'`,
+        $order: 'lastModifiedDateTime DESC',
+        $search: `*`,
+      }),
+      ProductenVerhoging: e => aim.list('product', {
+        $filter: `ID IN (SELECT Id from abisingen.dbo.dvArt WHERE ArtInkId IS NOT NULL AND Id IN (SELECT DISTINCT Id FROM abisingen.dbo.dvArtKlant WHERE Id IS NOT NULL))`,
+        $order: 'Verhoging DESC',
         $search: `*`,
       }),
       Winkelmandje() {
@@ -2408,7 +2415,7 @@ $().on('load', async e => {
         )
       }),
       $('button').class('abtn view').title('Selecteren').on('click', e => {
-        selectClient(row.name);
+        selectClient(row.id);
       }),
       $('button').class('abtn').text('Artikelen').on('click', e => aim.list('product', {
         $filter: `leverancierId = ${row.id}`,
@@ -2760,31 +2767,54 @@ $().on('load', async e => {
       var price;
       const mandregel = mandregels.find(rgl => rgl.artId === row.id) || {};
       var listPrice = row.cpe || row.bruto || row.ppe || 0;
-      if (!listPrice) return elem;
+      // if (!listPrice) return elem;
       // console.log(row);
 
       var discount = row.k || 0;
       // console.log(clientart);
       clientart.filter(a => a.artId === row.id).forEach(a => discount = a.clientDiscount);
-      if (discount) {
-        elem.append(
-          $('div').append(
+      elem.append(
+        $('div').append(
+          'Verkoop: ',
+          discount
+          ? [
             $('span').text('€ ' + num(listPrice)).style('text-decoration:line-through;'),
             ' € ',
             $('span').text(num(price = listPrice*(100-discount)/100)).style('color:var(--discountprice);font-size:1.2em;'),
             ' (€ ' + num(price * 1.21) + ' incl. btw) ',
             ' korting ',
             $('span').text(num(discount).replace(/,00$|0$/g,'') + '%')
-          ),
-        );
-      } else {
-        elem.append(
-          $('div').append(
+          ]
+          : [
             $('span').text('€ ' + num(price = listPrice)).style('color:var(--price);font-size:1.2em;'),
             ' (€ ' + num(price * 1.21) + ' incl. btw) ',
-          ),
-        );
-      }
+          ],
+          ' Inkoop: ',
+          $('span').text(cur(row.inkNetto)).style('color:lightgreen;font-size:1.2em;'),
+          $('span').text(` (- ${num(row.inkKorting,1)} %)`),
+          ' Leverancier: ',
+          $('span').text(cur(row.levBruto)).style('color:orange;font-size:1.2em;'),
+          $('span').text(` (- ${num(row.levKorting,1)} %)`),
+          $('span').text(cur(row.levNetto)),
+          ' Verhoging: ',
+          $('span').text(num(row.verhoging,1)).style('color:yellow;font-size:1.2em;'),
+        ),
+        // $('div').append(
+        //   ' Inkoop: ',
+        //   $('span').text(` (- ${num(row.inkKorting,1)} %)`),
+        //   $('span').text(cur(row.inkNetto)).style('color:lightgreen;font-size:1.2em;'),
+        // ),
+        // $('div').append(
+        //   ' Leverancier: ',
+        //   $('span').text(cur(row.levBruto)).style('color:orange;font-size:1.2em;'),
+        //   $('span').text(` (- ${num(row.levKorting,1)} %)`),
+        //   $('span').text(cur(row.levNetto)),
+        // ),
+        // $('div').append(
+        //   ' Verhoging: ',
+        //   $('span').text(num(row.verhoging,1)).style('color:yellow;font-size:1.2em;'),
+        // ),
+      );
       // console.log(mandregel,row.id,row.artId);
       elem.append(
         $('div').append(
@@ -3983,6 +4013,28 @@ $().on('load', async e => {
       },
     },
     Abis: {
+      async verhoging1() {
+        const [rows] = await dmsClient.api('/abis/verhoging1').get();
+        rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+        rows.forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId));
+        console.log(rows);
+        $('.lv').text('').append(
+          $('div').append(
+            $('table').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      },
       ArtikelInkoop: e => aim.list('artikelinkoop', {
         $search: ``,
       }),
@@ -4426,7 +4478,7 @@ $().on('load', async e => {
     clientName = contact.klantId;
   }
   // clientName = localStorage.getItem('clientName') || clientName;
-  await selectClient(clientName);
+  await selectClient(clientId);
 
   // dmsClient.api('/me/children').select('name').get().then(console.log);
   // dmsClient.api('/Contact').select('CompanyName,name,FirstName,Surname').search('alicon.nl').get().then(console.log);

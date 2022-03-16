@@ -1176,11 +1176,11 @@ $().on('load', async e => {
     //   els.trb.append($('td').align('right').text(cur(totaal - betaald)));
     // }
 
-    // await dmsClient.api('/abis/factuurOpslaan').body({
-    //   id: factuur.id,
-    //   content: elem.elem.innerHTML,
-    //   name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
-    // }).post().then(e => console.log(e));
+    await dmsClient.api('/abis/factuurOpslaan').body({
+      id: factuur.id,
+      content: elem.elem.innerHTML,
+      name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
+    }).post().then(e => console.log(e));
 
 
     return elem;

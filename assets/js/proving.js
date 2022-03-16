@@ -1175,11 +1175,14 @@ $().on('load', async e => {
     //   els.trh.append($('th').align('right').text(`Te betalen`));
     //   els.trb.append($('td').align('right').text(cur(totaal - betaald)));
     // }
-    await dmsClient.api('/abis/factuurOpslaan').body({
-      id: factuur.id,
-      content: elem.elem.innerHTML,
-      name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
-    }).post().then(e => console.log(e));
+
+    // await dmsClient.api('/abis/factuurOpslaan').body({
+    //   id: factuur.id,
+    //   content: elem.elem.innerHTML,
+    //   name: `${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase()
+    // }).post().then(e => console.log(e));
+
+
     return elem;
   }
   async function sendInvoice(factuurElem, factuur) {
@@ -2508,18 +2511,19 @@ $().on('load', async e => {
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
       $('button').text('Regels').on('click', e => orderInvoer(row)),
-      row.factuurId ? [
-        // $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await getfactuur(row.factuurId)).printpdf()),
-        $('button').class('abtn invoice').title('Factuur printen').on('click', e => toonFactuur({
-          afzenderNaam: row.afzenderNaam,
-          factuurNr: row.factuurNr,
-          uid: row.factuurUId,
-          jaar: row.jaar,
-        })),
-        // !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.invoiceNr), factuurData)),
-      ] : [
-        $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
-      ],
+      $('button').text('Factureren').on('click', async e => await lijstFactureren([row])).disabled(row.factuurId || !row.printDatumTijd || !row.gepaktDatumTijd || !row.verstuurdDatumTijd || !row.leverDatumTijd)
+      // row.factuurId ? [
+      //   // $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await getfactuur(row.factuurId)).printpdf()),
+      //   $('button').class('abtn invoice').title('Factuur printen').on('click', e => toonFactuur({
+      //     afzenderNaam: row.afzenderNaam,
+      //     factuurNr: row.factuurNr,
+      //     uid: row.factuurUId,
+      //     jaar: row.jaar,
+      //   })),
+      //   // !row.clientOtherMailAddress ? null : $('button').class('icn-mail-send').title('Factuur verzenden').on('click', async e => await sendInvoice(await getfactuur(row.invoiceNr), factuurData)),
+      // ] : [
+      //   $('button').text('Factureren').on('click', async e => await lijstFactureren([row])),
+      // ],
     ],
     navList: () => [
       $('button').text('Bonnen').append(
@@ -3061,6 +3065,14 @@ $().on('load', async e => {
       }),
     },
     CRM: {
+      Klanten: e => aim.list('company',{
+        $filter: `klantcode is not null`,
+        $search: ``,
+      }),
+      Leveranciers: e => aim.list('company',{
+        $filter: `levcode is not null or crednr is not null`,
+        $search: ``,
+      }),
       Organisaties: e => aim.list('company',{
         $search: ``,
       }),
@@ -3068,7 +3080,7 @@ $().on('load', async e => {
         $filter: `archivedDateTime NE NULL`,
         $search: ``,
       }),
-      Klanten:{
+      KlantenLijst:{
         Actief:{
           Mailadressen:{
             Proving: async e => {
@@ -4076,6 +4088,30 @@ $().on('load', async e => {
         $order: `LaatstVerkochtDatumTijd DESC`,
       }),
 
+      async InkoopPrijslijst3M() {
+        const [rows] = await dmsClient.api('/abis/inkoop_prijslijst').query({
+          prijslijstId: 3,
+          select: 'productgroep,tekst,code,partnr,levbruto AS bruto,eenheid,aantalstuks AS ve,minimaleBestelHoeveelheid AS mba',
+          order: 'productgroep,tekst',
+        }).get();
+        console.log(rows);
+        $('.lv').text('').append(
+          $('div').append(
+            $('table').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      },
 
       async Aandacht1() {
         const [rows] = await dmsClient.api('/abis/aandacht1').get();

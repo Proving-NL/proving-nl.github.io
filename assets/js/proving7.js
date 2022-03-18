@@ -504,180 +504,282 @@ $().on('load', async e => {
     // const rowserr = rows.filter(row => row.err);
     console.log(rows.some(row => row.err));
 
-    const elem = $('div').append(
-      $('link').rel('stylesheet').href(cssPrintUrl),
-      // $('header').style('position: fixed;top: 1mm;left: 0px;right: 0px;').append(
-      //   $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + salesorder.afzenderCode + '.png'),
+    const elem = printElem().append(
+      // !rowserr.length ? null : $('div').class('brief order').style('page-break-before:always;').append(
+      //   $('table').style('width:100%;').append(
+      //     $('tr').append(
+      //       $('td').append(
+      //         $('div').text('CORRECTIE OPDRACHT voor intern gebruik').style('font-weight:bold;font-size:1.2em;'),
+      //         $('table').style('margin-bottom:10mm;width:100%;').append(
+      //           $('tr').append(
+      //             $('td').style('padding-left:10mm;').append(
+      //               $('div').text('Afleveradres:').style('font-weight:bold;'),
+      //               $('div').text(salesorder.bonOrganisatieNaam),
+      //               $('div').text(salesorder.bonContact),
+      //               $('div').text(salesorder.bonAdres1),
+      //               $('div').text(salesorder.bonAdres2),
+      //             ),
+      //             $('td').append(
+      //               $('div').text('Factuuradres:').style('font-weight:bold;'),
+      //               $('div').text(salesorder.postOrganisatieNaam),
+      //               $('div').text(salesorder.postAdres1),
+      //               $('div').text(salesorder.postAdres2),
+      //             ),
+      //           )
+      //         ),
+      //       ),
+      //       $('td').style('width:50mm;').append(
+      //         $('div').text(salesorder.bedrijfOrganisatieNaam).style('font-weight:bold;'),
+      //         $('div').text(salesorder.bedrijfVoettekst).style('word-wrap:pre;font-size:0.8em;'),
+      //       ),
+      //     )
+      //   ),
+      //   $('style').text('tr.bbn>td{border-bottom:none;}tr.bbn+tr>td{border-top:none;}'),
+      //   $('table').class('grid summary').append(
+      //     $('thead').append(
+      //       $('tr').append(
+      //         $('td').colspan(6).append(
+      //           $('table').class('noborder').append(
+      //             $('tr').append(
+      //               $('td').text('Ordernummer'),
+      //               $('td').text(':', salesorder.id),
+      //               $('td').text('Klantnummer'),
+      //               $('td').text(':', salesorder.klantId),
+      //               $('td').text('VOS totaal'),
+      //               $('td').text(':', vosTotaal).style('width:100%;'),
+      //             ),
+      //             $('tr').append(
+      //               $('td').text('Orderdatum'),
+      //               $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+      //               $('td').text('Uw referentie'),
+      //               $('td').text(':', salesorder.uwRef),
+      //               $('td').text('Gewicht totaal'),
+      //               $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
+      //             ),
+      //             $('tr').append(
+      //               $('td').text('Verzenddatum'),
+      //               $('td').text(':', new Date(salesorder.planDatumTijd).toLocaleDateString()),
+      //               $('td').text('Bestelwijze'),
+      //               $('td').text(':', bestelOptions[salesorder.volgNr] ? bestelOptions[salesorder.volgNr].title : 'Onbekend'),
+      //               $('td').text('Transport'),
+      //               $('td').text(':', transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend'),
+      //             ),
+      //           ),
+      //         )
+      //       ),
+      //       $('tr').append(
+      //         // $('th').align('left').text('Artikelnummer'),
+      //         $('th').align('left').text('Code', 'Art.nr.'),
+      //         $('th').align('left').text('Vak'),
+      //         $('th').align('right').text('Aantal', 'Eenheid'),
+      //         // $('th').align('left').text('Eenheid'),
+      //         // $('th').align('left').text('Code'),
+      //         $('th').align('left').text('Omschrijving').style('width:100%;'),
+      //         // $('th').align('left').text('Inhoud'),
+      //         // $('th').align('left').text('Prod.nr.'),
+      //         // $('th').align('left').text('EAN'),
+      //         // $('th').align('left').style('width:100%;').text('Omschrijving'),
+      //         // $('th').align('right').text('KG/st.'),
+      //         // $('th').align('right').text('VOS/st.'),
+      //         // $('th').align('right').text('Aanw.'),
+      //         $('th').align('right').text('Bruto'),
+      //         $('th').align('right').text('Kort.'),
+      //         $('th').align('right').text('Netto'),
+      //       ),
+      //     ),
+      //     $('tbody').append(
+      //       rowserr.map(row => [
+      //         $('tr').append(
+      //           // $('td').text(Number(row.artId).pad(9)),
+      //           $('td').append(row.code, row.artId||''),
+      //           $('td').text(row.loc),
+      //           $('td').text(row.aantal),
+      //           $('td').text(row.eenheid),
+      //           $('td').text(row.code),
+      //           $('td').style('white-space:normal;').append(row.omschrijving),
+      //           // $('td').style('font-weight:bold;font-size:1.1em;white-space:nowrap;').text(row.code),
+      //           // $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
+      //           // $('td').text(row.prodNr),
+      //           // $('td').text(row.barcode),
+      //           // $('td').text(row.omschrijving).style('white-space:normal;'),
+      //           // $('td').align('right').text(!row.gewicht ? null : num(row.gewicht,1)),
+      //           // $('td').align('right').text(row.voswaarde),
+      //           // $('td').align('right').text(row.voorraad),
+      //           // $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
+      //         ),
+      //         $('tr').append(
+      //           $('td').colspan(10).text(row.err.join(', ')).style('color:red;'),
+      //         ),
+      //       ])
+      //     ),
+      //   ),
       // ),
-      // $('header').style('position: fixed;top: 0;left: 0;right: 0;bottom: -10mm;border: solid 1px black;'),
-      // $('header').style('position: fixed;top: -20mm;left: 0px;right: 0px;height:30mm;').append(
-      //   $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + factuur.bedrijfCode + '.png'),
-      // ),
-      // $('div').class('brief order').style('page-break-before:always;').append(
-      $('table').style('width:100%;').append(
-
-        $('tr').append(
-          $('td').append(
-            $('div').text('PAKBON voor intern gebruik').style('font-weight:bold;font-size:1.2em;'),
-            $('div').class('bc').text(`*${salesorder.id}*`).style('margin-bottom:10mm;height:10mm;'),
-            $('table').style('margin-bottom:10mm;width:100%;').append(
-              $('tr').append(
-                $('td').style('padding-left:10mm;').append(
-                  $('div').text('Afleveradres:').style('font-weight:bold;'),
-                  $('div').text(salesorder.bonOrganisatieNaam),
-                  $('div').text(salesorder.bonContact),
-                  $('div').text(salesorder.bonAdres1),
-                  $('div').text(salesorder.bonAdres2),
-                ),
-                $('td').append(
-                  $('div').text('Factuuradres:').style('font-weight:bold;'),
-                  $('div').text(salesorder.postOrganisatieNaam),
-                  $('div').text(salesorder.postAdres1),
-                  $('div').text(salesorder.postAdres2),
+      $('div').class('brief order').style('page-break-before:always;').append(
+        $('table').style('width:100%;').append(
+          $('tr').append(
+            $('td').append(
+              $('div').text('PAKBON voor intern gebruik').style('font-weight:bold;font-size:1.2em;'),
+              $('div').class('bc').text(`*${salesorder.id}*`).style('margin-bottom:10mm;height:10mm;'),
+              $('table').style('margin-bottom:10mm;width:100%;').append(
+                $('tr').append(
+                  $('td').style('padding-left:10mm;').append(
+                    $('div').text('Afleveradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.bonOrganisatieNaam),
+                    $('div').text(salesorder.bonContact),
+                    $('div').text(salesorder.bonAdres1),
+                    $('div').text(salesorder.bonAdres2),
+                  ),
+                  $('td').append(
+                    $('div').text('Factuuradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.postOrganisatieNaam),
+                    $('div').text(salesorder.postAdres1),
+                    $('div').text(salesorder.postAdres2),
+                  ),
+                )
+              ),
+            ),
+            $('td').style('width:50mm;').append(
+              $('div').text(salesorder.bedrijfOrganisatieNaam).style('font-weight:bold;'),
+              $('div').text(salesorder.bedrijfVoettekst).style('word-wrap:pre;font-size:0.8em;'),
+            ),
+          )
+        ),
+        rows.some(row => row.err) ? $('div').text(`Er zijn critieke foutmeldingen. Deze laten corrigeren door Verkoop Binnendienst. Deze fouten blokkeren de afhandeling.`).style('color:red; padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+        salesorder.opmerking ? $('div').text(salesorder.opmerking).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+        $('style').text('tr.bbn>td{border-bottom:none;}tr.bbn+tr>td{border-top:none;}'),
+        $('table').class('grid summary').append(
+          $('thead').append(
+            $('tr').append(
+              $('td').colspan(6).append(
+                $('table').class('noborder').append(
+                  $('tr').append(
+                    $('td').text('Ordernummer'),
+                    $('td').text(':', salesorder.id),
+                    $('td').text('Klantnummer'),
+                    $('td').text(':', salesorder.klantId),
+                    $('td').text('VOS totaal'),
+                    $('td').text(':', vosTotaal).style('width:100%;'),
+                  ),
+                  $('tr').append(
+                    $('td').text('Orderdatum'),
+                    $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                    $('td').text('Uw referentie'),
+                    $('td').text(':', salesorder.uwRef),
+                    $('td').text('Gewicht totaal'),
+                    $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
+                  ),
+                  $('tr').append(
+                    $('td').text('Verzenddatum'),
+                    $('td').text(':', new Date(salesorder.planDatumTijd).toLocaleDateString()),
+                    $('td').text('Bestelwijze'),
+                    $('td').text(':', bestelOptions[salesorder.volgNr] ? bestelOptions[salesorder.volgNr].title : 'Onbekend'),
+                    $('td').text('Transport'),
+                    $('td').text(':', transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend'),
+                  ),
                 ),
               )
             ),
-          ),
-          $('td').style('width:50mm;').append(
-            $('div').text(salesorder.bedrijfOrganisatieNaam).style('font-weight:bold;'),
-            $('div').text(salesorder.bedrijfVoettekst).style('word-wrap:pre;font-size:0.8em;'),
-          ),
-        )
-      ),
-      rows.some(row => row.err) ? $('div').text(`Er zijn critieke foutmeldingen. Deze laten corrigeren door Verkoop Binnendienst. Deze fouten blokkeren de afhandeling.`).style('color:red; padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
-      salesorder.opmerking ? $('div').text(salesorder.opmerking).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
-      $('table').class('grid summary').append(
-        $('thead').append(
-          $('tr').append(
-            $('td').colspan(6).style('border:none;padding:0;').append(
-              $('table').class('border summary').append(
-                $('tr').append(
-                  $('th').text('Ordernummer'),
-                  $('td').text(salesorder.id),
-                  $('th').text('Klantnummer'),
-                  $('td').text(salesorder.klantId),
-                  $('th').text('VOS totaal'),
-                  $('td').text(vosTotaal).style('width:100%;'),
-                ),
-                $('tr').append(
-                  $('th').text('Orderdatum'),
-                  $('td').text(new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
-                  $('th').text('Uw referentie'),
-                  $('td').text(salesorder.uwRef),
-                  $('th').text('Gewicht totaal'),
-                  $('td').text(num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
-                ),
-                $('tr').append(
-                  $('th').text('Verzenddatum'),
-                  $('td').text(new Date(salesorder.planDatumTijd).toLocaleDateString()),
-                  $('th').text('Bestelwijze'),
-                  $('td').text(bestelOptions[salesorder.volgNr] ? bestelOptions[salesorder.volgNr].title : 'Onbekend'),
-                  $('th').text('Transport'),
-                  $('td').text(transportOptions[salesorder.routeNr] ? transportOptions[salesorder.routeNr].title : 'Onbekend'),
-                ),
-              ),
-            )
-          ),
-          $('tr').append(
-            // $('th').align('left').text('Artikelnummer'),
-            $('th').append(
-              $('div').text('Vak'),
-            ),
-            $('th').style('text-align:right;').append(
-              $('div').text('Aantal'),
-              $('div').text('Eenheid'),
-            ),
-            $('th').append(
-              $('div').text('Art.nr.'),
-              // $('div').text('Art.code'),
-              $('div').text('Code'),
-            ),
-            $('th').style('width:100%;').append(
-              $('div').text('Omschrijving'),
-            ),
-            // $('th').align('left').text('Inhoud'),
-            // $('th').align('left').text('Prod.nr.'),
-            // $('th').align('left').text('EAN'),
-            // $('th').align('left').style('width:100%;').text('Omschrijving'),
-            // $('th').align('right').text('KG/st.'),
-            // $('th').align('right').text('VOS/st.'),
-            // $('th').align('right').text('Aanw.'),
-            $('th').style('text-align:right;').append(
-              $('div').text('Bruto'),
-              $('div').text('Kort.'),
-            ),
-            $('th').style('text-align:right;').append(
-              $('div').text('Netto'),
-              $('div').text('Totaal'),
-            ),
-          ),
-        ),
-        $('tbody').append(
-          rows
-          .sort((a,b) => a.loc.localeCompare(b.loc))
-          .filter(row => row.aantal || row.bruto)
-          .map(row => [
             $('tr').append(
-              $('td').append(
-                $('div').text(row.loc||''),
+              // $('th').align('left').text('Artikelnummer'),
+              $('th').append(
+                $('div').text('Vak'),
               ),
-              $('td').style('text-align:right;').append(
-                $('div').text(row.aantal).style('font-weight:bold;'),
-                $('div').text(row.eenheid).style('font-weight:bold;'),
+              $('th').style('text-align:right;').append(
+                $('div').text('Aantal'),
+                $('div').text('Eenheid'),
               ),
-              $('td').append(
-                $('div').text(row.artId||''),
-                // $('div').text(row.artCode||''),
-                $('div').text(row.code||'').style('font-weight:bold;'),
+              $('th').append(
+                $('div').text('Art.nr.'),
+                // $('div').text('Art.code'),
+                $('div').text('Code'),
               ),
-              $('td').style('white-space:normal;').append(
-                String(row.omschrijving||'').replace(/\r|\n/g,''),
-                $('div').text(row.extraTekst||'').style('font-weight:bold;'),
-                $('div').text(String(row.extraTekstIntern||'')).style('font-weight:bold;background:yellow;'),
-                !row.err ? null : row.err.map(err => $('div').text(err).style('color:red;')),
-                !row.warn ? null : row.warn.map(err => $('div').text(err).style('color:orange;')),
+              $('th').style('width:100%;').append(
+                $('div').text('Omschrijving'),
               ),
-              $('td').style('text-align:right;').append(
-                $('div').text(num(row.bruto)),
-                $('div').text(num(row.korting)),
+              // $('th').align('left').text('Inhoud'),
+              // $('th').align('left').text('Prod.nr.'),
+              // $('th').align('left').text('EAN'),
+              // $('th').align('left').style('width:100%;').text('Omschrijving'),
+              // $('th').align('right').text('KG/st.'),
+              // $('th').align('right').text('VOS/st.'),
+              // $('th').align('right').text('Aanw.'),
+              $('th').style('text-align:right;').append(
+                $('div').text('Bruto'),
+                $('div').text('Kort.'),
               ),
-              $('td').style('text-align:right;').append(
-                $('div').text(num(row.netto)),
-                $('div').text(num(row.totaal)),
+              $('th').style('text-align:right;').append(
+                $('div').text('Netto'),
+                $('div').text('Totaal'),
               ),
-              // $('td').style('font-weight:bold;font-size:1.1em;white-space:nowrap;').text(row.code),
-              // $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
-              // $('td').text(row.prodNr),
-              // $('td').text(row.barcode),
-              // $('td').text(row.omschrijving).style('white-space:normal;'),
-              // $('td').align('right').text(!row.gewicht ? null : num(row.gewicht,1)),
-              // $('td').align('right').text(row.voswaarde),
-              // $('td').align('right').text(row.voorraad),
-              // $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
             ),
-            // $('tr').append(
-            //   // $('td').text(Number(row.artId).pad(9)),
-            //   $('td'),
-            //   $('td'),
-            //   $('td').style('white-space:normal;').colspan(8).append(
-            //     // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
-            //     $('div').text(String(row.extratekstIntern||'')).style('background:yellow;'),
-            //     // $('div').style('font-style:italic;color:red;').text(String(row.rglomschrijving||'').replace(/\r|\n/g,'')),
-            //     // $('div').style('font-size:0.7em').text(String(row.omschrijving).replace(/\r|\n/g,'')),
-            //     // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
-            //   ),
-            //   $('td'),
-            // ),
-          ]),
-          $('tr').append(
-            $('td'),
-            $('td').text(num(rows.filter(row => row.aantal).map(row => row.aantal).reduce((tot,val)=>tot += val),1)).style('text-align:right;'),
-            $('td'),
-            $('th').colspan(2).text('BON TOTAAL').style('text-align:right;'),
-            $('td').text(num(rows.filter(row => row.totaal).map(row => row.totaal).reduce((tot,val)=>tot += val),2)).style('font-weight:bold;'),
           ),
-          //               $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
+          $('tbody').append(
+            rows
+            .sort((a,b) => a.loc.localeCompare(b.loc))
+            .filter(row => row.aantal || row.bruto)
+            .map(row => [
+              $('tr').append(
+                $('td').append(
+                  $('div').text(row.loc||''),
+                ),
+                $('td').style('text-align:right;').append(
+                  $('div').text(row.aantal).style('font-weight:bold;'),
+                  $('div').text(row.eenheid).style('font-weight:bold;'),
+                ),
+                $('td').append(
+                  $('div').text(row.artId||''),
+                  // $('div').text(row.artCode||''),
+                  $('div').text(row.code||'').style('font-weight:bold;'),
+                ),
+                $('td').style('white-space:normal;').append(
+                  String(row.omschrijving||'').replace(/\r|\n/g,''),
+                  $('div').text(row.extraTekst||'').style('font-weight:bold;font-size:1.1em;'),
+                  $('div').text(String(row.extraTekstIntern||'')).style('font-weight:bold;background:yellow;font-size:1.1em;'),
+                  !row.err ? null : row.err.map(err => $('div').text(err).style('color:red;')),
+                  !row.warn ? null : row.warn.map(err => $('div').text(err).style('color:orange;')),
+                ),
+                $('td').style('text-align:right;').append(
+                  $('div').text(num(row.bruto)),
+                  $('div').text(num(row.korting)),
+                ),
+                $('td').style('text-align:right;').append(
+                  $('div').text(num(row.netto)),
+                  $('div').text(num(row.totaal)),
+                ),
+                // $('td').style('font-weight:bold;font-size:1.1em;white-space:nowrap;').text(row.code),
+                // $('td').style('font-weight:bold;').text(row.inhoud, String(row.inhoudEenheid||'').toUpperCase()),
+                // $('td').text(row.prodNr),
+                // $('td').text(row.barcode),
+                // $('td').text(row.omschrijving).style('white-space:normal;'),
+                // $('td').align('right').text(!row.gewicht ? null : num(row.gewicht,1)),
+                // $('td').align('right').text(row.voswaarde),
+                // $('td').align('right').text(row.voorraad),
+                // $('td').align('right').text(row.bruto ? num(row.bruto) : ''),//.style('font-family:monospace;font-size:0.9em;'),
+              ),
+              // $('tr').append(
+              //   // $('td').text(Number(row.artId).pad(9)),
+              //   $('td'),
+              //   $('td'),
+              //   $('td').style('white-space:normal;').colspan(8).append(
+              //     // $('div').text(row.prodTitel.replace(/\r|\n/g,'')),
+              //     $('div').text(String(row.extratekstIntern||'')).style('background:yellow;'),
+              //     // $('div').style('font-style:italic;color:red;').text(String(row.rglomschrijving||'').replace(/\r|\n/g,'')),
+              //     // $('div').style('font-size:0.7em').text(String(row.omschrijving).replace(/\r|\n/g,'')),
+              //     // $('div').text(row.levTitel.replace(/\r|\n/g,'')),
+              //   ),
+              //   $('td'),
+              // ),
+            ]),
+            $('tr').append(
+              $('td'),
+              $('td').text(num(rows.filter(row => row.aantal).map(row => row.aantal).reduce((tot,val)=>tot += val),1)).style('text-align:right;'),
+              $('td'),
+              $('td').colspan(2).text('BON TOTAAL').style('text-align:right;'),
+              $('td').text(num(rows.filter(row => row.totaal).map(row => row.totaal).reduce((tot,val)=>tot += val),2)).style('font-weight:bold;'),
+            ),
+            //               $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
 
+          ),
         ),
       ),
       rows.filter(row => row.loc==='30.01.01').map(row => $('div').class('brief order').style('page-break-before:always;').append(
@@ -714,154 +816,138 @@ $().on('load', async e => {
         $('table').class('grid summary').append(
           $('thead').append(
             $('tr').append(
-              $('td').colspan(6).style('border:none;padding:0;').append(
-                $('table').class('border summary').append(
+              $('td').colspan(6).append(
+                $('table').class('noborder').append(
                   $('tr').append(
-                    $('th').text('Ordernummer'),
-                    $('td').text(salesorder.id),
-                    $('th').text('Klantnummer'),
-                    $('td').text(salesorder.klantId).style('width:100%;'),
+                    $('td').text('Ordernummer'),
+                    $('td').text(':', salesorder.id),
+                    $('td').text('Klantnummer'),
+                    $('td').text(':', salesorder.klantId).style('width:100%;'),
                   ),
                   $('tr').append(
-                    $('th').text('Orderdatum'),
-                    $('td').text(new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
-                    $('th').text('Uw referentie'),
-                    $('td').text(salesorder.uwRef),
+                    $('td').text('Orderdatum'),
+                    $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                    $('td').text('Uw referentie'),
+                    $('td').text(':', salesorder.uwRef),
                   ),
                   $('tr').append(
-                    $('th').text('Opdrachtnummer'),
-                    $('td').text(row.id),
-                    $('th'),
-                    $('td'),
+                    $('td').text('Opdrachtnummer'),
+                    $('td').text(':', row.id),
                   ),
                 ),
               )
             ),
           ),
         ),
-        $('table').class('grid summary').append(
+        $('table').append(
           $('tr').append(
-            $('th').text('Art.nr.'),
-            $('td').text(row.artId),
+            $('td').text('Art.nr.'),
+            $('td').text(':', row.artId),
           ),
           $('tr').append(
-            $('th').text('Code'),
-            $('td').text(row.code),
+            $('td').text('Code'),
+            $('td').text(':', row.code),
           ),
           $('tr').append(
-            $('th').text('Aantal'),
-            $('td').text(row.aantal),
+            $('td').text('Aantal'),
+            $('td').text(':', row.aantal),
           ),
           $('tr').append(
-            $('th').text('Product'),
-            $('td').text(row.omschrijving),
+            $('td').text('Product'),
+            $('td').text(':', row.omschrijving),
           ),
           $('tr').append(
-            $('th').text('Omschrijving'),
-            $('td').text(row.extraTekst).style('font-weight:bold;width:100%;'),
+            $('td').text('Omschrijving'),
+            $('td').text(':', row.extraTekst).style('font-weight:bold;width:100%;'),
           ),
         ),
       )),
-
-      // $('div').class('brief').style('page-break-before:always;margin-top:20mm;').append(
-        // $('div').append(
-        //   !salesorder.afzenderCode ? null : $('img').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + salesorder.afzenderCode + '.png'),
-        // ),
-      $('table').style('width:100%;page-break-before:always;').append(
-        $('thead').append(
-          $('tr').append(
-            $('td').colspan(6).append(
-              $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + salesorder.afzenderCode + '.png'),
-            )
-          ),
+      $('div').class('brief').style('page-break-before:always;').append(
+        $('div').append(
+          !salesorder.afzenderCode ? null : $('img').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + salesorder.afzenderCode + '.png'),
         ),
-        $('tr').append(
-          $('td').append(
-            $('div').text('LEVERBON').style('font-weight:bold;font-size:1.2em;'),
-            $('div').class('bc').text(`*${salesorder.id}*`).style('margin-bottom:10mm;height:10mm;'),
-            $('table').style('margin-bottom:10mm;width:100%;').append(
-              $('tr').append(
-                $('td').style('padding-left:10mm;').append(
-                  $('div').text('Afleveradres:').style('font-weight:bold;'),
-                  $('div').text(salesorder.bonOrganisatieNaam),
-                  $('div').text(salesorder.bonContact),
-                  $('div').text(salesorder.bonAdres1),
-                  $('div').text(salesorder.bonAdres2),
-                ),
-                $('td').append(
-                  // $('div').text('Factuuradres:').style('font-weight:bold;'),
-                  // $('div').text(salesorder.afzenderOrganisatieNaam),
-                  // $('div').text(salesorder.postadres1),
-                  // $('div').text(salesorder.postadres2),
+        $('table').style('width:100%;').append(
+          $('tr').append(
+            $('td').append(
+              $('div').text('LEVERBON').style('font-weight:bold;font-size:1.2em;'),
+              $('div').class('bc').text(`*${salesorder.id}*`).style('margin-bottom:10mm;height:10mm;'),
+              $('table').style('margin-bottom:10mm;width:100%;').append(
+                $('tr').append(
+                  $('td').style('padding-left:10mm;').append(
+                    $('div').text('Afleveradres:').style('font-weight:bold;'),
+                    $('div').text(salesorder.bonOrganisatieNaam),
+                    $('div').text(salesorder.bonContact),
+                    $('div').text(salesorder.bonAdres1),
+                    $('div').text(salesorder.bonAdres2),
+                  ),
+                  $('td').append(
+                    // $('div').text('Factuuradres:').style('font-weight:bold;'),
+                    // $('div').text(salesorder.afzenderOrganisatieNaam),
+                    // $('div').text(salesorder.postadres1),
+                    // $('div').text(salesorder.postadres2),
+                  ),
+                )
+              ),
+            ),
+            $('td').style('width:50mm;').append(
+              $('div').text(salesorder.afzenderOrganisatieNaam).style('font-weight:bold;'),
+              $('div').text(salesorder.afzenderVoettekst).style('word-wrap:pre;font-size:0.8em;'),
+            ),
+          )
+        ),
+
+        salesorder.postVerzendCode ? [
+          $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
+          $('div').text(`${salesorder.postVerzendCode}`),
+        ] : null,
+
+        $('table').class('grid').style('margin-bottom:25mm;').append(
+          $('thead').append(
+
+            $('tr').append(
+              $('td').colspan(6).append(
+                $('table').class('noborder').append(
+                  $('tr').append(
+                    $('td').text('Ordernummer'),
+                    $('td').text(':', salesorder.id),
+                    $('td').text('Klantnummer'),
+                    $('td').text(':', salesorder.klantId),
+                    $('td').text('VOS totaal'),
+                    $('td').text(':', vosTotaal).style('width:100%;'),
+                  ),
+                  $('tr').append(
+                    $('td').text('Orderdatum'),
+                    $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                    $('td').text('Uw referentie'),
+                    $('td').text(':', salesorder.uwRef),
+                  ),
+                  $('tr').append(
+                    $('td').text('Verzenddatum'),
+                    $('td').text(':', new Date(salesorder.planDatumTijd).toLocaleDateString()),
+                  ),
                 ),
               )
             ),
+
+            $('tr').append(
+              $('th').text('Art.nr.'),
+              $('th').style('text-align:right;').text('Aantal'),
+              $('th').text('Eenheid'),
+              $('th').style('width:100%;').text('Omschrijving'),
+              // $('th').align('right').text('VOS per eenheid').style('width:15mm;'),
+            ),
           ),
-          $('td').style('width:50mm;').append(
-            $('div').text(salesorder.afzenderOrganisatieNaam).style('font-weight:bold;'),
-            $('div').text(salesorder.afzenderVoettekst).style('word-wrap:pre;font-size:0.8em;'),
-          ),
-        )
-      ),
-
-      salesorder.postVerzendCode ? [
-        $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
-        $('div').text(`${salesorder.postVerzendCode}`),
-      ] : null,
-
-      $('table').class('grid').style('margin-bottom:25mm;').append(
-        $('thead').append(
-
-          $('tr').append(
-            $('td').colspan(6).style('border:none;padding:0;').append(
-              $('table').class('border summary').append(
-                $('tr').append(
-                  $('th').text('Ordernummer'),
-                  $('td').text(salesorder.id),
-                  $('th').text('Klantnummer'),
-                  $('td').text(salesorder.klantId),
-                  $('th').text('VOS totaal'),
-                  $('td').text(vosTotaal).style('width:100%;'),
-                ),
-                $('tr').append(
-                  $('th').text('Orderdatum'),
-                  $('td').text(new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
-                  $('th').text('Uw referentie'),
-                  $('td').text(salesorder.uwRef),
-                  $('th'),
-                  $('td'),
-                ),
-                $('tr').append(
-                  $('th').text('Verzenddatum'),
-                  $('td').text(new Date(salesorder.planDatumTijd).toLocaleDateString()),
-                  $('th'),
-                  $('td'),
-                  $('th'),
-                  $('td'),
-                ),
-              ),
-            )
-          ),
-
-          $('tr').append(
-            $('th').text('Art.nr.'),
-            $('th').style('text-align:right;').text('Aantal'),
-            $('th').text('Eenheid'),
-            $('th').style('width:100%;').text('Omschrijving'),
-            // $('th').align('right').text('VOS per eenheid').style('width:15mm;'),
+          $('tbody').append(
+            rows.sort((a,b) => a.id - b.id).map(row => $('tr').append(
+              $('td').text(row.artId ? row.artId.pad(5) : ''),
+              $('td').style('text-align:right;').text(row.aantal),
+              $('td').text(row.eenheid),
+              $('td').style('white-space:normal;').text(row.rglomschrijving.replace(/\r|\n/g,'')),
+              // $('td').text(row.title).style('white-space:normal;'),
+              // $('td').align('right').text(row.voswaarde),
+            )),
           ),
         ),
-        $('tbody').append(
-          rows.sort((a,b) => a.id - b.id).map(row => $('tr').append(
-            $('td').text(row.artId ? row.artId.pad(5) : ''),
-            $('td').style('text-align:right;').text(row.aantal),
-            $('td').text(row.eenheid),
-            $('td').style('white-space:normal;').text(row.rglomschrijving.replace(/\r|\n/g,'')),
-            // $('td').text(row.title).style('white-space:normal;'),
-            // $('td').align('right').text(row.voswaarde),
-          )),
-        ),
-      ),
         // backorder.length ? $('table').class('grid').append(
         //   $('thead').append(
         //     $('tr').append(
@@ -883,7 +969,7 @@ $().on('load', async e => {
         // ) : null,
 
         // $('div').text('Bij bestellingen is het vereist het artikel nummer op te geven. De code is informatief, merk gebonden, niet uniek en kan niet gebruikt worden voor het doorgeven van bestellingen.')
-      // ),
+      ),
     );
     return elem;
   }
@@ -914,186 +1000,182 @@ $().on('load', async e => {
     const elem = $('div').append(
       $('link').rel('stylesheet').href(cssPrintUrl),
       $('header').style('position: fixed;top: 0;left: 0;right: 0;bottom: -10mm;border: solid 1px black;'),
-      // $('header').style('position: fixed;top: 0mm;left: 0px;right: 0px;').append(
-      //   $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + factuur.bedrijfCode + '.png'),
-      // ),
-      $('table').style('width:100%;').append(
-        $('thead').append(
+      // $('header').style('position: fixed;top: 10px;left: 10px;right: 0px;bottom: 0px;border: solid 1px red;'),
+      // $('div').class('brief invoice').append(
+        $('header').style('position: fixed;top: -20mm;left: 0px;right: 0px;height:30mm;').append(
+          $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + factuur.bedrijfCode + '.png'),
+        ),
+        // $('header').style('position: fixed;top: 0px;left: 0px;right: 0px;bottom: 0px;border: solid 1px green;'),
+        $('table').style('width:100%;').append(
           $('tr').append(
             $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(8).append(
-              $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + factuur.bedrijfCode + '.png'),
-            )
-          )
-        ),
-
-        $('tr').append(
-          $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(8).append(
-            $('table').style('width:100%;').append(
-              $('tr').append(
-                $('td').append(
-                  $('div').text('FACTUUR').style('font-weight:bold;margin-bottom:20mm;font-size:1.2em;'),
-                  $('table').style('margin-bottom:10mm;width:100%;').append(
-                    $('tr').append(
-                      $('td').style('padding-left:10mm;').append(
-                        $('div').text('Factuuradres:').style('font-weight:bold;'),
-                        $('div').text(factuur.organisatieNaam),
-                        $('div').text(factuur.postadres1),
-                        $('div').text(factuur.postadres2),
-                      ),
-                      $('td').append(
-                        $('div').text('Vestigingsadres:').style('font-weight:bold;'),
-                        $('div').text(factuur.organisatieNaam),
-                        $('div').text(factuur.afleveradres1),
-                        $('div').text(factuur.afleveradres2),
-                      ),
-                    )
+              $('table').style('width:100%;').append(
+                $('tr').append(
+                  $('td').append(
+                    $('div').text('FACTUUR').style('font-weight:bold;margin-bottom:20mm;font-size:1.2em;'),
+                    $('table').style('margin-bottom:10mm;width:100%;').append(
+                      $('tr').append(
+                        $('td').style('padding-left:10mm;').append(
+                          $('div').text('Factuuradres:').style('font-weight:bold;'),
+                          $('div').text(factuur.organisatieNaam),
+                          $('div').text(factuur.postadres1),
+                          $('div').text(factuur.postadres2),
+                        ),
+                        $('td').append(
+                          $('div').text('Vestigingsadres:').style('font-weight:bold;'),
+                          $('div').text(factuur.organisatieNaam),
+                          $('div').text(factuur.afleveradres1),
+                          $('div').text(factuur.afleveradres2),
+                        ),
+                      )
+                    ),
+                  ),
+                  $('td').style('width:50mm;').append(
+                    $('div').text(factuur.bedrijfOrganisatieNaam).style('font-weight:bold;'),
+                    $('div').text(factuur.bedrijfKoptekst).style('word-wrap:pre;font-size:0.8em;'),
                   ),
                 ),
-                $('td').style('width:50mm;').append(
-                  $('div').text(factuur.bedrijfOrganisatieNaam).style('font-weight:bold;'),
-                  $('div').text(factuur.bedrijfKoptekst).style('word-wrap:pre;font-size:0.8em;'),
-                ),
               ),
             ),
           ),
-        ),
-        $('tr').append(
-          $('td').colspan(8).style('border:none;padding:0;').append(
-            $('table').class('border summary').append(
-              $('tr').append(
-                $('th').text('Factuurnummer'),
-                $('td').text(factuur.factuurNr),
-                $('th').text('Klantnummer'),
-                $('td').text(factuur.klantId.pad(5)).style('width:100%;'),
-                $('th').text('Totaal Excl.'),
-                $('td').text(cur(factuur.totExcl)).style('text-align:right;'),
-              ),
-              $('tr').append(
-                $('th').text('Factuurdatum'),
-                $('td').text(new Date(factuur.factuurDatumTijd).toLocaleDateString()),
-                $('th').text('Debiteurnummer'),
-                $('td').text(factuur.klantDebNr),
-                $('th').text(`Btw ${factuur.btw}%`),
-                $('td').text(cur(factuur.totBtw)).style('text-align:right;'),
-              ),
-              $('tr').append(
-                $('th').text('Vervaldatum'),
-                $('td').text(new Date(factuur.factuurDatumTijd).addDays(30).toLocaleDateString()),
-                $('th').text('BTW nummer'),
-                $('td').text(factuur.klantBtwNr),
-                $('th').text('TE BETALEN'),
-                $('td').text(cur(factuur.totIncl)).style('text-align:right;'),
-              ),
-            ),
-          )
-        ),
-        $('thead').append(
-          $('tr').class('border').append(
-            $('th').text('Art.nr.'),
-            $('th').class('nr').text('Aantal'),
-            $('th').class('nr').text('Eenheid'),
-            $('th').style('width:100%;').text('Omschrijving'),
-            $('th').class('nr').text('Bruto'),
-            $('th').class('nr').text('Kort.'),
-            $('th').class('nr').text('Netto'),
-            $('th').class('nr').text('Totaal'),
-          ),
-        ),
-        $('tbody').class('border').append(
-          ...orders.map((salesorder,i) => [
+        // $('table').class('grid').append(
+          $('thead').append(
             $('tr').append(
-              $('td').colspan(8).style('border:none;padding:0;').append(
-                $('table').class('border summary').append(
+              $('td').colspan(8).append(
+                $('table').class('border').style('width:100%;white-space:nowrap;').append(
                   $('tr').append(
-                    $('th').text('Ordernummer'),
-                    $('td').text(salesorder.id),
+                    $('th').text('Factuurnummer'),
+                    $('td').text(factuur.factuurNr),
                     $('th').text('Klantnummer'),
-                    $('td').text(salesorder.klantId.pad(5)),
-                    $('th').text('Afleveradres'),
-                    $('td').text(salesorder.afleverOrganisatieNaam || factuur.organisatieNaam || salesorder.afleverContactNaam || '').style('width:100%;'),
+                    $('td').text(factuur.klantId),
                   ),
                   $('tr').append(
-                    $('th').text('Orderdatum'),
-                    $('td').text(new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
-                    $('th').text('Uw referentie'),
-                    $('td').text(salesorder.uwRef),
-                    $('th').text(''),
-                    $('td').text(salesorder.afleverAdres1),
+                    $('th').text('Factuurdatum'),
+                    $('td').text(new Date(factuur.factuurDatumTijd).toLocaleDateString()),
+                    $('th').text('Debiteurnummer'),
+                    $('td').text(factuur.klantDebNr),
                   ),
                   $('tr').append(
-                    $('th').text('Verzenddatum'),
-                    $('td').text(new Date(salesorder.verstuurdDatumTijd||salesorder.opdrachtDatumTijd).toLocaleDateString()),
-                    $('th').text(''),
-                    $('td').text(''),
-                    $('th').text(''),
-                    $('td').text(salesorder.afleverAdres2),
+                    $('th').text('Vervaldatum'),
+                    $('td').text(new Date(factuur.factuurDatumTijd).addDays(30).toLocaleDateString()),
+                    $('th').text('BTW nummer'),
+                    $('td').text(factuur.klantBtwNr).style('width:100%;')
                   ),
                 ),
-              ),
+              )
             ),
-            // $('tr').append(
-            //   $('th').text('Art.nr.'),
-            //   $('th').class('nr').text('Aantal'),
-            //   $('th').class('nr').text('Eenheid'),
-            //   $('th').style('width:100%;').text('Omschrijving'),
-            //   $('th').class('nr').text('Bruto'),
-            //   $('th').class('nr').text('Kort.'),
-            //   $('th').class('nr').text('Netto'),
-            //   $('th').class('nr').text('Totaal'),
-            // ),
-          ].concat(
-            rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
-              $('td').text(row.artId ? row.artId.pad(5) : ''),
-              $('td').class('nr').text(row.aantal),
-              $('td').text(row.eenheid),
-              $('td').style('white-space:normal;').append(
-                row.rglomschrijving.replace(/\r|\n/g,''),
-                // $('div').style('font-style:italic;').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
+            $('tr').class('border').append(
+              $('th').text('Art.nr.'),
+              $('th').class('nr').text('Aantal'),
+              $('th').class('nr').text('Eenheid'),
+              $('th').style('width:100%;').text('Omschrijving'),
+              $('th').class('nr').text('Bruto'),
+              $('th').class('nr').text('Kort.'),
+              $('th').class('nr').text('Netto'),
+              $('th').class('nr').text('Totaal'),
+            ),
+          ),
+          $('tbody').class('border').append(
+            ...orders.map(salesorder => [
+              $('tr').append(
+                $('td').colspan(8).append(
+                  $('table').class('noborder').style('width:100%;white-space:nowrap;').append(
+                    $('tr').append(
+                      $('td').text('Ordernummer'),
+                      $('td').text(':', salesorder.id),
+                      $('td').text('Klantnummer'),
+                      $('td').text(':', salesorder.klantId),
+                      $('td').text('Afleveradres'),
+                      $('td').text(':', salesorder.afleverOrganisatieNaam || factuur.organisatieNaam || salesorder.afleverContactNaam || '').style('width:100%;'),
+                    ),
+                    $('tr').append(
+                      $('td').text('Orderdatum'),
+                      $('td').text(':', new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                      $('td').text('Uw referentie'),
+                      $('td').text(':', salesorder.uwRef),
+                      $('td').text(''),
+                      $('td').text(':', salesorder.afleverAdres1),
+                    ),
+                    $('tr').append(
+                      $('td').text('Verzenddatum'),
+                      $('td').text(':', new Date(salesorder.verstuurdDatumTijd||salesorder.opdrachtDatumTijd).toLocaleDateString()),
+                      $('td').text(''),
+                      $('td').text(''),
+                      $('td').text(''),
+                      $('td').text(':', salesorder.afleverAdres2),
+                    ),
+                  ),
+                ),
+                // .align('left')
+                // .text([
+                //   `Leverbon: ${salesorder.id}`,
+                //   `Order datum: ${new Date(salesorder.opdrachtDatumTijd).toLocaleDateString()}`,
+                //   salesorder.uwRef ? `uw referentie: ${salesorder.uwRef}`: '',
+                // ].filter(Boolean).join(', ')),
               ),
-              $('td').class('nr').text(row.bruto ? num(row.bruto) : ''),
-              $('td').class('nr').text(row.korting ? num(row.korting,1) : ''),
-              $('td').class('nr').text(row.netto ? num(row.netto) : ''),
-              $('td').class('nr').text(row.totaal ? num(row.totaal) : ''),
+              $('tr').append(
+                $('th').text('Art.nr.'),
+                $('th').class('nr').text('Aantal'),
+                $('th').class('nr').text('Eenheid'),
+                $('th').style('width:100%;').text('Omschrijving'),
+                $('th').class('nr').text('Bruto'),
+                $('th').class('nr').text('Kort.'),
+                $('th').class('nr').text('Netto'),
+                $('th').class('nr').text('Totaal'),
+              ),
+            ].concat(
+              rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
+                $('td').text(row.artId ? row.artId.pad(5) : ''),
+                $('td').class('nr').text(row.aantal),
+                $('td').text(row.eenheid),
+                $('td').style('white-space:normal;').append(
+                  row.rglomschrijving.replace(/\r|\n/g,''),
+                  // $('div').style('font-style:italic;').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
+                ),
+                $('td').class('nr').text(row.bruto ? num(row.bruto) : ''),
+                $('td').class('nr').text(row.korting ? num(row.korting,1) : ''),
+                $('td').class('nr').text(row.netto ? num(row.netto) : ''),
+                $('td').class('nr').text(row.totaal ? num(row.totaal) : ''),
+              )),
+
+              // !Number(invoice.vrachtKost) ? null : $('tr').append(
+              //   $('td'),$('td'),$('td').text('Vrachtkosten'),
+              //   $('td').align('right').text(1),$('td').align('right').text(cur(invoice.vrachtKost, totaal += Number(invoice.vrachtKost||0))),
+              // ),
+
+              // !invoice.payCash ? null : $('tr').append(
+              //   $('td'),$('td'),$('td').text(`Contant voldaan ${cur(invoice.payCash, betaald += Number(invoice.payCash))}`),$('td'),$('td')
+              // ),
+              // !invoice.payPin ? null : $('tr').append(
+              //   $('td'),$('td'),$('td').text(`PIN voldaan ${cur(invoice.payPin, betaald += Number(invoice.payPin))}`),$('td'),$('td')
+              // ),
+              // !invoice.payBank ? null : $('tr').append(
+              //   $('td'),$('td'),$('td').text(`Bank voldaan ${cur(invoice.payBank, betaald += Number(invoice.payBank))}`),$('td'),$('td')
+              // ),
             )),
+            // $('tr').style('height:5mm;'),
 
-            // !Number(invoice.vrachtKost) ? null : $('tr').append(
-            //   $('td'),$('td'),$('td').text('Vrachtkosten'),
-            //   $('td').align('right').text(1),$('td').align('right').text(cur(invoice.vrachtKost, totaal += Number(invoice.vrachtKost||0))),
+            // !salesorder.clientKortingContant ? null : $('tr').append(
+            //   $('td'),$('td'),$('td').text(`Korting contant over ${cur(totaal)}`),
+            //   $('td').align('right').text(`${salesorder.clientKortingContant || 0}%`),$('td').align('right').text(cur(salesorder.kortingContant = salesorder.clientKortingContant ? totaal * salesorder.clientKortingContant / 100 : 0, totaal -= salesorder.kortingContant)),
             // ),
 
-            // !invoice.payCash ? null : $('tr').append(
-            //   $('td'),$('td'),$('td').text(`Contant voldaan ${cur(invoice.payCash, betaald += Number(invoice.payCash))}`),$('td'),$('td')
+            // !invoice.kortContantProc ? null : $('tr').append(
+            //   $('td'),$('td'),$('td').text(`Korting contant over ${cur(totaal)}`),
+            //   $('td').align('right').text(`${invoice.kortContantProc}%`),$('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)),
             // ),
-            // !invoice.payPin ? null : $('tr').append(
-            //   $('td'),$('td'),$('td').text(`PIN voldaan ${cur(invoice.payPin, betaald += Number(invoice.payPin))}`),$('td'),$('td')
-            // ),
-            // !invoice.payBank ? null : $('tr').append(
-            //   $('td'),$('td'),$('td').text(`Bank voldaan ${cur(invoice.payBank, betaald += Number(invoice.payBank))}`),$('td'),$('td')
-            // ),
-          )),
-          // $('tr').style('height:5mm;'),
 
-          // !salesorder.clientKortingContant ? null : $('tr').append(
-          //   $('td'),$('td'),$('td').text(`Korting contant over ${cur(totaal)}`),
-          //   $('td').align('right').text(`${salesorder.clientKortingContant || 0}%`),$('td').align('right').text(cur(salesorder.kortingContant = salesorder.clientKortingContant ? totaal * salesorder.clientKortingContant / 100 : 0, totaal -= salesorder.kortingContant)),
-          // ),
-
-          // !invoice.kortContantProc ? null : $('tr').append(
-          //   $('td'),$('td'),$('td').text(`Korting contant over ${cur(totaal)}`),
-          //   $('td').align('right').text(`${invoice.kortContantProc}%`),$('td').align('right').text(cur(invoice.kortingContant = invoice.kortContantProc ? totaal * invoice.kortContantProc / 100 : 0, totaal -= invoice.kortingContant)),
-          // ),
-
+          ),
         ),
-      ),
-      $('table').class('grid summary').style('position:absolute;left: 0;right: 0;bottom: 0;').append(
-        $('thead').append(
-          els.trh = $('tr').style('background:#ddd;'),
+        $('table').class('grid summary').style('position:fixed;left: 0;right: 0;bottom: 0;').append(
+          $('thead').append(
+            els.trh = $('tr').style('background:#ddd;'),
+          ),
+          $('tbody').append(
+            els.trb = $('tr'),
+          ),
         ),
-        $('tbody').append(
-          els.trb = $('tr'),
-        ),
-      ),
-    // ),
+      // ),
     )
     // console.log(invoice);
     els.trh.append($('th'));

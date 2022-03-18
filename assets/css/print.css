@@ -1,10 +1,11 @@
 @page {
-  margin: 1cm 1cm 1cm 1cm;
+  margin: 10mm 10mm 30mm 10mm;
 }
 body {
   font-family: Arial, sans-serif;
   font-size: 10pt;
   padding: 0;
+  margin:0;
   /* padding-left: 1cm; */
   align-items: center;
   justify-content: center;
@@ -131,8 +132,10 @@ th,td{
   vertical-align: top;
   text-align: left;
 }
-th{
-  background:#ddd;
+th {
+  background: #eee;
+  font-weight: normal;
+  font-size: 0.9em;
 }
 .datum,.facnr,.nr,.debnr {
   /* width: 26mm; */
@@ -144,4 +147,19 @@ table.noborder td {
 }
 table.grid ul {
   margin:0;
+}
+
+.border td,.border th {
+  border: solid 1px black;
+  padding: 0 3px;
+}
+.border.summary {
+  width:100%;
+  white-space:nowrap;
+}
+.border.summary th {
+  min-width: 26mm;
+}
+.border.summary td {
+  min-width: 20mm;
 }

@@ -142,3 +142,6 @@ table.noborder td {
   border: none;
   padding: 0 10px 0 0;
 }
+table.grid ul {
+  margin:0;
+}

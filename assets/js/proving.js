@@ -928,7 +928,7 @@ $().on('load', async e => {
 
         $('tr').append(
           $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(8).append(
-            $('table').style('width:100%;').append(
+            $('table').style('width:100%;margin-bottom:8mm;').append(
               $('tr').append(
                 $('td').append(
                   $('div').text('FACTUUR').style('font-weight:bold;margin-bottom:20mm;font-size:1.2em;'),

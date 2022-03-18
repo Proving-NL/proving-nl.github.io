@@ -140,6 +140,7 @@ th {
 .datum,.facnr,.nr,.debnr {
   /* width: 26mm; */
   text-align: right;
+  white-space: nowrap;
 }
 table.noborder td {
   border: none;

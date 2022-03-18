@@ -982,7 +982,7 @@ $().on('load', async e => {
                 $('th').text('BTW nummer'),
                 $('td').text(factuur.klantBtwNr),
                 $('th').text('TE BETALEN'),
-                $('td').text(cur(factuur.totIncl)).style('text-align:right;'),
+                $('td').text(cur(factuur.totIncl)).style('text-align:right;font-weight:bold;'),
               ),
             ),
           )

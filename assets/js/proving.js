@@ -674,7 +674,7 @@ $().on('load', async e => {
             $('td').text(num(rows.filter(row => row.aantal).map(row => row.aantal).reduce((tot,val)=>tot += val),1)).style('text-align:right;'),
             $('td'),
             $('th').colspan(2).text('BON TOTAAL').style('text-align:right;'),
-            $('td').text(num(rows.filter(row => row.totaal).map(row => row.totaal).reduce((tot,val)=>tot += val),2)).style('font-weight:bold;'),
+            $('td').text(num(rows.filter(row => row.totaal||0).map(row => row.totaal||0).reduce((tot,val)=>tot += val),2)).style('font-weight:bold;'),
           ),
           //               $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
 
@@ -895,7 +895,7 @@ $().on('load', async e => {
     })
     var [salesorders,rows] = data;
     var [salesorder] = salesorders;
-    if (!rows.length) alert('Order bevat geen regels');
+    if (!rows || !rows.length) alert('Order bevat geen regels');
     return await orderPage(salesorder,rows);
   }
   async function getfactuur(factuurId) {

@@ -544,7 +544,7 @@ $().on('load', async e => {
           ),
         )
       ),
-      rows.some(row => row.err) ? $('div').text(`Er zijn critieke foutmeldingen. Deze laten corrigeren door Verkoop Binnendienst. Deze fouten blokkeren de afhandeling.`).style('color:red; padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
+      rows.some(row => row.err) ? $('div').text(`Er zijn critieke foutmeldingen. Bon afhandelen en leveren. Voor facturatie fouten oplossen.`).style('color:red; padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
       salesorder.opmerking ? $('div').text(salesorder.opmerking).style('padding:2mm;border:solid 1px red;margin-top:2mm;') : null,
       $('table').class('grid summary').append(
         $('thead').append(

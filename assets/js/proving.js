@@ -34,6 +34,7 @@ $().on('load', async e => {
     sessionStorage.setItem('clientId', clientId = id);
     $('button.account span.company').text(clientId||'');
     [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientId=' + clientId).then(res => res.json());
+    console.log(clientart,mandregels);
     // aim.idfilter = `clientName EQ '${clientName}'`;
   }
   Object.values(aim.config.artikelgroepen).forEach(obj =>
@@ -78,6 +79,25 @@ $().on('load', async e => {
     },
   });
 
+  aim.showBag = e => {
+    console.log('showbag');
+    if (!mandregels.length) return alert('Uw mandje bevat geen producten');
+    aim.list('product', {
+      $filter: `id in (${mandregels.map(r => r.artId)})`,
+    })
+  }
+  aim.orderBag = async e => {
+    console.log('orderBag');
+    const uwRef = prompt("Voer uw referentie in", "");
+
+    await dmsClient.api('/abis/orderBag').query({clientId:clientId,uwRef:uwRef}).get();
+    mandregels=[];
+
+    // aim.list('product', {
+    //   $filter: `id in (${mandregels.map(r => r.artId)})`,
+    // })
+  }
+
   const [kop1,kop2,artikelgroep] = await dmsClient.api('/abis/productgroepen').get();
   const kopmenu = Object.fromEntries(kop1.map(kop1 => [
     kop1.title,
@@ -86,7 +106,7 @@ $().on('load', async e => {
       Object.fromEntries(artikelgroep.filter(ag => ag.parentId === kop2.id).map(ag => [
         ag.title,
         e => aim.list('product', {
-          $filter: `artikelgroepid eq ${ag.id}`,
+          $filter: `productgroepid eq ${ag.id}`,
         }),
       ])),
     ])),
@@ -894,6 +914,7 @@ $().on('load', async e => {
       set: 'printDatumTijd = GETDATE()'
     })
     var [salesorders,rows] = data;
+    console.log(salesorders,rows);
     var [salesorder] = salesorders;
     if (!rows || !rows.length) alert('Order bevat geen regels');
     return await orderPage(salesorder,rows);
@@ -2380,6 +2401,39 @@ $().on('load', async e => {
       //   prijslijst_xls(`proving-prijslijst-${row.name}-${new Date().toISOString().substr(0,10)}`, `KlantName = '${row.name}'`, colsPrijslijst);
       // }),
       $('button').class('abtn').text('Prijslijst').on('click', async e => {
+        const [rows] = await dmsClient.api('/abis/klantartikelen').query({
+          // organisatieId: row.id,
+          select: 'id AS klantArtId,artId AS id,titel,lower(eenheid) eenheid,merk,code,propTekst,netto,nettoNieuw,brutoNieuw,korting,productGroep,inhoud,inhoudEenheid,CONVERT(FLOAT,round(NettoNieuw/Netto*100-100,1)) AS verhoging',
+          select: `productGroep,artId AS id,titel,brutoNieuw AS bruto,korting,nettoNieuw AS netto,CONVERT(FLOAT,round(NettoNieuw/Netto*100-100,1)) AS verhoging,netto AS oud,id as kid,artInkId`,
+          filter: `organisatieid = ${row.id} AND netto>0 AND DATEDIFF(YEAR,lastModifiedDateTime,GETDATE())<2`,
+          order: `productGroep,titel`,
+        }).get();
+        rows.forEach(row => {
+          row.id = $('a').href('#?id='+btoa('https://dms.aliconnect.nl/api/v1/product?id='+row.id)).text(row.id.pad(5)).style('color:white;');
+          ['netto','oud','bruto','korting','verhoging'].filter(n => n in row).forEach(n => row[n] = {t:'n',v:num(row[n])})
+        });
+        console.log(rows);
+        $('.lv').text('').append(
+          $('div').append(
+            $('div').append(
+              $('table').style('width:100%;').append(
+                $('thead').append(
+                  $('tr').append(
+                    Object.keys(rows[0]).map(k => $('td').text(k)),
+                  )
+                ),
+                $('tbody').style('font-family:consolas;').append(
+                  rows.map(row => $('tr').style(!row.artInkId ? 'color:red;' : '').append(
+                    Object.values(row).map(v => $('td').append(v && v.t ? v.v : v).style(v && v.t === 'n' ? 'text-align:right;' : '')),
+                  ))
+                )
+              )
+            )
+          )
+        )
+
+      }),
+      $('button').class('abtn').text('Prijslijst PDF').on('click', async e => {
         const [rows] = await dmsClient.api('/abis/klantartikelen').query({organisatieId: row.id}).get();
         $('div').parent(document.body).append(
           // $('link').rel('stylesheet').href('https://proving-nl.aliconnect.nl/assets/css/print.css'),
@@ -2771,6 +2825,7 @@ $().on('load', async e => {
         // ),
       );
       // console.log(mandregel,row.id,row.artId);
+      const mandart = mandregels.find(rgl => rgl.artId === row.id) || {};
       elem.append(
         $('div').append(
           $('span').style('font-size:0.8em;').append(
@@ -2784,10 +2839,15 @@ $().on('load', async e => {
           ),
           elem.input = $('input')
           .tabindex(-1)
-          .type('number').step(1).min(0).value(row.aantal).on('change', e => {
-            const body = dmsClient.api('/abis/OrderModArt').query({
-              clientName: clientName,
-              artId: row.artId,
+          .type('number').step(1).min(0).value(mandart.aantal).on('change', e => {
+            if (!mandregels.find(rgl => rgl.artId === row.id)) {
+              mandregels.push({artId:row.id})
+            }
+            const mandart = mandregels.find(rgl => rgl.artId === row.id);
+            mandart.aantal = e.target.value;
+            const body = dmsClient.api('/abis/orderModArt').query({
+              clientId: clientId,
+              artId: row.id,
               aantal: e.target.value,
             }).then(res => res.json());
             console.log(body);
@@ -3015,6 +3075,7 @@ $().on('load', async e => {
   aim.om.treeview({
     InkoopPrijslijst: Object.fromEntries(leveranciers.map(lev => [lev.firma, async e => {
       const [rows] = await dmsClient.api('/abis/leverancier_artikelen').query({id:lev.id}).get();
+      rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
       console.log(rows);
       $('.lv').text('').append(
         $('div').append(
@@ -3039,6 +3100,7 @@ $().on('load', async e => {
   aim.om.treeview({
     VerkoopPrijslijst: Object.fromEntries(merken.map(merk => [merk.merk, async e => {
       const [rows] = await dmsClient.api('/abis/prijslijst_merk').query({merk:merk.merk}).get();
+      rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
       console.log(rows);
       $('.lv').text('').append(
         $('div').append(
@@ -4052,6 +4114,27 @@ $().on('load', async e => {
       },
     },
     Abis: {
+      async facturatie_zonder_inkartikel() {
+        const [rows] = await dmsClient.api('/abis/facturatie_zonder_inkartikel').get();
+        rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+        console.log(rows);
+        $('.lv').text('').append(
+          $('div').append(
+            $('table').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      },
       async inkoopOpnameLijst() {
         const [rows] = await dmsClient.api('/abis/inkoopOpnameLijst').get();
         aim.downloadExcel({

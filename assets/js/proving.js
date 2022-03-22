@@ -3010,6 +3010,8 @@ $().on('load', async e => {
   }
 
   const [leveranciers] = await dmsClient.api('/abis/leveranciers').get();
+  const [merken] = await dmsClient.api('/abis/merken').get();
+
   aim.om.treeview({
     InkoopPrijslijst: Object.fromEntries(leveranciers.map(lev => [lev.firma, async e => {
       const [rows] = await dmsClient.api('/abis/leverancier_artikelen').query({id:lev.id}).get();
@@ -3034,9 +3036,54 @@ $().on('load', async e => {
       )
     }]))
   });
+  aim.om.treeview({
+    VerkoopPrijslijst: Object.fromEntries(merken.map(merk => [merk.merk, async e => {
+      const [rows] = await dmsClient.api('/abis/prijslijst_merk').query({merk:merk.merk}).get();
+      console.log(rows);
+      $('.lv').text('').append(
+        $('div').append(
+          $('div').append(
+            $('table').style('width:100%;').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      )
+    }]))
+  });
 
 
 
+  async function prijslijst (id,merk) {
+    const [rows] = await dmsClient.api('/abis/prijslijst').query({id:id}).get();
+    rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+    console.log(rows);
+    $('.lv').text('').append(
+      $('div').append(
+        $('table').style('white-space:pre;').append(
+          $('thead').append(
+            $('tr').append(
+              Object.keys(rows[0]).map(k => $('td').text(k)),
+            )
+          ),
+          $('tbody').style('font-family:consolas;').append(
+            rows.map(row => $('tr').style(!row.artInkId ? 'color:red;' : '').append(
+              Object.values(row).map(v => $('td').append(v)),
+            ))
+          )
+        )
+      )
+    )
+  }
 
   aim.om.treeview({
     Inkoop: {
@@ -4180,25 +4227,22 @@ $().on('load', async e => {
         )
       },
       async prijslijst_airo_3() {
-        const [rows] = await dmsClient.api('/abis/prijslijst').query({id:3}).get();
-        rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
-        console.log(rows);
-        $('.lv').text('').append(
-          $('div').append(
-            $('table').style('white-space:pre;').append(
-              $('thead').append(
-                $('tr').append(
-                  Object.keys(rows[0]).map(k => $('td').text(k)),
-                )
-              ),
-              $('tbody').style('font-family:consolas;').append(
-                rows.map(row => $('tr').style(!row.artInkId ? 'color:red;' : '').append(
-                  Object.values(row).map(v => $('td').append(v)),
-                ))
-              )
-            )
-          )
-        )
+        prijslijst(3);
+      },
+      async prijslijst_kovax() {
+        prijslijst(21);
+      },
+      async prijslijst_3m() {
+        prijslijst(22);
+      },
+      async prijslijst_mirka() {
+        prijslijst(23);
+      },
+      async prijslijst_emm() {
+        prijslijst(24);
+      },
+      async prijslijst_ppg() {
+        prijslijst(24);
       },
     },
     Overig: {

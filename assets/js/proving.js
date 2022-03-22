@@ -488,7 +488,7 @@ $().on('load', async e => {
     //   return elem;
     // }
     const rowsArt = rows.filter(row => row.artId);
-    rowsArt.filter(row => !row.artInkId && row.loc !== '30.01.01').forEach(row => row.err = (row.err||[]).concat('INKOOP ARTIKEL NIET AANWEZIG !'));
+    rowsArt.filter(row => !row.artInkId && row.loc !== '30.01.01').forEach(row => row.err = (row.err||[]).concat('Geen inkoop artikel gekoppeld, geen inkoop informatie.'));
 
     // console.log(111,rowsArt);
     rowsArt.filter(row => row.inkArtLevBruto && row.inkArtLevBruto != row.inkArtInkBruto).forEach(row => row.err = (row.err||[]).concat(`Bruto verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`));

@@ -491,12 +491,12 @@ $().on('load', async e => {
     rowsArt.filter(row => !row.artInkId && row.loc !== '30.01.01').forEach(row => row.err = (row.err||[]).concat('INKOOP ARTIKEL NIET AANWEZIG !'));
 
     // console.log(111,rowsArt);
-    rowsArt.filter(row => row.inkArtLevBruto && row.inkArtLevBruto != row.inkArtInkBruto).forEach(row => row.warn = (row.warn||[]).concat(`Bruto verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`));
-    rowsArt.filter(row => row.inkArtLevKorting && row.inkArtLevKorting != row.inkArtInkKorting).forEach(row => row.warn = (row.warn||[]).concat(`Korting verhoging ${num((100*row.inkArtLevKorting/row.inkArtInkKorting)-100)}%`));
-    rowsArt.filter(row => row.inkArtLevNetto && row.inkArtLevNetto != row.inkArtInkNetto).forEach(row => row.warn = (row.warn||[]).concat(`Netto verhoging ${num((100*row.inkArtLevNetto/row.inkArtInkNetto)-100)}%`));
+    rowsArt.filter(row => row.inkArtLevBruto && row.inkArtLevBruto != row.inkArtInkBruto).forEach(row => row.err = (row.err||[]).concat(`Bruto verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`));
+    rowsArt.filter(row => row.inkArtLevKorting && row.inkArtLevKorting != row.inkArtInkKorting).forEach(row => row.err = (row.err||[]).concat(`Korting verhoging ${num((100*row.inkArtLevKorting/row.inkArtInkKorting)-100)}%`));
+    rowsArt.filter(row => row.inkArtLevNetto && row.inkArtLevNetto != row.inkArtInkNetto).forEach(row => row.err = (row.err||[]).concat(`Netto verhoging ${num((100*row.inkArtLevNetto/row.inkArtInkNetto)-100)}%`));
 
-    rowsArt.filter(row => row.productId==1).forEach(row => row.err = (row.err||[]).concat('Product ID niet ingevuld'));
-    rowsArt.filter(row => !row.loc.match(/\d+\.\d+\.\d+/)).forEach(row => row.warn = (row.warn||[]).concat('MagLokatie niet goed, invullen bij pakken'));
+    // rowsArt.filter(row => row.productId==1).forEach(row => row.err = (row.err||[]).concat('Product ID niet ingevuld'));
+    // rowsArt.filter(row => !row.loc.match(/\d+\.\d+\.\d+/)).forEach(row => row.warn = (row.warn||[]).concat('MagLokatie niet goed, invullen bij pakken'));
     // rowsArt.filter(row => row.voswaarde===null).forEach(row => row.warn = (row.warn||[]).concat('VOS waarde niet ingevuld'));
     // rowsArt.filter(row => row.gewicht===null).forEach(row => row.warn = (row.warn||[]).concat('Gewicht niet ingevuld'));
     // rowsArt.filter(row => row.barcode===null).forEach(row => row.warn = (row.warn||[]).concat('EAN niet ingevuld'));
@@ -3009,6 +3009,35 @@ $().on('load', async e => {
     })()
   }
 
+  const [leveranciers] = await dmsClient.api('/abis/leveranciers').get();
+  aim.om.treeview({
+    InkoopPrijslijst: Object.fromEntries(leveranciers.map(lev => [lev.firma, async e => {
+      const [rows] = await dmsClient.api('/abis/leverancier_artikelen').query({id:lev.id}).get();
+      console.log(rows);
+      $('.lv').text('').append(
+        $('div').append(
+          $('div').append(
+            $('table').style('width:100%;').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      )
+    }]))
+  });
+
+
+
+
   aim.om.treeview({
     Inkoop: {
       Producten: e => aim.list('artink',{
@@ -4112,6 +4141,46 @@ $().on('load', async e => {
         const [rows] = await dmsClient.api('/abis/aandacht1').get();
         rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
         console.log(rows);
+        $('.lv').text('').append(
+          $('div').append(
+            $('table').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      },
+      async Aandacht2() {
+        const [rows] = await dmsClient.api('/abis/aandacht2').get();
+        rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+        console.log(rows);
+        $('.lv').text('').append(
+          $('div').append(
+            $('table').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      },
+      async inkoop_ppg() {
+        const [rows] = await dmsClient.api('/abis/inkoop_ppg').get();
         $('.lv').text('').append(
           $('div').append(
             $('table').append(

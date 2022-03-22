@@ -4179,18 +4179,20 @@ $().on('load', async e => {
           )
         )
       },
-      async inkoop_ppg() {
-        const [rows] = await dmsClient.api('/abis/inkoop_ppg').get();
+      async prijslijst_airo_3() {
+        const [rows] = await dmsClient.api('/abis/prijslijst').query({id:3}).get();
+        rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+        console.log(rows);
         $('.lv').text('').append(
           $('div').append(
-            $('table').append(
+            $('table').style('white-space:pre;').append(
               $('thead').append(
                 $('tr').append(
                   Object.keys(rows[0]).map(k => $('td').text(k)),
                 )
               ),
               $('tbody').style('font-family:consolas;').append(
-                rows.map(row => $('tr').append(
+                rows.map(row => $('tr').style(!row.artInkId ? 'color:red;' : '').append(
                   Object.values(row).map(v => $('td').append(v)),
                 ))
               )

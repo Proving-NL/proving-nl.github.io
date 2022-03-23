@@ -1,0 +1,107 @@
+<biztalk_1 xmlns="urn:schemas-biztalk-org:biztalk:biztalk_1">
+  <body>
+    <Order xmlns="urn:www.basda.org/schema/eBIS-XML_order_v3.00.xml">
+      <OrderHead>
+        <BackendOrderType>DELIVERYNOTE</BackendOrderType>
+      </OrderHead>
+      <OrderReferences>
+        <BuyersOrderNumber>172608.423110</BuyersOrderNumber>
+      </OrderReferences>
+      <OrderDate>01/03/22</OrderDate>
+      <Buyer>
+        <Party>5036938-2001ST_APELDOORN</Party>
+      </Buyer>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>D837/E5</SuppliersProductCode>
+          <BuyersProductCode>4772</BuyersProductCode>
+          <Description>PPG, Product, DX330SPIRITWIPE, D837/E5, Verpakt per 2</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P565-5607/E1</SuppliersProductCode>
+          <BuyersProductCode>4273</BuyersProductCode>
+          <Description>Nexa, Primer, SelfLevelling-SG07, P565-5607/E1, Verpakt per 3</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P565-5705/E3</SuppliersProductCode>
+          <BuyersProductCode>4276</BuyersProductCode>
+          <Description>Nexa, Primer, PremiumSurfacer-GreySG05, P565-5705/E3, Verpakt per 2</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P565-5707/E3</SuppliersProductCode>
+          <BuyersProductCode>4277</BuyersProductCode>
+          <Description>Nexa, Primer, PremiumSurfacer-DarkGreySG07, P565-5707/E3, Verpakt per 2</Description>
+        </Product>
+        <Quantity>
+          <Amount>2</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P572-2000/E0.4</SuppliersProductCode>
+          <BuyersProductCode>4301</BuyersProductCode>
+          <Description>Nexa, Plastic, Primer, AEROSOLFORS, P572-2000/E0.4, Verpakt per 6</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P990-8948/E2</SuppliersProductCode>
+          <BuyersProductCode>4110</BuyersProductCode>
+          <Description>Nexa, Product, Zwart, AQUABASEPLUSDEEPBLACK, P990-8948/E2, Verpakt per 2</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P990-8950/E2</SuppliersProductCode>
+          <BuyersProductCode>4111</BuyersProductCode>
+          <Description>Nexa, Product, Zwart, AQUABASEPLUSJETBLACK, P990-8950/E2, Verpakt per 2</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P991-8942/E1</SuppliersProductCode>
+          <BuyersProductCode>4121</BuyersProductCode>
+          <Description>Nexa, Product, AQUABASEPLUSTRANSPARENTRED, P991-8942/E1, Verpakt per 3</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <OrderLine>
+        <Product>
+          <SuppliersProductCode>P991-8952/E1</SuppliersProductCode>
+          <BuyersProductCode>4122</BuyersProductCode>
+          <Description>Nexa, Product, AQUABASEPLUSTRANSPARENTGREEN, P991-8952/E1, Verpakt per 3</Description>
+        </Product>
+        <Quantity>
+          <Amount>1</Amount>
+        </Quantity>
+      </OrderLine>
+      <SpecialInstructions/>
+    </Order>
+  </body>
+</biztalk_1>

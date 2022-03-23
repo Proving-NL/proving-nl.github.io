@@ -508,12 +508,41 @@ $().on('load', async e => {
     //   return elem;
     // }
     const rowsArt = rows.filter(row => row.artId);
-    rowsArt.filter(row => !row.artInkId && row.loc !== '30.01.01').forEach(row => row.err = (row.err||[]).concat('Geen inkoop artikel gekoppeld, geen inkoop informatie.'));
+    rowsArt.forEach(row => {
+      if (row.inkArtLevBruto && row.inkArtLevBruto != row.inkArtInkBruto) {
+        row.warn = (row.warn||[]).concat(`Artikel versus Leverancier Bruto verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`);
+      }
+      row.inkArtLevBruto = row.inkArtLevBruto || (row.inkArtLevNetto * 100 / (100 - row.inkArtLevKorting) * 100 ) / 100;
+      // console.log(row.artId,row.inkArtLevBruto,row.bruto,row);
+      if (row.inkArtLevBruto && row.bruto && row.inkArtLevBruto != row.bruto) {
+        row.err = (row.err||[]).concat(`Regel versus Leverancier Bruto (${num(row.inkArtLevBruto)}) verhoging ${num((100*row.inkArtLevBruto/row.bruto)-100)}%`);
+      }
+      if (row.inkArtInkBruto && row.bruto && row.inkArtInkBruto != row.bruto) {
+        row.err = (row.err||[]).concat(`Regel versus Artikel Bruto (${num(row.inkArtInkBruto)}) verhoging ${num((100*row.inkArtInkBruto/row.bruto)-100)}%`);
+      }
+      if (row.inkArtLevKorting && row.inkArtInkKorting && row.inkArtLevKorting != row.inkArtInkKorting) {
+        row.warn = (row.warn||[]).concat(`Artikel versus Leverancier Korting verhoging ${num((100*row.inkArtLevKorting/row.inkArtInkKorting)-100)}%`);
+      }
+      if (row.inkArtLevNetto && row.inkArtInkNetto && row.inkArtLevNetto != row.inkArtInkNetto) {
+        row.warn = (row.warn||[]).concat(`Artikel versus Leverancier Netto verhoging ${num((100*row.inkArtLevNetto/row.inkArtInkNetto)-100)}%`);
+      }
+      if (!row.artInkId && row.loc !== '30.01.01') {
+        row.err = (row.err||[]).concat('Geen inkoop artikel gekoppeld, geen inkoop informatie.');
+      }
+      if (row.korting < 0) {
+        row.err = (row.err||[]).concat(`Regel korting negatief`);
+      }
+    });
+    // rowsArt.filter(row => !row.artInkId && row.loc !== '30.01.01').forEach(row => row.err = (row.err||[]).concat('Geen inkoop artikel gekoppeld, geen inkoop informatie.'));
 
     // console.log(111,rowsArt);
-    rowsArt.filter(row => row.inkArtLevBruto && row.inkArtLevBruto != row.inkArtInkBruto).forEach(row => row.err = (row.err||[]).concat(`Bruto verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`));
-    rowsArt.filter(row => row.inkArtLevKorting && row.inkArtLevKorting != row.inkArtInkKorting).forEach(row => row.err = (row.err||[]).concat(`Korting verhoging ${num((100*row.inkArtLevKorting/row.inkArtInkKorting)-100)}%`));
-    rowsArt.filter(row => row.inkArtLevNetto && row.inkArtLevNetto != row.inkArtInkNetto).forEach(row => row.err = (row.err||[]).concat(`Netto verhoging ${num((100*row.inkArtLevNetto/row.inkArtInkNetto)-100)}%`));
+
+    // rowsArt.filter(row => row.inkArtLevBruto && row.Bruto && row.Bruto != row.inkArtLevBruto).forEach(row => row.err = (row.err||[]).concat(`Regel versus Leverancier Bruto verhoging ${num((100*row.Bruto/row.inkArtLevBruto)-100)}%`));
+    // rowsArt.filter(row => row.inkArtInkBruto && row.Bruto && row.Bruto != row.inkArtInkBruto).forEach(row => row.err = (row.err||[]).concat(`Regel versus Artikel Bruto verhoging ${num((100*row.Bruto/row.inkArtInkBruto)-100)}%`));
+
+    // rowsArt.filter(row => row.inkArtLevBruto && row.inkArtLevBruto != row.inkArtInkBruto).forEach(row => row.err = (row.err||[]).concat(`Artikel versus Leverancier Bruto verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`));
+    // rowsArt.filter(row => row.inkArtLevKorting && row.inkArtLevKorting != row.inkArtInkKorting).forEach(row => row.err = (row.err||[]).concat(`Artikel versus Leverancier Korting verhoging ${num((100*row.inkArtLevKorting/row.inkArtInkKorting)-100)}%`));
+    // rowsArt.filter(row => row.inkArtLevNetto && row.inkArtLevNetto != row.inkArtInkNetto).forEach(row => row.err = (row.err||[]).concat(`Artikel versus Leverancier Netto verhoging ${num((100*row.inkArtLevNetto/row.inkArtInkNetto)-100)}%`));
 
     // rowsArt.filter(row => row.productId==1).forEach(row => row.err = (row.err||[]).concat('Product ID niet ingevuld'));
     // rowsArt.filter(row => !row.loc.match(/\d+\.\d+\.\d+/)).forEach(row => row.warn = (row.warn||[]).concat('MagLokatie niet goed, invullen bij pakken'));
@@ -2858,6 +2887,22 @@ $().on('load', async e => {
       return elem;
     },
   }
+
+  aim.config.components.schemas.organisatie.app = {
+    nav: row => [
+      $('button').class('icn-print').title('Bon printen').on('click', async e => await (await order(row.id)).printp()),
+    ],
+    navList: () => [
+      $('button').text('Nieuw').on('click', async e => {
+        const res = await dmsClient.api('/organisatie').post({
+          organisatieNaam: 'Nieuw',
+        });
+        console.log(res);
+      }),
+    ]
+  }
+
+
   aim.cols = {
     catalogPrice(row, div) {
       if ('catalogPrice' in row) {
@@ -4741,6 +4786,11 @@ $().on('load', async e => {
           ),
         ).print()
       },
+    },
+    CRMC: {
+      organisatie: e => aim.list('organisatie',{
+        $search: ``,
+      }),
     },
   });
 

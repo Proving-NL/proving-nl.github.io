@@ -2217,14 +2217,128 @@ $().on('load', async e => {
     console.log(order);
     let row;
     const [rows] = await dmsClient.api('/abis/bonrgls').query('id', order.id).get();
+    function set(row,name,value){
+      console.log('set',row.id,name,value);
+      dmsClient.api('/abis/bonrgls').query('id', row.id).post({name:name,val:String(value)}).then(res => {
+        console.log(res);
+        elem.remove();
+        orderInvoer(order);
+      });
+    }
+    function setbutton(row,name,value) {
+      return $('button').text(`${name} = ${value}`).on('click', e => set(row,name,value));
+    }
+    function round(v) {
+      return Math.round(v*100)/100;
+    }
+
+    rows.forEach(row => {
+      if (row.artId) {
+        row.err = [];
+        if (row.omschrijving != row.titel) {
+          row.err.push($('div').style('color:orange;').append(
+            `${row.titel}`,
+            $('button').text(`Aanpassen`).on('click', e => set(row,'aantal',row.aantal)),
+          ));
+        }
+        function check(a,b) {
+          if (row[a] && row[b] && round(row[a]) != round(row[b])) {
+            row.err.push($('div').style('color:orange;').append(
+              // $('span').text(a).style('display:inline-block;width:140px;'),
+              // ':',
+              // $('span').text(num(row[a])).style('display:inline-block;width:80px;text-align:right;'),
+              // ', ',
+              //
+              // $('span').text(b).style('display:inline-block;width:140px;'),
+              // ':',
+              // $('span').text(num(row[b])).style('display:inline-block;width:80px;text-align:right;'),
+              // ', ',
+              //
+              // 'Factor :',
+              // num(row[b]/row[a]),
+
+              // `: ${num(row[a])}, ${b}: ${num(row[b])}, Factor: ${num(row[b]/row[a])}%`,
+              $('a').style('display:block;').append(
+                $('span').text(a).style('display:inline-block;width:140px;'),
+                $('span').text(num(round(row[a]))).style('display:inline-block;width:80px;text-align:right;text-decoration:line-through;'),
+                $('span').text(num(round(row[b]))).style('display:inline-block;width:80px;text-align:right;'),
+                $('span').text(`${num((100*row[b]/row[a])-100)}%`).style('display:inline-block;width:80px;text-align:right;'),
+                ` bron: ${b}`,
+                // `${a} ${round(row[b])} `
+              ).on('click', e => set(row,a,round(row[b]))),
+            ));
+          }
+        }
+        check('artInkKorting','inkArtLevKorting');
+        check('artInkBruto','inkArtLevBruto');
+        row.inkArtLevBruto = row.inkArtLevBruto || round(row.inkArtLevNetto * 100 / (100 - row.inkArtLevKorting));
+        check('artInkNetto','inkArtLevNetto');
+
+        check('bruto','artInkBruto');
+
+        // if (row.inkArtLevBruto && row.inkArtLevBruto !== row.artInkBruto) {
+        //   row.err.push($('div').style('color:orange;').append(
+        //     `Artikel Inkoop Bruto: ${num(row.artInkBruto)}, Leverancier Bruto: ${num(row.inkArtLevBruto)}, Verhoging ${num((100*row.inkArtLevBruto/row.artInkBruto)-100)}%`,
+        //     setbutton(row,'artInkBruto',row.inkArtLevBruto),
+        //   ));
+        // }
+
+        // if (row.inkArtLevBruto && row.inkArtInkBruto && row.inkArtLevBruto != row.inkArtInkBruto) {
+        //   row.err.push($('div').style('color:orange;').append(
+        //     `Artikel Inkoop Bruto: ${num(row.inkArtInkBruto)}) versus Leverancier Bruto (${num(row.inkArtLevBruto)}) verhoging ${num((100*row.inkArtLevBruto/row.inkArtInkBruto)-100)}%`,
+        //     setbutton(row,'inkArtInkBruto',row.inkArtLevBruto),
+        //   ));
+        // }
+        // if (row.inkArtLevNetto && row.inkArtInkNetto && row.inkArtLevNetto != row.inkArtInkNetto) {
+        //   row.err.push($('div').style('color:orange;').append(
+        //     `Artikel inkoop netto (${row.inkArtInkNetto}) versus Leverancier Netto (${row.inkArtLevNetto}) verhoging ${num((100*row.inkArtLevNetto/row.inkArtInkNetto)-100)}%`,
+        //     setbutton(row,'inkArtInkNetto',row.inkArtLevNetto),
+        //   ));
+        // }
+
+
+
+
+        // console.log(row.artId,row.inkArtLevBruto,row.bruto,row);
+        // if (row.inkArtLevBruto && row.bruto && row.inkArtLevBruto != row.bruto) {
+        //   row.err.push($('div').style('color:orange;').append(
+        //     `Regel Bruto (${num(row.bruto)}) versus Leverancier Bruto (${num(row.inkArtLevBruto)}) verhoging ${num((100*row.inkArtLevBruto/row.bruto)-100)}%`,
+        //     setbutton(row,'bruto',row.inkArtLevBruto),
+        //   ));
+        // }
+        // if (row.inkArtInkBruto && row.bruto && row.inkArtInkBruto != row.bruto) {
+        //   row.err.push($('div').style('color:orange;').append(
+        //     `Regel Bruto (${num(row.bruto)}) versus Artikel Inkoop Bruto (${num(row.inkArtInkBruto)}) verhoging ${num((100*row.inkArtInkBruto/row.bruto)-100)}%`,
+        //     setbutton(row,'bruto',row.inkArtInkBruto),
+        //   ));
+        // }
+        // if (row.inkArtLevKorting && row.inkArtInkKorting && row.inkArtLevKorting != row.inkArtInkKorting) {
+        //   row.err.push($('div').style('color:orange;').append(
+        //     `Artikel inkoop korting (${row.inkArtInkKorting}) versus Leverancier Korting (${row.inkArtLevKorting}) verhoging ${num((100*row.inkArtLevKorting/row.inkArtInkKorting)-100)}%`,
+        //     setbutton(row,'inkArtInkKorting',row.inkArtLevKorting),
+        //   ));
+        // }
+        if (!row.artInkId && row.magLokatie !== '30.01.01') {
+          row.err.push($('div').style('color:red;').append(
+            'Geen inkoop artikel gekoppeld, geen inkoop informatie.',
+          ));
+        }
+        if (row.korting < 0) {
+          row.err.push($('div').style('color:orange;').append(
+            `Regel korting negatief`,
+          ));
+        }
+      }
+    });
+
     function calc(){
       form.nr.value = row.artId || '';
       form.aantal.value = row.aantal;
       form.omschrijving.value = row.omschrijving || '';
-      form.bruto.value = num(row.bruto || '',2);
-      form.netto.value = num(row.netto || '',2);
-      form.korting.value = num(row.korting || '',1);
-      form.tot.value = num(row.totaal,2);
+      form.bruto.value = num(row.bruto || 0,2);
+      form.netto.value = num(row.netto || 0,2);
+      form.korting.value = num(row.korting || 0,1);
+      form.tot.value = num(row.totaal || 0,2);
       $('.tot').text(num(rows.map(row =>row.totaal||0).reduce((tot,val)=>tot += val),2));
     }
     function addrow(row){
@@ -2234,7 +2348,12 @@ $().on('load', async e => {
           $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.artId}`)}`).text(row.artId)
         ),
         $('td').append(row.aantal),
-        $('td').append(row.omschrijving),
+        $('td').text(
+          row.omschrijving,
+          // row.magLokatie,
+        ).append(
+          row.err,
+        ),
         $('td').append(row.extratekst),
         $('td').align('right').append(num(row.bruto,2)),
         $('td').align('right').append(num(row.netto,2)),
@@ -2245,92 +2364,93 @@ $().on('load', async e => {
       form.nr.scrollIntoView();
     }
     // $('.pv').text('');
-    $('.lv').append(
-      $('div').style('position:absolute;margin:auto;top:0;left:0;right:0;bottom:0;background:black;height:auto;').append(
-        $('div').class('col orderform').append(
-          $('form').on('submit', async e => {
-            e.preventDefault();
-            if (row.artId) {
-              addrow(row);
-              rows.push(row = { quant: 1 });
-              calc();
-            }
-            return false;
-          }).class('aco orderlist').style('overflow:overlay;display:flex;flex-direction:columns;').append(
-            $('table').append(
-              $('thead').append(
-                $('tr').append(
-                  $('th').text('Art.nr.'),
-                  $('th').text('Aantal'),
-                  $('th').text('Omschrijving').style('width:100%;'),
-                  $('th').text('Extra'),
-                  $('th').style('text-align:right;').text('Bruto'),
-                  $('th').style('text-align:right;').text('Netto'),
-                  $('th').style('text-align:right;').text('Korting'),
-                  $('th').style('text-align:right;').text('Totaal'),
-                )
+    const elem = $('div').parent('.lv').style('position:absolute;margin:auto;top:0;left:0;right:0;bottom:0;background:black;height:auto;z-index:1;').append(
+      $('div').class('col orderform').append(
+        $('nav').append(
+          $('button').class('abtn close').on('click', e => elem.remove()),
+        ),
+        $('form').on('submit', async e => {
+          e.preventDefault();
+          if (row.artId) {
+            addrow(row);
+            rows.push(row = { quant: 1 });
+            calc();
+          }
+          return false;
+        }).class('aco orderlist').style('overflow:overlay;display:flex;flex-direction:columns;').append(
+          $('table').append(
+            $('thead').append(
+              $('tr').append(
+                $('th').text('Art.nr.'),
+                $('th').text('Aantal'),
+                $('th').text('Omschrijving').style('width:100%;'),
+                $('th').text('Extra'),
+                $('th').style('text-align:right;').text('Bruto'),
+                $('th').style('text-align:right;').text('Korting'),
+                $('th').style('text-align:right;').text('Netto'),
+                $('th').style('text-align:right;').text('Totaal'),
+              )
+            ),
+            $('tbody').style('font-family:consolas;white-space:pre;'),
+            $('tfoot').style('font-family:consolas;white-space:pre;').append(
+              $('tr').append(
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').style('min-width:80px;').autocomplete('off').name('nr').on('change', async e => {
+                      const [[art]] = await dmsClient.api('/abis/order_add_artikel').query({artnr:e.target.value,orderNr:order.nr}).get();
+                      Object.assign(row,art);
+                      console.log(art,row);
+                      calc();
+                    }),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').autocomplete('off').type('number').style('text-align:right;').name('aantal').value(1).on('change', async e => {
+                      row.quant = e.target.value;
+                      calc();
+                    }),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').autocomplete('off').name('omschrijving').tabindex(-1),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').autocomplete('off').name('extra'),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').style('text-align:right;min-width:100px;').name('bruto').value(0),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').style('text-align:right;min-width:100px;').name('korting').value(0),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').style('text-align:right;min-width:100px;').name('netto').value(0),
+                  ),
+                ),
+                $('td').append(
+                  $('span').class('input').append(
+                    $('input').style('text-align:right;min-width:100px;').name('tot').value(0),
+                  ),
+                ),
+                $('button').style('display:none;'),
               ),
-              $('tbody'),
-              $('tfoot').append(
-                $('tr').append(
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').style('min-width:80px;').autocomplete('off').name('nr').on('change', async e => {
-                        const [[art]] = await dmsClient.api('/abis/order_add_artikel').query({artnr:e.target.value,orderNr:order.nr}).get();
-                        Object.assign(row,art);
-                        console.log(art,row);
-                        calc();
-                      }),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').autocomplete('off').type('number').style('text-align:right;').name('aantal').value(1).on('change', async e => {
-                        row.quant = e.target.value;
-                        calc();
-                      }),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').autocomplete('off').name('omschrijving').tabindex(-1),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').autocomplete('off').name('extra'),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').style('text-align:right;min-width:100px;').name('bruto').value(0),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').style('text-align:right;min-width:100px;').name('netto').value(0),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').style('text-align:right;min-width:100px;').name('korting').value(0),
-                    ),
-                  ),
-                  $('td').append(
-                    $('span').class('input').append(
-                      $('input').style('text-align:right;min-width:100px;').name('tot').value(0),
-                    ),
-                  ),
-                  $('button').style('display:none;'),
-                ),
-                $('tr').append(
-                  $('td').colspan(7),
-                  $('td').style('text-align:right;font-weight:bold;').class('tot')
-                ),
+              $('tr').append(
+                $('td').colspan(7),
+                $('td').style('text-align:right;font-weight:bold;').class('tot')
               ),
             ),
           ),
-        )
+        ),
       )
     );
     const form = document.querySelector('.lv form');
@@ -2894,10 +3014,15 @@ $().on('load', async e => {
     ],
     navList: () => [
       $('button').text('Nieuw').on('click', async e => {
-        const res = await dmsClient.api('/organisatie').post({
+        const [[row]] = await dmsClient.api('/organisatie').post({
           organisatieNaam: 'Nieuw',
         });
-        console.log(res);
+        // document.location.hash = `#?id=${btoa('https://dms.aliconnect.nl/api/v1/organisatie?edit&id='+row.id)}`;
+        document.location.hash = '?$search=';
+        document.location.hash = '?$search='+aim.searchString;
+        document.location.hash = `?id=${btoa('https://dms.aliconnect.nl/api/v1/organisatie?edit&id='+row.id)}`;
+        // const elems = document.body.querySelectorAll(`.lv div.${row.schemaname+row.id}`);
+        console.log(row);
       }),
     ]
   }
@@ -4790,6 +4915,7 @@ $().on('load', async e => {
     CRMC: {
       organisatie: e => aim.list('organisatie',{
         $search: ``,
+        $order: 'organisatieId DESC',
       }),
     },
   });

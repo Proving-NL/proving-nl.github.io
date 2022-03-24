@@ -1060,7 +1060,7 @@ $().on('load', async e => {
                     $('th').text('Klantnummer'),
                     $('td').text(salesorder.klantId.pad(5)),
                     $('th').text('Afleveradres'),
-                    $('td').text(salesorder.afleverOrganisatieNaam || factuur.organisatieNaam || salesorder.afleverContactNaam || '').style('width:100%;'),
+                    $('td').text(salesorder.afleverOrganisatieNaam || factuur.organisatieNaam || salesorder.afleverContactNaam || '').style('width:100%;white-space:normal;'),
                   ),
                   $('tr').append(
                     $('th').text('Orderdatum'),
@@ -1068,7 +1068,7 @@ $().on('load', async e => {
                     $('th').text('Uw referentie'),
                     $('td').text(salesorder.uwRef),
                     $('th').text(''),
-                    $('td').text(salesorder.afleverAdres1),
+                    $('td').text(salesorder.afleverAdres1).style('width:100%;white-space:normal;'),
                   ),
                   $('tr').append(
                     $('th').text('Verzenddatum'),
@@ -1076,7 +1076,7 @@ $().on('load', async e => {
                     $('th').text(''),
                     $('td').text(''),
                     $('th').text(''),
-                    $('td').text(salesorder.afleverAdres2),
+                    $('td').text(salesorder.afleverAdres2).style('width:100%;white-space:normal;'),
                   ),
                 ),
               ),

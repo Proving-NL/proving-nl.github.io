@@ -2356,8 +2356,8 @@ $().on('load', async e => {
         ),
         $('td').append(row.extratekst),
         $('td').align('right').append(num(row.bruto,2)),
-        $('td').align('right').append(num(row.netto,2)),
         $('td').align('right').append(num(row.korting,1)),
+        $('td').align('right').append(num(row.netto,2)),
         $('td').align('right').append(num(row.totaal,2)),
       );
       form.nr.focus();
@@ -2707,7 +2707,7 @@ $().on('load', async e => {
           $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
         ),
       ),
-    ]
+    ],
   }
   aim.config.components.schemas.inkbon.app = {
     nav: row => [
@@ -4913,7 +4913,7 @@ $().on('load', async e => {
       },
     },
     CRMC: {
-      organisatie: e => aim.list('organisatie',{
+      Organisaties: e => aim.list('organisatie',{
         $search: ``,
         $order: 'organisatieId DESC',
       }),

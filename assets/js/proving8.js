@@ -3188,33 +3188,6 @@ $().on('load', async e => {
   }
 
   // aim.om.treeview(kopmenu);
-  function tableLijst(rows) {
-    rows.filter(row => row.productId).forEach(row => row.productId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId.pad(6)));
-    rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)));
-    $('.lv').text('').append(
-      $('div').append(
-        $('div').append(
-          $('table').style('white-space:pre;min-width:100%;').append(
-            $('thead').append(
-              $('tr').append(
-                Object.keys(rows[0]).map(k => $('td').text(aim.displayName(k))),
-              )
-            ),
-            $('tbody').style('font-family:consolas;').append(
-              rows.map(row => $('tr').style(('artInkId' in row) && !row.artInkId ? 'color:red;' : '').append(
-                Object.values(row).map(v => $('td').style(isNaN(v) ? '' : 'text-align:right;').append(v)),
-              ))
-            )
-          )
-        )
-      )
-    )
-  }
-  async function analyseTable(name,query) {
-    const [rows] = await dmsClient.api(name).query(query).get();
-    tableLijst(rows);
-  }
-  Object.assign(aim, { analyseTable });
 
   const [kop1,kop2,artikelgroep] = await dmsClient.api('/abis/productgroepen').get();
   const [merken] = await dmsClient.api('/abis/merken').get();
@@ -3230,7 +3203,29 @@ $().on('load', async e => {
     ])),
   ])));
   Object.assign(mainmenu.shop, {
-    merken: Object.fromEntries(merken.map(merk => [merk.merk, e => analyseTable('/abis/prijslijst_merk', {merk:merk.merk})])),
+    merken: Object.fromEntries(merken.map(merk => [merk.merk, async e => {
+      const [rows] = await dmsClient.api('/abis/prijslijst_merk').query({merk:merk.merk}).get();
+      rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+      console.log(rows);
+      $('.lv').text('').append(
+        $('div').append(
+          $('div').append(
+            $('table').style('width:100%;').append(
+              $('thead').append(
+                $('tr').append(
+                  Object.keys(rows[0]).map(k => $('td').text(k)),
+                )
+              ),
+              $('tbody').style('font-family:consolas;').append(
+                rows.map(row => $('tr').append(
+                  Object.values(row).map(v => $('td').append(v)),
+                ))
+              )
+            )
+          )
+        )
+      )
+    }])),
     bestellijst: e => aim.list('productklant', {
       $filter: `organisatieId EQ '${clientId}'`,
       $order: 'lastModifiedDateTime DESC',
@@ -3241,7 +3236,93 @@ $().on('load', async e => {
     // },
   });
   if (account.scopes.includes('abisingen.medewerker')) {
+    // const [leveranciers] = await dmsClient.api('/abis/leveranciers').get();
+
     Object.assign(mainmenu, aim.config.mainmenu);
+
+    // Object.assign(mainmenu, aim.config.mainmenu, {
+    //   verkoop: {
+    //     Klanten: e => aim.list('company',{
+    //       $filter: `klantcode is not null`,
+    //       $search: ``,
+    //     }),
+    //     Orders: {
+    //       // Actief: e => aim.list('salesorder',{
+    //       //   $filter: `aanbieding NE 1 && verwerkt NE 0 && factuurnr EQ 0`,
+    //       //   $filter: `factuurid EQ NULL`,
+    //       //   $order: `id DESC`,
+    //       //   $search: '*',
+    //       // }),
+    //       // Mandje: e => aim.list('salesorder',{
+    //       //   $filter: `verwerkt NE 1`,
+    //       //   $order: `id DESC`,
+    //       //   $search: '*',
+    //       // }),
+    //       // Aanbieding: e => aim.list('salesorder',{
+    //       //   $filter: `aanbieding NE 0`,
+    //       //   $order: `nr DESC`,
+    //       //   $search: '*',
+    //       // }),
+    //       Alles: e => aim.list('salesorder',{
+    //         $order: `id DESC`,
+    //         $top: 1000,
+    //         $search: '',
+    //       }),
+    //       // Factureren: e => aim.list('salesorder',{
+    //       //   $filter: `(DATEDIFF(day,verstuurdDatumTijd,GETDATE())>2 OR leverDatumTijd IS NOT NULL) AND factuurId IS NULL AND aanbieding=0`,
+    //       //   $order: `organisatieId,id`,
+    //       //   $top: 100,
+    //       //   $search: '*',
+    //       // }),
+    //       ReadyMix: e => aim.list('salesorderrow',{
+    //         $filter: `prodStockLocation EQ 'k-m' && sendDateTime EQ NULL && isQuote <> 1 && isOrder = 1`,
+    //         // $order: `nr DESC`,
+    //         $top: `100`,
+    //       }),
+    //       orderInvoer,
+    //       Inkoop: e => aim.list('inkbon',{
+    //         $filter: `gereedDatumTijd EQ NULL`,
+    //         $search: '',
+    //       }),
+    //
+    //     },
+    //   },
+    //   inkoop: {
+    //     // leveranciers: e => aim.list('company',{
+    //     //   $filter: `levcode is not null or crednr is not null`,
+    //     //   $search: ``,
+    //     // }),
+    //     // producten: e => aim.list('artink',{
+    //     //   $search: ``,
+    //     // }),
+    //     prijslijsten: Object.fromEntries(leveranciers.map(lev => [lev.firma, async e => {
+    //       const [rows] = await dmsClient.api('/abis/leverancier_artikelen').query({id:lev.id}).get();
+    //       rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+    //       console.log(rows);
+    //       $('.lv').text('').append(
+    //         $('div').append(
+    //           $('div').append(
+    //             $('table').style('width:100%;').append(
+    //               $('thead').append(
+    //                 $('tr').append(
+    //                   Object.keys(rows[0]).map(k => $('td').text(k)),
+    //                 )
+    //               ),
+    //               $('tbody').style('font-family:consolas;').append(
+    //                 rows.map(row => $('tr').append(
+    //                   Object.values(row).map(v => $('td').append(v)),
+    //                 ))
+    //               )
+    //             )
+    //           )
+    //         )
+    //       )
+    //     }]))
+    //   },
+    //   administratie: {
+    //
+    //   }
+    // });
   }
 
   mainmenu.tools = {
@@ -3254,6 +3335,27 @@ $().on('load', async e => {
   aim.om.treeview(mainmenu);
 
 
+  async function prijslijst (id,merk) {
+    const [rows] = await dmsClient.api('/abis/prijslijst').query({id:id}).get();
+    rows.forEach(row => row.id = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.id}`)}`).text(row.id));
+    console.log(rows);
+    $('.lv').text('').append(
+      $('div').append(
+        $('table').style('white-space:pre;').append(
+          $('thead').append(
+            $('tr').append(
+              Object.keys(rows[0]).map(k => $('td').text(k)),
+            )
+          ),
+          $('tbody').style('font-family:consolas;').append(
+            rows.map(row => $('tr').style(!row.artInkId ? 'color:red;' : '').append(
+              Object.values(row).map(v => $('td').append(v)),
+            ))
+          )
+        )
+      )
+    )
+  }
 
   // aim.om.treeview(aim.config.mainmenu);
 
@@ -4667,6 +4769,33 @@ $().on('load', async e => {
     lijstFactureren(orders);
   }
 
+  function tableLijst(rows) {
+    rows.filter(row => row.productId).forEach(row => row.productId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId));
+    rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId));
+    $('.lv').text('').append(
+      $('div').append(
+        $('table').style('white-space:pre;').append(
+          $('thead').append(
+            $('tr').append(
+              Object.keys(rows[0]).map(k => $('td').text(aim.displayName(k))),
+            )
+          ),
+          $('tbody').style('font-family:consolas;').append(
+            rows.map(row => $('tr').style(('artInkId' in row) && !row.artInkId ? 'color:red;' : '').append(
+              Object.values(row).map(v => $('td').append(v)),
+            ))
+          )
+        )
+      )
+    )
+  }
+
+  Object.assign(aim, {
+    async analyseTable(name,query) {
+      const [rows] = await dmsClient.api(name).query(query).get();
+      tableLijst(rows);
+    },
+  });
 
 
   const url = new URL(document.location);

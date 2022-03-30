@@ -1100,8 +1100,8 @@ $().on('load', async e => {
               $('td').text(row.artId ? row.artId.pad(5) : ''),
               $('td').class('nr').text(row.aantal),
               $('td').text(row.eenheid),
-              $('td').style('white-space:normal;').append(
-                row.rglomschrijving.replace(/\r|\n/g,''),
+              $('td').style('white-space:normal;word-break:break-word;').append(
+                row.rglomschrijving.replace(/\r|\n/g,'').replace(/\b([\w]+[-|\/|\.][^,]*)\b/g,'<nobr>$1</nobr>'),
                 // $('div').style('font-style:italic;').text(String(row.rglomschrijving).replace(/\r|\n/g,'')),
               ),
               $('td').class('nr').text(row.bruto ? num(row.bruto) : ''),

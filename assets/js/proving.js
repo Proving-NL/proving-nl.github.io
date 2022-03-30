@@ -11,11 +11,16 @@ $().on('message', data => {
 
 $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
+
+  localStorage.setItem('connectorId', '4328291f-8542-42cc-bd67-5021b5e54a58');
+  aim.send('/aliconnector/client/init', { body: { nonce: localStorage.getItem('connectorId') } });
+
   console.log('AIM', aim.config);
   // sessionStorage.clear();
 
   const accountId = new URLSearchParams(document.location.search).get('accountId') || localStorage.getItem('accountId') || '';
   localStorage.setItem('accountId', accountId);
+
   const account = await aimClient.api('/abis/account').query({client_id: aim.config.client_id, account_id: accountId}).get();
   sessionStorage.setItem('access_token', account.access_token);
   console.log('AIM', account, accountId, aimClient, dmsClient, aim.config);
@@ -631,6 +636,7 @@ $().on('load', async e => {
             // $('th').align('left').text('Artikelnummer'),
             $('th').append(
               $('div').text('Vak'),
+              $('div').text('Pos.'),
             ),
             $('th').style('text-align:right;').append(
               $('div').text('Aantal'),
@@ -669,6 +675,7 @@ $().on('load', async e => {
             $('tr').append(
               $('td').append(
                 $('div').text(row.loc||''),
+                $('div').text(Number(row.pos).pad(2)),
               ),
               $('td').style('text-align:right;').append(
                 $('div').text(row.aantal).style('font-weight:bold;'),
@@ -860,7 +867,6 @@ $().on('load', async e => {
 
       $('table').class('grid').style('margin-bottom:25mm;').append(
         $('thead').append(
-
           $('tr').append(
             $('td').colspan(6).style('border:none;padding:0;').append(
               $('table').class('border summary').append(
@@ -891,8 +897,8 @@ $().on('load', async e => {
               ),
             )
           ),
-
           $('tr').append(
+            $('th').text('Pos.'),
             $('th').text('Art.nr.'),
             $('th').style('text-align:right;').text('Aantal'),
             $('th').text('Eenheid'),
@@ -902,6 +908,7 @@ $().on('load', async e => {
         ),
         $('tbody').append(
           rows.sort((a,b) => a.id - b.id).map(row => $('tr').append(
+            $('td').text(Number(row.pos).pad(2)),
             $('td').text(row.artId ? row.artId.pad(5) : ''),
             $('td').style('text-align:right;').text(row.aantal),
             $('td').text(row.eenheid),
@@ -961,6 +968,20 @@ $().on('load', async e => {
     const els = {};
     let totaal = 0;
     let betaald = 0;
+    var pos;
+    function trheader() {
+      return $('tr').class('border').append(
+        $('th').text('Pos.'),
+        $('th').text('Art.nr.'),
+        $('th').class('nr').text('Aantal'),
+        $('th').class('nr').text('Eenheid'),
+        $('th').style('width:100%;').text('Omschrijving'),
+        $('th').class('nr').text('Bruto'),
+        $('th').class('nr').text('Kort.'),
+        $('th').class('nr').text('Netto'),
+        $('th').class('nr').text('Totaal'),
+      )
+    }
     const elem = $('div').append(
       $('link').rel('stylesheet').href(cssPrintUrl),
       $('header').style('position: fixed;top: 0;left: 0;right: 0;bottom: -10mm;border: solid 1px black;'),
@@ -970,14 +991,14 @@ $().on('load', async e => {
       $('table').style('width:100%;').append(
         $('thead').append(
           $('tr').append(
-            $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(8).append(
+            $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(9).append(
               $('img').style('width:100%;').src('https://proving-nl.aliconnect.nl/assets/img/letter-header-' + factuur.bedrijfCode + '.png'),
             )
           )
         ),
 
         $('tr').append(
-          $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(8).append(
+          $('td').style('border-left:solid 2px white;border-right:solid 2px white;border-top:solid 2px white;').colspan(9).append(
             $('table').style('width:100%;margin-bottom:8mm;').append(
               $('tr').append(
                 $('td').append(
@@ -1008,7 +1029,7 @@ $().on('load', async e => {
           ),
         ),
         $('tr').append(
-          $('td').colspan(8).style('border:none;padding:0;').append(
+          $('td').colspan(9).style('border:none;padding:0;').append(
             $('table').class('border summary').append(
               $('tr').append(
                 $('th').text('Factuurnummer'),
@@ -1038,21 +1059,12 @@ $().on('load', async e => {
           )
         ),
         $('thead').append(
-          $('tr').class('border').append(
-            $('th').text('Art.nr.'),
-            $('th').class('nr').text('Aantal'),
-            $('th').class('nr').text('Eenheid'),
-            $('th').style('width:100%;').text('Omschrijving'),
-            $('th').class('nr').text('Bruto'),
-            $('th').class('nr').text('Kort.'),
-            $('th').class('nr').text('Netto'),
-            $('th').class('nr').text('Totaal'),
-          ),
+          trheader(),
         ),
         $('tbody').class('border').append(
           ...orders.map((salesorder,i) => [
             $('tr').append(
-              $('td').colspan(8).style('border:none;padding:0;').append(
+              $('td').colspan(9).style('border:none;padding:0;').append(
                 $('table').class('border summary').append(
                   $('tr').append(
                     $('th').text('Ordernummer'),
@@ -1081,18 +1093,10 @@ $().on('load', async e => {
                 ),
               ),
             ),
-            // $('tr').append(
-            //   $('th').text('Art.nr.'),
-            //   $('th').class('nr').text('Aantal'),
-            //   $('th').class('nr').text('Eenheid'),
-            //   $('th').style('width:100%;').text('Omschrijving'),
-            //   $('th').class('nr').text('Bruto'),
-            //   $('th').class('nr').text('Kort.'),
-            //   $('th').class('nr').text('Netto'),
-            //   $('th').class('nr').text('Totaal'),
-            // ),
+            trheader(),
           ].concat(
-            rows.filter(row => row.bonId === salesorder.id).map(row => $('tr').append(
+            rows.filter(row => row.bonId === salesorder.id).map((row,i) => $('tr').append(
+              $('td').text((i ? ++pos : pos=1).pad(2)),
               $('td').text(row.artId ? row.artId.pad(5) : ''),
               $('td').class('nr').text(row.aantal),
               $('td').text(row.eenheid),
@@ -1103,7 +1107,7 @@ $().on('load', async e => {
               $('td').class('nr').text(row.bruto ? num(row.bruto) : ''),
               $('td').class('nr').text(row.korting ? num(row.korting,1) : ''),
               $('td').class('nr').text(row.netto ? num(row.netto) : ''),
-              $('td').class('nr').text(row.totaal ? num(row.totaal) : ''),
+              $('td').class('nr').text(num(row.totaal || 0)),
             )),
 
             // !Number(invoice.vrachtKost) ? null : $('tr').append(
@@ -3027,7 +3031,6 @@ $().on('load', async e => {
     ]
   }
 
-
   aim.cols = {
     catalogPrice(row, div) {
       if ('catalogPrice' in row) {
@@ -3292,8 +3295,6 @@ $().on('load', async e => {
       )
     }]))
   });
-
-
 
   async function prijslijst (id,merk) {
     const [rows] = await dmsClient.api('/abis/prijslijst').query({id:id}).get();
@@ -4917,6 +4918,15 @@ $().on('load', async e => {
         $search: ``,
         $order: 'organisatieId DESC',
       }),
+    },
+    PC: {
+      Organisaties: e => aim.send('/aliconnector/execute', { body: { name: 'organisaties' } }),
+      Orders: e => aim.send('/aliconnector/execute', { body: { name: 'orders' } }),
+      Admin: e => aim.send('/aliconnector/execute', { body: { name: 'abisAmdin' } }),
+      Boeken: e => aim.send('/aliconnector/execute', { body: { name: 'boeken' } }),
+      Download: e => aim.send('/aliconnector/external', { body: { name: 'filedownload', args: [ 'http://share.aliconnect.nl/test1.docx' ] } }),
+      // Download: e => aim.send('/aliconnector/external', { body: { name: 'filedownload', args: [ 'http://ashare.nl/test1.docx' ] } }),
+
     },
   });
 

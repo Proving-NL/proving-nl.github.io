@@ -2469,7 +2469,7 @@ $().on('load', async e => {
 
     dmsClient.api('/abis/factuurGeprint').query({id: factuur.id}).get().then(e => console.log(e));
 
-    const href = `https://aliconnect.nl/shared/${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf`.toLowerCase();
+    const href = `https://aliconnect.nl/shared/${factuur.afzenderNaam}/facturen/${factuur.jaar}/${factuur.afzenderNaam}-factuur-${factuur.factuurNr}-${factuur.uid}.pdf?dt=${(new Date()).getTime()}`.toLowerCase();
     const elem = $('div').parent('body>main').style('position:absolute;width:100%;height:100%;').append(
       $('iframe').src(href).style('position:absolute;width:100%;height:100%;border:none;'),
       $('button').style('position:absolute;width:20px;height:20px;border:none;right:0px;top:0px;background:red;').text('X').on('click', e => elem.remove()),

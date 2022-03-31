@@ -6,19 +6,23 @@ function getnumber(selector){
 }
 $().on('message', data => {
   // const {data,target} = e;
-  console.log('ON MESSAGE', data);
+  // console.log('ON MESSAGE', data);
 })
 
 $().on('load', async e => {
   const {aimClient,dmsClient} = aim;
   localStorage.setItem('connectorId', '4328291f-8542-42cc-bd67-5021b5e54a58');
   aim.send('/aliconnector/client/init', { body: { nonce: localStorage.getItem('connectorId') } });
+  console.error(sessionStorage.getItem('access_token'));
   // sessionStorage.clear();
+  // localStorage.clear();
   const accountId = new URLSearchParams(document.location.search).get('accountId') || localStorage.getItem('accountId') || '';
   localStorage.setItem('accountId', accountId);
   const account = await aimClient.api('/abis/account').query({client_id: aim.config.client_id, account_id: accountId}).get();
-  sessionStorage.setItem('access_token', account.access_token);
-  console.log('AIM', account, accountId, aimClient, dmsClient, aim.config);
+  console.log(account.access_token);
+  localStorage.setItem('access_token', account.access_token);
+  // localStorage.setItem('access_token', account.access_token);
+  // console.log('AIM', account, accountId, aimClient, dmsClient, aim.config);
   const cssPrintUrl = 'https://proving-nl.aliconnect.nl/assets/css/print.css';
   let clientart = [];
   let clientId = sessionStorage.getItem('clientId');
@@ -31,7 +35,7 @@ $().on('load', async e => {
     sessionStorage.setItem('clientId', clientId = id);
     $('button.account span.company').text(clientId||'');
     [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientId=' + clientId).then(res => res.json());
-    console.log(clientart,mandregels);
+    // console.log(clientart,mandregels);
     // aim.idfilter = `clientName EQ '${clientName}'`;
   }
   Object.values(aim.config.artikelgroepen).forEach(obj =>

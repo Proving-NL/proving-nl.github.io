@@ -4661,11 +4661,11 @@ $().on('load', async e => {
 
   // aim.om.treeview(menu);
 
-  async function factureren() {
-    const [orders] = await dmsClient.api('/abis/orderstefactureren').get();
-    // return console.log(orders);
-    lijstFactureren(orders);
-  }
+  // async function factureren() {
+  //   const [orders] = await dmsClient.api('/abis/orderstefactureren').get();
+  //   // return console.log(orders);
+  //   lijstFactureren(orders);
+  // }
 
 
 

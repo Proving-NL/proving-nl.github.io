@@ -121,3 +121,7 @@ div.search input {
 .bruto {
   float:right;
 }
+a {
+  color: rgb(10,132,255);
+  cursor: pointer;
+}

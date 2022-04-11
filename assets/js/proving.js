@@ -1216,7 +1216,7 @@ $().on('load', async e => {
     // const [clientInvoices,clientOrders,rows] = factuurData;
     // const [invoice] = clientInvoices;
     facturenElem = facturenElem || $('div')//$('iframe').printbody();
-    if (false && rowfactuur.postadresMailadres) {
+    if (0 && rowfactuur.postadresMailadres) {
       await sendInvoice(factuurElem, rowfactuur);
     } else {
       facturenElem.append(factuurElem.style('page-break-after:always;'))
@@ -2305,7 +2305,7 @@ $().on('load', async e => {
         ).append(
           row.err,
         ),
-        $('td').append(row.extratekst),
+        $('td').append(row.extraTekst).style('white-space:nowrap'),
         $('td').align('right').append(num(row.bruto,2)),
         $('td').align('right').append(num(row.korting,1)),
         $('td').align('right').append(num(row.netto,2)),

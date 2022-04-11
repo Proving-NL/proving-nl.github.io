@@ -4,12 +4,8 @@ function gettext(selector){
 function getnumber(selector){
   return (selector.match(/\\d+/)||[]).shift()
 }
-$().on('message', data => {
-  // const {data,target} = e;
-  // console.log('ON MESSAGE', data);
-})
-
 $().on('load', async e => {
+  if (!aim.send) return;
   const {aimClient,dmsClient} = aim;
   localStorage.setItem('connectorId', '4328291f-8542-42cc-bd67-5021b5e54a58');
   aim.send('/aliconnector/client/init', { body: { nonce: localStorage.getItem('connectorId') } });
@@ -2479,6 +2475,14 @@ $().on('load', async e => {
       $('button').style('position:absolute;width:20px;height:20px;border:none;right:0px;top:0px;background:red;').text('X').on('click', e => elem.remove()),
     )
   }
+  function toonImage(e){
+    e.preventDefault();
+    const img = $('img').parent(document.body).src(e.target.src)
+    .style('position:fixed;top:0;right:0;bottom:0;left:0;object-fit:contain;width:100%;height:100%;background-color:rgba(0,0,0,0.8);')
+    .on('click', e => img.remove());
+  }
+
+
 
   aim.config.components.schemas.company.app = {
     nav: row => [
@@ -2885,6 +2889,7 @@ $().on('load', async e => {
       // console.log(clientart);
       clientart.filter(a => a.artId === row.id).forEach(a => discount = a.clientDiscount);
       elem.append(
+        !row.iconUrl ? null : $('img').src(row.iconUrl).style('max-width:80px;max-height:80px;').on('click', toonImage),
         $('div').append(
           'Verkoop: ',
           discount
@@ -3083,7 +3088,13 @@ $().on('load', async e => {
   $(window).on('drop', async e => {
     e.preventDefault();
     e.stopPropagation();
+    const {dataTransfer} = e;
+    const {types} = dataTransfer;
     const data = e.dataTransfer || e.clipboardData;
+    types.forEach(type => {
+      const data = dataTransfer.getData(type);
+      console.log(type, data);
+    });
     if (data.types.includes('Files')) {
       importFiles(data.files);
       // const config = await fetch('https://aliconnect.nl/yaml.php', {
@@ -3092,7 +3103,57 @@ $().on('load', async e => {
       // }).then(res => res.json());
       // console.log(1, config, files);
     }
+    if (types.includes('text/uri-list')) {
+      const uri = dataTransfer.getData('text/uri-list');
+      // const elem = $('img').src(uri)
+      // var xhr = new XMLHttpRequest();
+      // xhr.open('GET', uri);
+      // xhr.responseType = 'blob';
+      // xhr.onload = e => {
+      //   var reader = new FileReader();
+      //   reader.onload = e => {
+      //     console.log(reader.result.replace('data:', '').replace(/^.+,/, ''));
+      //   }
+      //   reader.readAsDataURL(this.response);
+      // };
+      // xhr.send();
+
+
+      // fetch(uri, {
+      //   method: 'GET',
+      //   // headers: headers,
+      //   mode: 'no-cors',
+      //   // credentials: 'include'
+      // })
+      // .then(res => res.blob())
+      // .then(blob => {
+      //   console.log(blob);
+      //   // Read the Blob as DataURL using the FileReader API
+      //   const reader = new FileReader();
+      //   reader.onloadend = () => {
+      //     console.log(reader.result);
+      //     // Logs data:image/jpeg;base64,wL2dvYWwgbW9yZ...
+      //
+      //     // Convert to Base64 string
+      //     const base64 = reader.result.replace('data:', '').replace(/^.+,/, '');
+      //     console.log(base64);
+      //     // Logs wL2dvYWwgbW9yZ...
+      //   };
+      //   reader.readAsDataURL(blob);
+      // });
+
+
+      const image = await dmsClient.api('/abis/saveimageuri').query({uri:uri, id:aim.pageRow.prodId, filename:aim.pageRow.prodCode || aim.pageRow.prodId }).get();
+      const result = await dmsClient.api('/abis/product').query({
+        id: aim.pageRow.prodId
+      }).post({
+        iconUrl: image.src,
+      });
+      console.log(image,result,uri,aim.pageRow);
+    }
   });
+
+
   const cols = {
     title: {h:'Titel', t:'s', wch:80, },
     // row.title.replace(/\r|\n/g,''),

@@ -3357,11 +3357,50 @@ $().on('load', async e => {
     togglePrintserviceON_OFF(){
       window.localStorage.setItem('printService', window.localStorage.getItem('printService') ? '' : 'on');
     },
+    async inkoopadvies() {
+      const [rows] = await dmsClient.api('/abis/inkoop/inkoopadvies/leveranciers').get();
+      console.log(rows);
+      const elem = $('div').parent('.lv').style('flex-flow: column;').append(
+        $('div').append(
+          $('nav').append(
+            $('a').class('icn-back').caption('Terug').on('click', e => elem.remove())
+          ),
+          $('div').class('list').append(
+            rows.map(row => $('div').text(row.artLevLeverancier).on('click', async e => {
+              const [rows] = await dmsClient.api('/abis/inkoop/inkoopadvies').query(row).get();
+              rows.filter(row => row.productId).forEach(row => row.productId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId.pad(6)));
+              rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)));
+              console.log(rows);
+              const elem = $('div').parent('.lv').style('flex-flow: column;').append(
+                $('nav').append(
+                  $('a').class('icn-back').caption('Terug').on('click', e => elem.remove())
+                ),
+                $('table').append(
+                  $('tbody').append(
+                    rows.map(row => $('tr').append(
+                      $('td').append(row.totaal),
+                      $('td').append(row.artLevBestelCode),
+                      $('td').append(row.inkArtTitel),
+                      $('td').append(row.productId),
+                      $('td').append(row.artInkId),
+                    )),
+                  )
+                )
+              );
+            })),
+          )
+        )
+      );
+    },
     mohlmann: {
       overzicht1() {
         analyseTable('/abis/analyse/mohlmann1');
       }
     },
+    bedrijfKlantTopMerkVerkoopAantal() {
+      analyseTable('/abis/analyse/bedrijfKlantTopMerkVerkoopAantal');
+    }
+
   }
 
   aim.om.treeview(mainmenu);

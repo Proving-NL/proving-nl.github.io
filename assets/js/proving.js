@@ -2660,12 +2660,12 @@ $().on('load', async e => {
   }
   aim.config.components.schemas.salesorder.app = {
     nav: row => [
-      $('button').class('icn-print').text('Pakbon').title('Pakbon printen').on('click', async e => await (await order(row.id)).printp()),
-      $('button').class('icn-print').text('Leverbon').title('Leverbon printen').on('click', async e => await (await leverbon(row.id)).printp()),
+      $('button').class('icn-print').caption('Pakbon').title('Pakbon printen').on('click', async e => await (await order(row.id)).printp()),
+      $('button').class('icn-print').caption('Leverbon').title('Leverbon printen').on('click', async e => await (await leverbon(row.id)).printp()),
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
-      $('button').text('Regels').on('click', e => orderInvoer(row)),
-      $('button').text('Factureren').on('click', async e => await lijstFactureren([row])).disabled(row.factuurId || !row.printDatumTijd || !row.gepaktDatumTijd || !row.verstuurdDatumTijd || !row.leverDatumTijd)
+      $('button').caption('Regels').on('click', e => orderInvoer(row)),
+      $('button').class('icn-invoice').caption('Factureren').on('click', async e => await lijstFactureren([row])).disabled(row.factuurId || !row.printDatumTijd || !row.gepaktDatumTijd || !row.verstuurdDatumTijd || !row.leverDatumTijd)
       // row.factuurId ? [
       //   // $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await getfactuur(row.factuurId)).printpdf()),
       //   $('button').class('abtn invoice').title('Factuur printen').on('click', e => toonFactuur({
@@ -2680,31 +2680,31 @@ $().on('load', async e => {
       // ],
     ],
     navList: () => [
-      $('button').text('Bonnen').append(
-        $('div').append(
-          $('button').text('Paklijst').on('click', lijstPakken),
-          $('button').text('Gepakt').on('click', async e => {
+      $('button').caption('Bonnen').append(
+        $('nav').append(
+          $('button').caption('Paklijst').on('click', lijstPakken),
+          $('button').caption('Gepakt').on('click', async e => {
             await dmsClient.api('/abis/paklijst').post({
               id: aim.listRows.map(row => row.nr).join(','),
               set: 'pickDateTime = GETDATE()'
             });
             alert('Status gepakt');
           }),
-          $('button').text('Verzonden').on('click', async e => {
+          $('button').caption('Verzonden').on('click', async e => {
             await dmsClient.api('/abis/paklijst').post({
               id: aim.listRows.map(row => row.nr).join(','),
               set: 'sendDateTime = GETDATE()'
             });
             alert('Status verzonden');
           }),
-          $('button').text('Geleverd').on('click', async e => {
+          $('button').caption('Geleverd').on('click', async e => {
             await dmsClient.api('/abis/paklijst').post({
               id: aim.listRows.map(row => row.nr).join(','),
               set: 'deliverDateTime = GETDATE()'
             });
             alert('Status geleverd');
           }),
-          $('button').text('Factureren').on('click', e => lijstFactureren(aim.listRows)),
+          $('button').caption('Factureren').on('click', e => lijstFactureren(aim.listRows)),
         ),
       ),
     ],

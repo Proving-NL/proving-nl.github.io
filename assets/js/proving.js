@@ -28,8 +28,9 @@ $().on('load', async e => {
   let factuur,orders,row;
   aim.listselector = 'product';
   async function selectClient(id){
-    sessionStorage.setItem('clientId', clientId = id);
-    $('button.account span.company').text(clientId||'');
+    sessionStorage.setItem('clientId', clientId = id || '');
+    // console.log(id,clientId);
+    // $('button.account span.company').text(clientId || '');
     [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientId=' + clientId).then(res => res.json());
     // console.log(clientart,mandregels);
     // aim.idfilter = `clientName EQ '${clientName}'`;

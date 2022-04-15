@@ -31,7 +31,7 @@ $().on('load', async e => {
     sessionStorage.setItem('clientId', clientId = id || '');
     // console.log(id,clientId);
     // $('button.account span.company').text(clientId || '');
-    [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientId=' + clientId).then(res => res.json());
+    // [clientart,mandregels] = await dmsClient.api('/abis/art_klant?clientId=' + clientId).then(res => res.json());
     // console.log(clientart,mandregels);
     // aim.idfilter = `clientName EQ '${clientName}'`;
   }

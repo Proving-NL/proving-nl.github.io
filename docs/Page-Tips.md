@@ -1,4 +1,4 @@
-![car-spray-paint.png](img/car-spray-paint.png)
+![car-spray-paint.png](/docs/images/car-spray-paint.png)
 
 HANDIGE HULP VOOR DE AUTOSPUITER
 Hieronder vindt u een aantal handige links naar tips voor het spuiten van auto’s:

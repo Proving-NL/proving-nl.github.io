@@ -34,7 +34,7 @@ Laklijn           | Toepassing  | Basis   | Prijs/Ltr
 MaxMeyer Maxicar  | Auto        | Thinner | NTB
 Aquamax Extra     | Auto        | Water   | NTB
 Deltron BC        | Auto        | Thinner | NTB
-Duralit           | Auto        | 2K      | NTB 
+Duralit           | Auto        | 2K      | NTB
 Duralit Extra     | Auto        | 2K      | NTB
 Selemix DTM       | Industrieel | Glans   | NTB
 Selemis 7110      | Industrieel | 2K      | NTB

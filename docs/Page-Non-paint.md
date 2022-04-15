@@ -6,19 +6,19 @@ Proving levert o.a. folies, cabineonderhoudsprodukten, auto-onderhoudsprodukten,
 Wij zijn onder andere dealer van:
 
 <style>img{width:24%;}</style>
-![3M](img/3m.png)
-![Airo](img/airo.png)
-![Colad](img/colad.png)
-![](img/devilbiss.png)
+![3M](/docs/images/3m.png)
+![Airo](/docs/images/airo.png)
+![Colad](/docs/images/colad.png)
+![](/docs/images/devilbiss.png)
 
-![](img/Endstra.png)
-![](img/Europroducts.png)
-![](img/Farecla.png)
-![](img/Finixa.png)
+![](/docs/images/Endstra.png)
+![](/docs/images/Europroducts.png)
+![](/docs/images/Farecla.png)
+![](/docs/images/Finixa.png)
 
-![](img/mirka.png)
-![](img/motip1.png)
-![](img/Sagola.png)
-![](img/sata.png)
+![](/docs/images/mirka.png)
+![](/docs/images/motip1.png)
+![](/docs/images/Sagola.png)
+![](/docs/images/sata.png)
 
 Zie ook [Paint](Paint)

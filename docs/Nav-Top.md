@@ -6,4 +6,5 @@
 - [Tips](Page-Tips)
 - [Over Proving](Page-Over-proving)
     - [Duurzaam](Page-Duurzaam)
+    - [Verfmengerij](Page-Verfmengerij)
 - [Contact](Page-Contact)

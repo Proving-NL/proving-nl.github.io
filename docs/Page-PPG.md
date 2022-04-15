@@ -1,4 +1,4 @@
-![stichting-duurzaam-repareren](img/stichting-duurzaam-repareren.png)
+![stichting-duurzaam-repareren](/docs/images/stichting-duurzaam-repareren.png)
 
 PPG is de samenwerking aangegaan met de stichting Duurzaam Repareren. Men wil niet alleen maar duurzame producten leveren, maar zelfs innovatief op kop lopen.
 

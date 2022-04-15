@@ -2,7 +2,7 @@
 # Black Friday
 
 1. **Mirka Schuurmachine met schuurstroken**
-    - ![Schuurmachine](/img/product/car-spray-paint.png)
+    - ![Schuurmachine](/docs/images/product/car-spray-paint.png)
         - **Mirka S765**
 
           samen met
@@ -18,7 +18,7 @@
           abranet schuurstroken
 
 1. **Verfspuit**
-    - ![Schuurmachine](/img/product/car-spray-paint.png)
+    - ![Schuurmachine](/docs/images/product/car-spray-paint.png)
         - **Mirka S765** jhfkhsdlkjfhgsdjkfhgjksdhfjghsd samen met
           jasdfhlasdl asjdh fjkasdf handlers
           - jdfghkjdshgsjk

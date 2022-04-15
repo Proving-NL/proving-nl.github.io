@@ -1,4 +1,4 @@
-![provingpand.png](img/provingpand.png)
+![provingpand.png](/docs/images/provingpand.png)
 
 Behalve hoogwaardige autolakken, van o.a. het merk Max Meijer, kunt u bij ons terecht voor non-paint producten van diverse bekende merken. Zowel kleine als middelgrote schadeherstellers zijn bij
 

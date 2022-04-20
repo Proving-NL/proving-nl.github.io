@@ -636,7 +636,16 @@ $().on('load', async e => {
             $('td').text(num(rows.filter(row => row.aantal).map(row => row.aantal).reduce((tot,val)=>tot += val),1)).style('text-align:right;'),
             $('td'),
             $('th').colspan(2).text('BON TOTAAL').style('text-align:right;'),
-            $('td').text(num(rows.filter(row => row.totaal||0).map(row => row.totaal||0).reduce((tot,val)=>tot += val),2)).style('font-weight:bold;'),
+            $('td').text(
+              num(
+                rows
+                // .filter(row => row.totaal||0)
+                .map(row => row.totaal||0)
+                // .filter(Boolean)
+                .reduce((tot,val)=>tot += val),
+                2
+              )
+            ).style('font-weight:bold;'),
           ),
           //               $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
 
@@ -2911,7 +2920,7 @@ $().on('load', async e => {
     ],
     navList: () => [
       $('button').text('Facturen').append(
-        $('div').append(
+        $('nav').append(
           $('button').text('Herinneren').on('click', lijstHerinneren),
         ),
       ),
@@ -3394,13 +3403,78 @@ $().on('load', async e => {
       );
     },
     mohlmann: {
-      overzicht1() {
-        analyseTable('/abis/analyse/mohlmann1');
+      async ppgArtikelen() {
+        const [rows] = await dmsClient.api('/abis/analyse/mohlmann/ppgArtikelen').get();
+        var factuurNr,bonId;
+        const elem = $('.lv').text('').append(
+          $('div').append(
+            $('div').append(
+              $('table').style('white-space:pre;min-width:100%;').append(
+                $('thead').append(
+                  $('tr').append(
+                    Object.keys(rows[0]).map(k => $('th').text(aim.displayName(k))),
+                  )
+                ),
+                $('tbody').style('font-family:consolas;'),
+              )
+            )
+          )
+        );
+        rows.forEach(row => {
+            // row.xml = row.xml || $('button').text('ja');
+          row.credit = row.credit || $('button').text('ja').on('click', e => {
+            dmsClient.api('/abis/analyse/mohlmann/ppgArtikelen').query({
+              id: row.id,
+            }).post({
+              creditFactuurVanPPG: new Date().toISOString(),
+            });
+          });
+          row.comm = row.comm || $('button').text('ja');
+          for (var name in row) {
+            if (row[name] && isNaN(row[name]) && String(row[name]).match(/\d+-\d+-\d+\s\d+:\d+:\d+\.\d+/)) {
+              row[name] = new Date(row[name]).toLocaleDateString();
+            }
+          }
+          // row.xml = row.xml ? new Date(row.xml).toLocaleDateString() : '';
+          // row.opdracht = row.opdracht ? new Date(row.opdracht).toLocaleDateString() : '';
+          // row.gefactureerd = row.gefactureerd ? new Date(row.gefactureerd).toLocaleDateString() : '';
+          // if (factuurNr !== row.factuurNr) {
+          //   $('.lv tbody').append(
+          //     $('tr').style('position:sticky;top:36px;height:30px;background:#333;z-index:1;').append(
+          //       $('td').colspan(10).text(factuurNr = row.factuurNr),
+          //     )
+          //   )
+          // }
+          if (bonId !== row.bonId) {
+            $('.lv tbody').append(
+              $('tr').style('position:sticky;top:36px;height:30px;background:#333;z-index:1;').append(
+                $('td').text(bonId = row.bonId),
+                $('td').text(row.opdracht),
+                $('td').text(row.factuurNr),
+                $('td').text(row.gefactureerd),
+                $('td').colspan(20),
+              )
+            )
+          }
+          row.bonId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/salesorder?id=${row.bonId}`)}`).text(row.bonId);
+          row.productId = row.productId ? $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId.pad(6)) : '';
+          // row.artInkId = row.artInkId ? $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)) : '';
+          $('.lv tbody').append(
+            $('tr').style(('artInkId' in row) && !row.artInkId ? 'color:red;' : '').append(
+              Object.values(row).map(v => $('td').style(isNaN(v) ? '' : 'text-align:right;').append(v)),
+            )
+          )
+        });
+        $('.lv table').resizable();
+
       }
     },
     bedrijfKlantTopMerkVerkoopAantal() {
       analyseTable('/abis/analyse/bedrijfKlantTopMerkVerkoopAantal');
-    }
+    },
+    prijslijstAiro() {
+      analyseTable('/abis/analyse/prijslijstAiro');
+    },
 
   }
 

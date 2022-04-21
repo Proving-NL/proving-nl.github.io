@@ -3407,8 +3407,8 @@ $().on('load', async e => {
         const [rows] = await dmsClient.api('/abis/analyse/mohlmann/ppgArtikelen').get();
         var factuurNr,bonId;
         const elem = $('.lv').text('').append(
-          $('div').append(
-            $('div').append(
+          $('div').class('oa').append(
+            // $('div').append(
               $('table').style('white-space:pre;min-width:100%;').append(
                 $('thead').append(
                   $('tr').append(
@@ -3417,16 +3417,17 @@ $().on('load', async e => {
                 ),
                 $('tbody').style('font-family:consolas;'),
               )
-            )
+            // )
           )
         );
         rows.forEach(row => {
             // row.xml = row.xml || $('button').text('ja');
           row.credit = row.credit || $('button').text('ja').on('click', e => {
+
             dmsClient.api('/abis/analyse/mohlmann/ppgArtikelen').query({
               id: row.id,
             }).post({
-              creditFactuurVanPPG: new Date().toISOString(),
+              creditFactuurVanPPG: e.target.innerText = new Date().toISOString(),
             });
           });
           row.comm = row.comm || $('button').text('ja');
@@ -3451,12 +3452,14 @@ $().on('load', async e => {
                 $('td').text(bonId = row.bonId),
                 $('td').text(row.opdracht),
                 $('td').text(row.factuurNr),
+                $('td'),
                 $('td').text(row.gefactureerd),
                 $('td').colspan(20),
               )
             )
           }
           row.bonId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/salesorder?id=${row.bonId}`)}`).text(row.bonId);
+          row.factuurId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/invoice?id=${row.factuurId}`)}`).text(row.factuurId);
           row.productId = row.productId ? $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId.pad(6)) : '';
           // row.artInkId = row.artInkId ? $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)) : '';
           $('.lv tbody').append(

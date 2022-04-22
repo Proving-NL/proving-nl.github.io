@@ -1,0 +1,9 @@
+{
+  "name": "provingprinter2",
+  "version": "0.0.1",
+  "main": "index.html?printer",
+  "window": {
+    "title": "Proving Printer",
+    "icon": "assets/img/icon/icon-120x120.png"
+  }
+}

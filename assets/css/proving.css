@@ -28,3 +28,76 @@ body.lv td {
   border: solid 1px var(--trans5);
   font-family: consolas;
 }
+.lv .cards>div[status] header::before {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin: auto;
+  top: -26px;
+  left: -26px;
+  transform: rotate(45deg);
+}
+/* .lv .cards>div[class^="salesorder"][status="1"] header::before {
+  background: gray;
+}
+.lv .cards>div[class^="salesorder"][status="2"] header::before {
+  background: orange;
+}
+.lv .cards>div[class^="salesorder"][status="3"] header::before {
+  background: yellow;
+}
+.lv .cards>div[class^="salesorder"][status="4"] header::before {
+  background: green;
+}
+.lv .cards>div[class^="salesorder"][status="5"] header::before {
+  background: lightgreen;
+}
+.lv .cards>div[class^="salesorder"][status="9"] header::before {
+  background: red;
+} */
+
+.lv .cards>div[class^="salesorder"][status] .icon {
+  font-weight: bold;
+}
+
+.lv .cards>div[class^="salesorder"][status="1"] .icon {
+  background: blue;
+  color: white;
+}
+.lv .cards>div[class^="salesorder"][status="2"] .icon {
+  background: orange;
+  color: black;
+}
+.lv .cards>div[class^="salesorder"][status="3"] .icon {
+  background: yellow;
+  color: black;
+}
+.lv .cards>div[class^="salesorder"][status="4"] .icon {
+  background: green;
+  color: white;
+}
+.lv .cards>div[class^="salesorder"][status="5"] .icon {
+  background: lightgreen;
+  color: black;
+}
+.lv .cards>div[class^="salesorder"][status="6"] .icon {
+  /* background: lightgreen; */
+}
+.lv .cards>div[class^="salesorder"][status="7"] .icon {
+  background: lightgreen;
+  color: black;
+}
+.lv .cards>div[class^="salesorder"][status="8"] .icon {
+  background: red;
+  color: white;
+}
+.lv .cards>div[class^="salesorder"][status="9"] .icon {
+  background: #333;
+  color: white;
+}
+.lv .cards>div[class^="salesorder"][status="0"] .icon {
+  /* background: red; */
+  /* color: white; */
+}

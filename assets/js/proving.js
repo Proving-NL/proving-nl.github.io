@@ -5,9 +5,18 @@ function getnumber(selector){
   return (selector.match(/\\d+/)||[]).shift()
 }
 $().on('load', async e => {
-  if (!aim.send) return;
+  const searchParams = new URLSearchParams(document.location.search);
+
+
+
+
+  if (!aim.send) return $(document.body).text('Geen AIM SEND');
+  // return;
+
+
   const {aimClient,dmsClient} = aim;
   localStorage.setItem('connectorId', '4328291f-8542-42cc-bd67-5021b5e54a58');
+  // return $(document.body).text('jA');
   aim.send('/aliconnector/client/init', { body: { nonce: localStorage.getItem('connectorId') } });
   console.error(sessionStorage.getItem('access_token'));
   // sessionStorage.clear();
@@ -509,7 +518,7 @@ $().on('load', async e => {
       $('table').class('grid summary').append(
         $('thead').append(
           $('tr').append(
-            $('td').colspan(6).style('border:none;padding:0;').append(
+            $('td').colspan(7).style('border:none;padding:0;').append(
               $('table').class('border summary').append(
                 $('tr').append(
                   $('th').text('Ordernummer'),
@@ -564,6 +573,10 @@ $().on('load', async e => {
             // $('th').align('right').text('VOS/st.'),
             // $('th').align('right').text('Aanw.'),
             $('th').style('text-align:right;').append(
+              $('div').text('Gewicht'),
+              $('div').text('Totaal'),
+            ),
+            $('th').style('text-align:right;').append(
               $('div').text('Bruto'),
               $('div').text('Kort.'),
             ),
@@ -594,10 +607,15 @@ $().on('load', async e => {
               ),
               $('td').style('white-space:normal;').append(
                 String(row.omschrijving||'').replace(/\r|\n/g,''),
+                row.unNummer ? ', UN-'+[row.unNummer,row.unCategorie].join(':') : '',
                 $('div').text(row.extraTekst||'').style('font-weight:bold;'),
                 $('div').text(String(row.extraTekstIntern||'')).style('font-weight:bold;background:yellow;'),
                 !row.err ? null : row.err.map(err => $('div').text(err).style('color:red;')),
                 !row.warn ? null : row.warn.map(err => $('div').text(err).style('color:orange;')),
+              ),
+              $('td').style('text-align:right;').append(
+                $('div').text(num(row.gewicht)),
+                $('div').text(num(row.gewicht * row.aantal)),
               ),
               $('td').style('text-align:right;').append(
                 $('div').text(num(row.bruto)),
@@ -635,7 +653,9 @@ $().on('load', async e => {
             $('td'),
             $('td').text(num(rows.filter(row => row.aantal).map(row => row.aantal).reduce((tot,val)=>tot += val),1)).style('text-align:right;'),
             $('td'),
-            $('th').colspan(2).text('BON TOTAAL').style('text-align:right;'),
+            $('td'),
+            $('td'),
+            $('td'),
             $('td').text(
               num(
                 rows
@@ -647,6 +667,19 @@ $().on('load', async e => {
               )
             ).style('font-weight:bold;'),
           ),
+          rows.filter(row => row.unNummer).map(row => [row.unNummer,row.unCategorie].join(':')).unique().map(nrcat => $('tr').append(
+            $('td'),
+            $('td'),
+            $('td'),
+            $('td').text('UN-nummer:categorie', nrcat).style('text-align:right;'),
+            $('td').text(num(
+              rows.filter(row => row => [row.unNummer,row.unCategorie].join(':') === nrcat)
+              .map(row => row.aantal * row.gewicht).reduce((tot,val)=>tot += val),
+              2
+            )).style('text-align:right;'),
+            $('td'),
+            $('td'),
+          )),
           //               $('td').text(':', num(rows.map(row =>(row.aantal||0) * (row.gewicht||0)).reduce((tot,val)=>tot += val),1)),
 
         ),
@@ -769,10 +802,10 @@ $().on('load', async e => {
           ),
         )
       ),
-      salesorder.postVerzendCode ? [
-        $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
-        $('div').text(`${salesorder.postVerzendCode}`),
-      ] : null,
+      // salesorder.postVerzendCode ? [
+      //   $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
+      //   $('div').text(`${salesorder.postVerzendCode}`),
+      // ] : null,
       $('table').class('grid').style('margin-bottom:25mm;').append(
         $('thead').append(
           $('tr').append(
@@ -872,10 +905,10 @@ $().on('load', async e => {
           ),
         )
       ),
-      salesorder.postVerzendCode ? [
-        $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
-        $('div').text(`${salesorder.postVerzendCode}`),
-      ] : null,
+      // salesorder.postVerzendCode ? [
+      //   $('div').class('bc').text(`*${salesorder.postVerzendCode}*`),
+      //   $('div').text(`${salesorder.postVerzendCode}`),
+      // ] : null,
       $('table').class('grid').style('margin-bottom:25mm;').append(
         $('thead').append(
           $('tr').append(
@@ -2558,6 +2591,14 @@ $().on('load', async e => {
       // $('button').class('abtn').text('Prijslijst').on('click', e => {
       //   prijslijst_xls(`proving-prijslijst-${row.name}-${new Date().toISOString().substr(0,10)}`, `KlantName = '${row.name}'`, colsPrijslijst);
       // }),
+      $('button').class('abtn').text('Mandje').on('click', async e => {
+        const searchParams = new URLSearchParams(document.location.search);
+        searchParams.set('klant_id', row.uid);
+        window.history.replaceState('page', '', '?' + searchParams);
+        abis.bestellijst('.lv');
+      }),
+
+
       $('button').class('abtn').text('Prijslijst').on('click', async e => {
         const [rows] = await dmsClient.api('/abis/klantartikelen').query({
           // organisatieId: row.id,
@@ -2675,7 +2716,243 @@ $().on('load', async e => {
       // $('button').text('TEST').on('click', async e => (await order1(row.nr)).print()),
       // $('button').class('abtn').text('OffBon').title('Offert bon printen').on('click', async e => (await offertebon(row.nr))),
       $('button').caption('Regels').on('click', e => orderInvoer(row)),
-      $('button').class('icn-invoice').caption('Factureren').on('click', async e => await lijstFactureren([row])).disabled(row.factuurId || !row.printDatumTijd || !row.gepaktDatumTijd || !row.verstuurdDatumTijd || !row.leverDatumTijd)
+      $('button').class('icn-invoice').caption('Factureren').on('click', async e => await lijstFactureren([row])).disabled(row.factuurId || !row.printDatumTijd || !row.gepaktDatumTijd || !row.verstuurdDatumTijd || !row.leverDatumTijd),
+      $('button').text('visser').on('click', async e => {
+        function map(l,v,s=' '){
+          return (String(s).repeat(l)+(v||'')).substr(-l);
+        }
+        const landcode = {
+          30: 'Griekenland',
+          31: 'Nederland',
+          32: 'Belgie',
+          33: 'Frankrijk',
+          34: 'Spanje',
+          39: 'Italie',
+          351: 'Portugal',
+          352: 'Luxemburg',
+          353: 'Ierland',
+          358: 'Finland',
+          43: 'Oostenrijk',
+          44: 'Engeland',
+          45: 'Denemarken',
+          46: 'Zweden',
+          49: 'Duitsland',
+        };
+        const zendingSoorten = {
+          1: 'Levering',
+          2: 'Afhaling',
+        };
+        const order = {
+          // kenmerk: '', // Kenmerk Nee 30A
+          losdatum: 'dd-mm-jjjj', // 83 92 Losdatum Ja 10A dd-mm-jjjj
+          soortZending: 0, // 107 114 Soort zending Ja 8N Zie tabel
+          afzenderNaam: '', // 115 144 Naam afzender Ja 30A
+          afzenderAdres: '', // 145 174 Adres afzender Ja 30A
+          afzenderHuisnummer: '', // 175 184 Huisnummer afzender Ja 10A
+          afzenderPostcode: '', // 185 191 Postcode afzender Ja 7A
+          afzenderPlaats: '', // 192 221 Plaats afzender Ja 30A
+          afzenderLandCode: 0, // 222 225 Landcode afzender Ja 4N Zie tabel
+          zendingId: '', // 226 255 Zending identificatie nummer (ZIN) Ja 30A
+          // laadOpmerking: '', // 256 375 Laadopmerking Nee 120A
+          // laadDatum: '', // 376 385 Laaddatum Nee 10A dd-mm-jjjj
+          // laadVan: '', // 386 390 Laadvan Nee 5A hh:mm
+          // laadTot: '', // 391 395 Laadtot Nee 5A hh:mm
+          // documentenBijgevoegd: 0, // 396 396 Originele documenten bijgevoegd Nee 1N 0 = Nee, 1 = Ja
+          // afzenderTav: '', // 397 426 Tav afzender Nee 30A
+
+          ontvangerNaam: '', // 3 32 Naam ontvanger Ja 30A
+          ontvangerAdres: '', // 33 62 Adres ontvanger Ja 30A
+          ontvangerHuisnummer: '', // 63 72 Huisnummer ontvanger Ja 10A
+          ontvangerPostcode: '', // 73 79 Postcode ontvanger Ja 7A
+          ontvangerPlaats: '', // 80 109 Plaats ontvanger Ja 30A
+          ontvangerLandCode: 0, // 110 113 Landcode ontvanger Ja 4N Zie tabel
+          totaalAantalColli: 0, // 114 117 Totaal aantal colli Ja 4N
+          totaalAantalPallets: 0, // 118 121 Totaal aantal pallets Ja 4N
+          totaalGewicht: 0, // 122 129 Totaal gewicht Ja 8N In hele Kg
+          // rembours: 0, // 130 137 Rembours Nee 8N In centen
+          // ontvangerTelefoon: '', // 198 227 Telefoonnummer ontvanger Nee 30A
+          // ontvangerEmail: '', // 228 287 Emailadres ontvanger Nee 60A
+          // losOpmerking: '', // 288 407 Losopmerking Nee 120A
+          // losVan: '', // 408 412 Losvan Nee 5A hh:mm
+          // losTot: '', // 413 417 Lostot Nee 5A hh:mm
+          // ontvangerTav: '', // 418 447 Tav ontvanger Nee 30A
+
+          details: [
+            {
+              aantalColli: 0, // 3 6 Aantal colli Ja 4N
+              gewichtColli: 0, // 7 14 Gewicht colli Ja 8N In hele Kg
+              // aantalPallets: 0, // 15 18 Aantal pallets Nee 4N
+              // gewichtPallets: 0, // 19 26 Gewicht pallets Nee 8N In hele Kg
+              verpakking: '', // 27 46 Verpakking Ja 20A
+              // volume: '', // 77 84 Volume Nee 8A Kubieke decimeter
+              // adrVervoersCategorie: '', // 85 94 ADR vervoerscategorie Nee 10A
+              // UnNummer: '', // 95 104 UN-nummer Nee 10A
+              // omschrijvingGoederen: '', // 105 164 Omschrijving goederen Nee 40A
+              // lengte: 0, // 225 232 Lengte Nee 8N Cm
+              // breedte: 0, // 233 240 Breedte Nee 8N Cm
+              // hoogte: 0, // 241 248 Hoogte Nee 8N Cm
+              // palletSoort: '', // 249 268 Palletsoort Nee 20A
+              // artikelNummer: '', // 269 288 Artikelnummer Nee 20A
+              // laadmeters: 0, // 289 296 Laadmeters Nee 8N X 100
+              // palletplaatsen: 0, // 297 304 Palletplaatsen Nee 8N X 100
+            },
+            {
+              aantalColli: 0, // 3 6 Aantal colli Ja 4N
+              gewichtColli: 0, // 7 14 Gewicht colli Ja 8N In hele Kg
+              verpakking: '', // 27 46 Verpakking Ja 20A
+            },
+            {
+              aantalColli: 0, // 3 6 Aantal colli Ja 4N
+              gewichtColli: 0, // 7 14 Gewicht colli Ja 8N In hele Kg
+              verpakking: '', // 27 46 Verpakking Ja 20A
+            },
+          ],
+          adr: [
+            {
+              unNr: 0, // 3 12 UN nummer Ja 10N
+              categorie: 0, // 13 22 Categorie Ja 10N
+              // stofnaam: '', // 23 102 Stofnaam Nee 80A
+              // stofnaam2: '', // 103 182 Stofnaam2 Nee 80A
+              etiket: '', // 183 192 Etiket Ja 10A
+              // factor: '', // 193 202 Factor Nee 10A
+              // klasse: '', // 203 217 Klasse Nee 15A
+              // milieugevaarlijk: 0, // 218 219 Milieugevaarlijk Nee 2N 0 = Nee, 1 = Ja
+              // tunnelcode: '', // 220 229 Tunnelcode Nee 10A
+              // verpakkingsgroep: '', // 230 234 Verpakkingsgroep Nee 5A
+              // afvalstof: 0, // 235 236 Afvalstof Nee 2N 0 = Nee, 1 = Ja
+              // gewicht: 0, // 237 246 Gewicht Nee 10N In hele Kg
+            },
+            {
+              unNr: 0, // 3 12 UN nummer Ja 10N
+              categorie: 0, // 13 22 Categorie Ja 10N
+              etiket: '', // 183 192 Etiket Ja 10A
+            },
+          ],
+        }
+        const data = [
+          [
+            map(2,10,0),
+            map(8,100396,0),
+            map(10,new Date().toISOString().substr(0,10)),
+            map(10,new Date().toISOString().substr(12,8)),
+            map(2,3,0),
+          ],
+          [
+            map(2,20,0), // RecordID // afzendergegevens
+            map(10,0,0), // VrachtbriefNummer, wordt niet gebruikt
+            map(30,order.kenmerk), // Kenmerk
+            map(10), // --- niet gebruikt --- Nee 10A
+            map(30), // 53 82 --- niet gebruikt --- Nee 30A
+            map(10,order.losdatum), // 83 92 Losdatum Ja 10A dd-mm-jjjj
+            map(10), // 93 102 --- niet gebruikt --- Nee 10A
+            map(4), // 103 106 --- niet gebruikt --- Nee 4A
+            map(8,order.soortZending,0), // 107 114 Soort zending Ja 8N Zie tabel
+            map(30,order.afzenderNaam), // 115 144 Naam afzender Ja 30A
+            map(30,order.afzenderAdres), // 145 174 Adres afzender Ja 30A
+            map(10,order.afzenderHuisnummer), // 175 184 Huisnummer afzender Ja 10A
+            map(7,order.afzenderPostcode), // 185 191 Postcode afzender Ja 7A
+            map(30,order.afzenderPlaats), // 192 221 Plaats afzender Ja 30A
+            map(4,order.afzenderLandCode,0), // 222 225 Landcode afzender Ja 4N Zie tabel
+            map(30,order.zendingId), // 226 255 Zending identificatie nummer (ZIN) Ja 30A
+            map(120,order.laadOpmerking), // 256 375 Laadopmerking Nee 120A
+            map(10,order.laadDatum), // 376 385 Laaddatum Nee 10A dd-mm-jjjj
+            map(5,order.laadVan), // 386 390 Laadvan Nee 5A hh:mm
+            map(5,order.laadTot), // 391 395 Laadtot Nee 5A hh:mm
+            map(1,0,0), // 396 396 Originele documenten bijgevoegd Nee 1N 0 = Nee, 1 = Ja
+            map(30,order.afzenderTav), // 397 426 Tav afzender Nee 30A
+          ],
+          [
+            map(2,30,0), // 1 2 Record ID Ja 2N 30 // ontvangergegevens
+            map(30,order.ontvangerNaam), // 3 32 Naam ontvanger Ja 30A
+            map(30,order.ontvangerAdres), // 33 62 Adres ontvanger Ja 30A
+            map(10,order.ontvangerHuisnummer), // 63 72 Huisnummer ontvanger Ja 10A
+            map(7,order.ontvangerPostcode), // 73 79 Postcode ontvanger Ja 7A
+            map(30,order.ontvangerPlaats), // 80 109 Plaats ontvanger Ja 30A
+            map(4,order.ontvangerLandCode,0), // 110 113 Landcode ontvanger Ja 4N Zie tabel
+            map(4,order.totaalAantalColli,0), // 114 117 Totaal aantal colli Ja 4N
+            map(4,order.totaalAantalPallets,0), // 118 121 Totaal aantal pallets Ja 4N
+            map(8,order.totaalGewicht,0), // 122 129 Totaal gewicht Ja 8N In hele Kg
+            map(8,order.rembours,0), // 130 137 Rembours Nee 8N In centen
+            map(60), // 138 197 --- niet gebruikt --- Nee 60A
+            map(30,order.ontvangerTelefoon), // 198 227 Telefoonnummer ontvanger Nee 30A
+            map(60,order.ontvangerEmail), // 228 287 Emailadres ontvanger Nee 60A
+            map(120,order.losOpmerking), // 288 407 Losopmerking Nee 120A
+            map(5,order.losVan), // 408 412 Losvan Nee 5A hh:mm
+            map(5,order.losTot), // 413 417 Lostot Nee 5A hh:mm
+            map(30,order.ontvangerTav), // 418 447 Tav ontvanger Nee 30A
+          ]
+        ].concat(
+          order.details.map(detail => [
+            map(2,50,0), // 1 2 Record ID Ja 2N 50 // detailgegevens
+            map(4,detail.aantalColli,0), // 3 6 Aantal colli Ja 4N
+            map(8,detail.gewichtColli,0), // 7 14 Gewicht colli Ja 8N In hele Kg
+            map(4,detail.aantalPallets,0), // 15 18 Aantal pallets Nee 4N
+            map(8,detail.gewichtPallets,0), // 19 26 Gewicht pallets Nee 8N In hele Kg
+            map(20,detail.verpakking), // 27 46 Verpakking Ja 20A
+            map(30), // 47 76 --- niet gebruikt --- Nee 30A
+            map(8,detail.volume), // 77 84 Volume Nee 8A Kubieke decimeter
+            map(10,detail.adrVervoersCategorie), // 85 94 ADR vervoerscategorie Nee 10A
+            map(10,detail.UnNummer), // 95 104 UN-nummer Nee 10A
+            map(40,detail.omschrijvingGoederen), // 105 164 Omschrijving goederen Nee 40A
+            map(80), // 165 224 --- niet gebruikt --- Nee 80A
+            map(8,detail.lengte,0), // 225 232 Lengte Nee 8N Cm
+            map(8,detail.breedte,0), // 233 240 Breedte Nee 8N Cm
+            map(8,detail.hoogte,0), // 241 248 Hoogte Nee 8N Cm
+            map(20,detail.palletSoort), // 249 268 Palletsoort Nee 20A
+            map(20,detail.artikelNummer), // 269 288 Artikelnummer Nee 20A
+            map(8,detail.laadmeters,0), // 289 296 Laadmeters Nee 8N X 100
+            map(8,detail.palletplaatsen,0), // 297 304 Palletplaatsen Nee 8N X 100
+          ]),
+          // [[
+          //   map(2,60,0), // 1 2 Record ID Ja 2N 60 // unieke nummers
+          //   map(40,order.barcode), // 3 42 Barcode Ja 40A
+          // ]],
+          order.adr.map(adr => [
+            map(2,70,0), // 1 2 Record ID Ja 2N 70 // ADR gegevens
+            map(10,adr.unNr,0), // 3 12 UN nummer Ja 10N
+            map(10,adr.categorie,0), // 13 22 Categorie Ja 10N
+            map(80,adr.stofnaam), // 23 102 Stofnaam Nee 80A
+            map(80,adr.stofnaam2), // 103 182 Stofnaam2 Nee 80A
+            map(10,adr.etiket), // 183 192 Etiket Ja 10A
+            map(10,adr.factor), // 193 202 Factor Nee 10A
+            map(15,adr.klasse), // 203 217 Klasse Nee 15A
+            map(2,adr.milieugevaarlijk,0), // 218 219 Milieugevaarlijk Nee 2N 0 = Nee, 1 = Ja
+            map(10,adr.tunnelcode), // 220 229 Tunnelcode Nee 10A
+            map(5,adr.verpakkingsgroep), // 230 234 Verpakkingsgroep Nee 5A
+            map(2,adr.afvalstof,0), // 235 236 Afvalstof Nee 2N 0 = Nee, 1 = Ja
+            map(10,adr.gewicht,0), // 237 246 Gewicht Nee 10N In hele Kg
+          ]),
+          [[
+            map(2,90,0),
+          ]],
+        ).map(r => r.join('')).join("\r\n");
+        // console.log(data);
+
+        const elem = $('a')
+        .text('visser')
+        .href('data:text/plain;charset=utf-8,' + encodeURIComponent(data))
+        .download('Visser.csv');
+        elem.elem.click();
+        elem.remove();
+      }),
+      (function(){
+        if (row.verstuurdDatumTijd) return $('button').class('icn-next').caption('Factureren');
+        if (row.gepaktDatumTijd) return $('button').class('icn-next').caption('Verzonden');
+        if (row.printDatumTijd) return $('button').class('icn-next').caption('Gepakt');
+      })(),
+      $('button').caption('On hold'),
+      // !row.gepaktDatumTijd ? $('button').caption('Gepakt') : null,
+      // row.gepaktDatumTijd && !row.verstuurdDatumTijd ? $('button').caption('Verzonden') : null,
+      // row.gepaktDatumTijd && !row.leverDatumTijd ? $('button').caption('Verzonden') : null,
+      // $('button').caption('Status').append(
+      //   $('nav').append(
+      //     $('button').caption('Gepakt'),
+      //     $('button').caption('Verzonden'),
+      //     $('button').caption('Geleverd'),
+      //   )
+      // )
+      //
+
       // row.factuurId ? [
       //   // $('button').class('abtn invoice').title('Factuur printen').on('click', async e => (await getfactuur(row.factuurId)).printpdf()),
       //   $('button').class('abtn invoice').title('Factuur printen').on('click', e => toonFactuur({
@@ -3206,7 +3483,6 @@ $().on('load', async e => {
     }
   });
 
-
   const cols = {
     title: {h:'Titel', t:'s', wch:80, },
     // row.title.replace(/\r|\n/g,''),
@@ -3292,6 +3568,31 @@ $().on('load', async e => {
     // { n: 'artGroep', v: 'Categorie', wch: 20 },
   ];
   let arts,artvalues;
+
+
+  if (searchParams.has('printer')) {
+    $(document.body).text('').append($('pre'));
+    (async function getPrintOpdracht () {
+      console.log = function() {
+        $('body>pre').append($('div').text(new Date().toLocaleString(), ...arguments));
+      }
+      $('body>pre').text('');
+      console.log('Haal opdracht');
+      const [[row]] = await aim.fetch('https://dms.aliconnect.nl/api/v1/abis/printer/opdracht').get();
+      console.log('Opdracht ontvangen');
+      if (row) {
+        console.log('Start print', row.id);
+        const orderElem = await order(row.id);
+        await orderElem.printp();
+        getPrintOpdracht();
+      } else {
+        console.log('Geen opdracht, wacht 5s');
+        setTimeout(() => getPrintOpdracht(),5000);
+      }
+    })();
+    return;
+  }
+
 
   if (window.localStorage.getItem('printService')) {
     (async function checkprint(){

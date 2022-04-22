@@ -1,5 +1,9 @@
 {
-  "name": "nw-demo",
+  "name": "Proving11",
   "version": "0.0.1",
-  "main": "404.html"
+  "main": "404.html",
+  "window": {
+    "title": "Proving",
+    "icon": "assets/img/icon/icon-120x120.png"
+  }
 }

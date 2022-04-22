@@ -1,5 +1,9 @@
 {
   "name": "nw-demo",
   "version": "0.0.1",
-  "main": "index.html"
+  "main": "index.html",
+  "window": {
+    "title": "index.html",
+    "icon": "assets/img/icon-120x120.png"
+  }
 }

@@ -7,13 +7,8 @@ function getnumber(selector){
 $().on('load', async e => {
   const searchParams = new URLSearchParams(document.location.search);
 
-
-
-
   if (!aim.send) return $(document.body).text('Geen AIM SEND');
   // return;
-
-
   const {aimClient,dmsClient} = aim;
   localStorage.setItem('connectorId', '4328291f-8542-42cc-bd67-5021b5e54a58');
   // return $(document.body).text('jA');
@@ -2279,9 +2274,9 @@ $().on('load', async e => {
             $('button').text(`Aanpassen`).on('click', e => set(row,'aantal',row.aantal)),
           ));
         }
-        function check(a,b) {
+        function check(a,b, color='orange') {
           if (row[a] && row[b] && round(row[a]) != round(row[b])) {
-            row.err.push($('div').style('color:orange;').append(
+            row.err.push($('div').append(
               // $('span').text(a).style('display:inline-block;width:140px;'),
               // ':',
               // $('span').text(num(row[a])).style('display:inline-block;width:80px;text-align:right;'),
@@ -2296,7 +2291,7 @@ $().on('load', async e => {
               // num(row[b]/row[a]),
 
               // `: ${num(row[a])}, ${b}: ${num(row[b])}, Factor: ${num(row[b]/row[a])}%`,
-              $('a').style('display:block;').append(
+              $('a').style(`color:${color};display:block;`).append(
                 $('span').text(a).style('display:inline-block;width:140px;'),
                 $('span').text(num(round(row[a]))).style('display:inline-block;width:80px;text-align:right;text-decoration:line-through;'),
                 $('span').text(num(round(row[b]))).style('display:inline-block;width:80px;text-align:right;'),
@@ -2307,10 +2302,10 @@ $().on('load', async e => {
             ));
           }
         }
-        check('artInkKorting','inkArtLevKorting');
-        check('artInkBruto','inkArtLevBruto');
+        check('artInkKorting','inkArtLevKorting', 'yellow');
+        check('artInkBruto','inkArtLevBruto', 'yellow');
         row.inkArtLevBruto = row.inkArtLevBruto || round(row.inkArtLevNetto * 100 / (100 - row.inkArtLevKorting));
-        check('artInkNetto','inkArtLevNetto');
+        check('artInkNetto','inkArtLevNetto', 'yellow');
 
         check('bruto','artInkBruto');
 
@@ -3611,19 +3606,17 @@ $().on('load', async e => {
     rows.filter(row => row.productId).forEach(row => row.productId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId.pad(6)));
     rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)));
     $('.lv').text('').append(
-      $('div').append(
-        $('div').append(
-          $('table').style('white-space:pre;min-width:100%;').append(
-            $('thead').append(
-              $('tr').append(
-                Object.keys(rows[0]).map(k => $('td').text(aim.displayName(k))),
-              )
-            ),
-            $('tbody').style('font-family:consolas;').append(
-              rows.map(row => $('tr').style(('artInkId' in row) && !row.artInkId ? 'color:red;' : '').append(
-                Object.values(row).map(v => $('td').style(isNaN(v) ? '' : 'text-align:right;').append(v)),
-              ))
+      $('div').class('oa').append(
+        $('table').style('white-space:pre;min-width:100%;').append(
+          $('thead').append(
+            $('tr').append(
+              Object.keys(rows[0]).map(k => $('td').text(aim.displayName(k))),
             )
+          ),
+          $('tbody').style('font-family:consolas;').append(
+            rows.map(row => $('tr').style(('artInkId' in row) && !row.artInkId ? 'color:red;' : '').append(
+              Object.values(row).map(v => $('td').style(isNaN(v) ? '' : 'text-align:right;').append(v)),
+            ))
           )
         )
       )

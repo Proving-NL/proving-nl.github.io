@@ -3772,6 +3772,12 @@ $().on('load', async e => {
     prijslijstAiro() {
       analyseTable('/abis/analyse/prijslijstAiro');
     },
+    prijsverhoging() {
+      analyseTable('/abis/analyse/prijsverhoging');
+    },
+    kemtex() {
+      analyseTable('/abis/analyse/kemtex');
+    },
 
   }
 

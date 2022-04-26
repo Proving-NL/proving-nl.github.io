@@ -3778,6 +3778,15 @@ $().on('load', async e => {
     kemtex() {
       analyseTable('/abis/analyse/kemtex');
     },
+    prijsWijziging() {
+      analyseTable('/abis/analyse/prijsWijziging');
+    },
+    prijsWijzigingVerkocht() {
+      analyseTable('/abis/analyse/prijsWijzigingVerkocht');
+    },
+    zonderInkoop() {
+      analyseTable('/abis/analyse/zonderInkoop');
+    },
 
   }
 

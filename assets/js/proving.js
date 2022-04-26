@@ -3603,8 +3603,15 @@ $().on('load', async e => {
 
   // aim.om.treeview(kopmenu);
   function tableLijst(rows) {
+    if (!rows.length) return;
     rows.filter(row => row.productId).forEach(row => row.productId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/product?id=${row.productId}`)}`).text(row.productId.pad(6)));
-    rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)));
+    rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId));
+    var cols = Object.fromEntries(Object.keys(rows[0]).map(key => [key, {type:rows.some(row => isNaN(row[key])) ? 's' : 'n' }]));
+    console.log(cols);
+
+    // rows.filter(row => row.artInkId).forEach(row => row.artInkId = $('a').href(`#?id=${btoa(`https://dms.aliconnect.nl/api/v1/artikelinkoop?id=${row.artInkId}`)}`).text(row.artInkId.pad(6)));
+
+
     $('.lv').text('').append(
       $('div').class('oa').append(
         $('table').style('white-space:pre;min-width:100%;').append(
@@ -3615,7 +3622,7 @@ $().on('load', async e => {
           ),
           $('tbody').style('font-family:consolas;').append(
             rows.map(row => $('tr').style(('artInkId' in row) && !row.artInkId ? 'color:red;' : '').append(
-              Object.values(row).map(v => $('td').style(isNaN(v) ? '' : 'text-align:right;').append(v)),
+              Object.entries(row).map(([n,v]) => $('td').style(cols[n].type === 'n' ? 'text-align:right;' : '').append(v)),
             ))
           )
         )
@@ -3786,6 +3793,9 @@ $().on('load', async e => {
     },
     zonderInkoop() {
       analyseTable('/abis/analyse/zonderInkoop');
+    },
+    voorraad() {
+      analyseTable('/abis/analyse/voorraadlijst');
     },
 
   }
